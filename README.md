@@ -200,7 +200,7 @@ miryu-software-center
 
 ## License
 
-GPL-3.0-or-later
+MIT License
 © 2027 KairikiFedora and © 2027 MiryuGaming
 
 ## Acknowledgments
