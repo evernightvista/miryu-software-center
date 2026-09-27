@@ -20,6 +20,7 @@ class QDialog;
 class QTextBrowser;
 class QProcess;
 class QFrame;
+class QEvent;
 
 namespace Miryu {
 class Package;
@@ -55,6 +56,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private Q_SLOTS:
     void onSearch();
@@ -94,6 +96,7 @@ private:
     void doDistroSyncWithLog();
     void runRpmInstallWithPolkit(const QStringList &files, bool offline);
     void createRestartBanner();
+    void updateRestartBannerHeight();
     void checkRestartNeededOnStartup();
     void checkRestartNeeded(const Miryu::TransactionResult &result);
     void runNeedsRestartingCheck();
@@ -151,6 +154,9 @@ private:
 
     // Restart-needed banner
     QFrame *m_restartBanner = nullptr;
+    // Description label of the restart banner; its height is tracked via
+    // eventFilter() so the banner hugs the wrapped text.
+    QLabel *m_restartBannerDescLabel = nullptr;
 
     // Update checker
     UpdateChecker *m_updateChecker;

@@ -4,7 +4,7 @@
 
 Name:           miryu-software-center
 Version:        45.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A modern RPM and Linglong software center powered by dnf5daemon
 
 License:        GPL-3.0-or-later
@@ -72,6 +72,9 @@ install -Dm 644 data/evernight-vista.conf %{buildroot}/%{_datadir}/dnf5/suggest-
 %{_datadir}/polkit-1/actions/org.miryugaming.PackageManager.polkit
 
 %changelog
+* Sun Sep 27 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-2
+- Fix Banner Location wrong bug
+
 * Sun Sep 27 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-1
 - Fix Dark Mode Appearance BUG
 - Fix DNF5 Update list not completely

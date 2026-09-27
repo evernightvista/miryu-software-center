@@ -1200,7 +1200,9 @@ void MainWindow::createRestartBanner()
     // Queue / Repositories / Flatpak) — switching pages only changes the
     // QStackedWidget below it, the banner stays put. It is hidden until
     // setRestartNeeded() makes it visible. The layout is a single row
-    // (icon + title + description) to keep the banner thin.
+    // (icon + title + description); the description wraps to additional
+    // lines when the window is too narrow, growing the banner vertically
+    // instead of clipping or eliding the text.
     m_restartBanner = new QFrame(this);
     m_restartBanner->setObjectName(QStringLiteral("restartBanner"));
     m_restartBanner->setVisible(false);
@@ -1208,12 +1210,20 @@ void MainWindow::createRestartBanner()
         "QFrame#restartBanner { background-color: #fdebc6; border-bottom: 1px solid #e6a817; }"
         "QLabel { background: transparent; }"
     ));
-    // A single row of icon+text only needs a small fixed height; this keeps
-    // the banner from eating vertical space from the content below.
+    // The banner height is locked and re-adjusted in eventFilter() from the
+    // description label's heightForWidth(). A QLabel with wordWrap(true)
+    // reports an inflated sizeHint (computed for a very narrow width), which
+    // would otherwise blow the banner up to a huge height; locking the banner
+    // height keeps it compact (single row when the window is wide) and lets
+    // it grow exactly to the wrapped text when the window narrows. The
+    // vertical margins (4px each side) are symmetric, so the icon/title/
+    // description stay exactly centered.
+    m_restartBanner->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     m_restartBanner->setFixedHeight(36);
+    m_restartBanner->installEventFilter(this);
 
     auto *layout = new QHBoxLayout(m_restartBanner);
-    layout->setContentsMargins(10, 0, 10, 0);
+    layout->setContentsMargins(10, 4, 10, 4);
     layout->setSpacing(8);
 
     auto *iconLabel = new QLabel;
@@ -1224,15 +1234,28 @@ void MainWindow::createRestartBanner()
     auto *titleLabel = new QLabel(QStringLiteral("<b>%1</b>").arg(i18n("Need to Restart")));
     titleLabel->setStyleSheet(QStringLiteral("color: #7a4f00;"));
     layout->addWidget(titleLabel);
-
     auto *descLabel = new QLabel(i18n("You have installed software packages that require a computer restart. "
                                       "Please restart the operating system as soon as possible to ensure "
                                       "the updates take full effect."));
     descLabel->setStyleSheet(QStringLiteral("color: #6b4d00;"));
-    // Single-line elision instead of wrapping keeps the banner one row tall.
-    descLabel->setWordWrap(false);
+    // Word-wrapping: the description starts a new line when the window is
+    // too narrow. Ignored horizontal policy lets the label fill the banner
+    // width without forcing the window to widen to fit the full text; the
+    // label height is locked to the wrapped text height (eventFilter()).
+    descLabel->setWordWrap(true);
     descLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+    descLabel->setMinimumWidth(0);
+    descLabel->setFixedHeight(36);
+    m_restartBannerDescLabel = descLabel;
+    descLabel->installEventFilter(this);
     layout->addWidget(descLabel, 1);
+
+    // Vertically center every element within the banner row so the icon,
+    // title and (possibly multi-line) description share the exact same
+    // center line.
+    layout->setAlignment(iconLabel, Qt::AlignVCenter);
+    layout->setAlignment(titleLabel, Qt::AlignVCenter);
+    layout->setAlignment(descLabel, Qt::AlignVCenter);
 }
 
 QString MainWindow::currentBootId() const
@@ -1594,6 +1617,38 @@ void MainWindow::updateStatusBar()
         m_queueCountLabel->clear();
         m_queueCountLabel->setStyleSheet(QString());
     }
+}
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    // Keep the restart banner hugging its content: on any resize/show of the
+    // banner or its description label, recompute the wrapped text height via
+    // heightForWidth at the CURRENT width, lock the description label to it
+    // and the banner to it plus the vertical margins. Wide window -> compact
+    // single row; narrow window -> the text wraps to a new line and the
+    // banner grows exactly to fit it, always centered.
+    if ((watched == m_restartBanner || watched == m_restartBannerDescLabel)
+        && (event->type() == QEvent::Resize || event->type() == QEvent::Show)) {
+        updateRestartBannerHeight();
+    }
+    return KXmlGuiWindow::eventFilter(watched, event);
+}
+
+void MainWindow::updateRestartBannerHeight()
+{
+    if (!m_restartBanner || !m_restartBannerDescLabel)
+        return;
+    const int labelWidth = m_restartBannerDescLabel->width();
+    if (labelWidth <= 0)
+        return;
+    const int textHeight = m_restartBannerDescLabel->heightForWidth(labelWidth);
+    if (textHeight <= 0)
+        return;
+    // Lock the description label to the wrapped text height and the banner
+    // to text height + the symmetric 4px vertical margins. With every
+    // element AlignVCenter'ed, icon/title/description stay exactly centered.
+    m_restartBannerDescLabel->setFixedHeight(textHeight);
+    m_restartBanner->setFixedHeight(qMax(36, textHeight + 8));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
