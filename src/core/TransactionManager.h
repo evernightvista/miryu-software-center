@@ -37,6 +37,10 @@ private:
     TransactionResult buildResult(const QVariantList &transactionItems, uint resultCode);
     bool buildTransactions(const QList<Package> &packages, const TransactionOptions &opts);
     void fetchInstalledEvr();
+
+    // Returns "Failed to prepare transaction", or a friendlier message when a
+    // mid-build reconnect invalidated the goal state on the old session.
+    QString transactionBuildError(int reconnectCountBefore) const;
 };
 
 }

@@ -32,6 +32,11 @@ public:
         else if (opt.state & QStyle::State_MouseOver)
             painter->fillRect(opt.rect, opt.palette.color(QPalette::AlternateBase));
 
+        // Secondary text: same hue as the primary text, dimmed. QPalette::Mid is
+        // a 3D/bevel shade that resolves to near-black in dark themes.
+        QColor secondaryText = opt.palette.color(QPalette::WindowText);
+        secondaryText.setAlpha(160);
+
         bool enabled = index.data(RepoModel::EnabledRole).toBool();
         QString id = index.data(RepoModel::IdRole).toString();
         QString name = index.data(RepoModel::NameRole).toString();
@@ -55,11 +60,12 @@ public:
         QFont idFont = opt.font;
         idFont.setPointSize(idFont.pointSize() - 1);
         painter->setFont(idFont);
-        painter->setPen(opt.palette.color(QPalette::Mid));
+        painter->setPen(secondaryText);
         painter->drawText(idRect, Qt::AlignLeft | Qt::AlignTop, id);
 
         // Priority
         QRect prioRect = opt.rect.adjusted(opt.rect.width() - 180, 0, -100, 0);
+        painter->setPen(secondaryText);
         painter->drawText(prioRect, Qt::AlignRight | Qt::AlignVCenter,
                           priority == 99 ? i18n("Default") : i18n("Priority: %1", priority));
 

@@ -3,13 +3,13 @@
 
 
 Name:           miryu-software-center
-Version:        1.0.1
+Version:        45.0.0
 Release:        1%{?dist}
 Summary:        A modern RPM and Linglong software center powered by dnf5daemon
 
 License:        GPL-3.0-or-later
 URL:            https://github.com/evernightvista/miryu-software-center
-Source0:        miryu-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cmake >= 3.20
 BuildRequires:  gcc-c++
@@ -72,6 +72,10 @@ install -Dm 644 data/evernight-vista.conf %{buildroot}/%{_datadir}/dnf5/suggest-
 %{_datadir}/polkit-1/actions/org.miryugaming.PackageManager.polkit
 
 %changelog
+* Sun Sep 27 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-1
+- Fix Dark Mode Appearance BUG
+- Fix DNF5 Update list not completely
+
 * Sun Sep 27 2026 KairikiFedora <13278297951@sina.cn> - 1.0.1-1
 - Rename translation domain to miryu-software-center so the compiled
   catalog is miryu-software-center.mo (rename .pot/.po files, update

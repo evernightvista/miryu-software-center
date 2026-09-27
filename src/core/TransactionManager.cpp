@@ -87,6 +87,13 @@ QList<Package> TransactionManager::filterUpdates(const QList<Package> &updates,
 
 bool TransactionManager::buildTransactions(const QList<Package> &packages, const TransactionOptions &opts)
 {
+    // Drop the daemon's in-memory repo sack before building the goal. The
+    // session may have been opened (and cached its sack) before the on-disk
+    // metadata was refreshed (`dnf5 makecache --refresh` / `--refresh`);
+    // without this, upgrade("steam") resolves against the old sack, decides
+    // the package is already up-to-date, and resolve() returns an empty
+    // transaction — which shows up as the "0 B / empty summary" dialog.
+    m_client->resetSession();
     m_client->resetGoal();
 
     QStringList toInstall, toUpdate, toRemove, toDowngrade, toReinstall, toDistroSync;
@@ -211,8 +218,9 @@ TransactionResult TransactionManager::buildTransaction(const QList<Package> &pac
 
     m_lastTransaction = packages;
 
+    const int genBefore = m_client->reconnectCount();
     if (!buildTransactions(packages, opts)) {
-        result.error = QStringLiteral("Failed to prepare transaction");
+        result.error = transactionBuildError(genBefore);
         return result;
     }
 
@@ -243,8 +251,9 @@ TransactionResult TransactionManager::runTransaction(const TransactionOptions &o
 {
     TransactionResult result;
 
+    const int genBefore = m_client->reconnectCount();
     if (!buildTransactions(m_lastTransaction, opts)) {
-        result.error = QStringLiteral("Failed to prepare transaction");
+        result.error = transactionBuildError(genBefore);
         return result;
     }
 
@@ -284,8 +293,9 @@ TransactionResult TransactionManager::depsolve(const QList<Package> &packages)
 {
     TransactionResult result;
 
+    const int genBefore = m_client->reconnectCount();
     if (!buildTransactions(packages, {})) {
-        result.error = QStringLiteral("Failed to prepare transaction for dependency solving");
+        result.error = transactionBuildError(genBefore);
         return result;
     }
 
@@ -299,6 +309,19 @@ TransactionResult TransactionManager::depsolve(const QList<Package> &packages)
     result.completed = resolveResult.success;
     m_client->resetGoal();
     return result;
+}
+
+QString TransactionManager::transactionBuildError(int reconnectCountBefore) const
+{
+    // If the client re-connected while the goal was being set up, the specs
+    // added to the OLD session were lost — retrying resolve on the new
+    // (goal-less) session would yield an incomplete transaction. Ask the user
+    // to retry the whole operation instead.
+    if (m_client->reconnectCount() != reconnectCountBefore) {
+        return QStringLiteral("The connection to dnf5daemon-server was interrupted "
+                              "while preparing the transaction. Please try again.");
+    }
+    return QStringLiteral("Failed to prepare transaction");
 }
 
 }

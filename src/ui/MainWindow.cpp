@@ -975,6 +975,10 @@ void MainWindow::doRefreshMetadataWithLog()
             [this](int exitCode, QProcess::ExitStatus) {
         if (exitCode == 0) {
             m_logView->append(QStringLiteral("\n[SUCCESS] ") + i18n("Metadata refreshed."));
+            // The user explicitly refreshed the repository metadata; make sure
+            // the backend does not re-run makecache on the next fetchUpdates()
+            // (it only auto-refreshes once per app run at startup).
+            m_backend->markMetadataRefreshed();
             onRefresh();
         } else {
             m_logView->append(QStringLiteral("\n[ERROR] ") + i18n("Failed to refresh metadata (exit code %1).").arg(exitCode));

@@ -33,6 +33,11 @@ public:
             painter->fillRect(opt.rect, opt.palette.color(QPalette::AlternateBase));
         }
 
+        // Secondary text: same hue as the primary text, dimmed. QPalette::Mid is
+        // a 3D/bevel shade that resolves to near-black in dark themes.
+        QColor secondaryText = opt.palette.color(QPalette::WindowText);
+        secondaryText.setAlpha(160);
+
         bool queued = index.data(PackageModel::QueuedRole).toBool();
         bool installed = index.data(PackageModel::IsInstalledRole).toBool();
         bool isDep = index.data(PackageModel::IsDepRole).toBool();
@@ -63,7 +68,7 @@ public:
         QFont verFont = opt.font;
         verFont.setPointSize(verFont.pointSize() - 1);
         painter->setFont(verFont);
-        painter->setPen(opt.palette.color(QPalette::Mid));
+        painter->setPen(secondaryText);
         QString verText = index.data(PackageModel::VersionRole).toString() +
                           QStringLiteral("-") + index.data(PackageModel::ReleaseRole).toString() +
                           QStringLiteral("  (") + index.data(PackageModel::ArchRole).toString() + QStringLiteral(")");
@@ -90,7 +95,7 @@ public:
 
         if (isDep) {
             QRect depRect(opt.rect.right() - 80, opt.rect.y(), 80, opt.rect.height());
-            painter->setPen(opt.palette.color(QPalette::Mid));
+            painter->setPen(secondaryText);
             QFont dFont = opt.font;
             dFont.setPointSize(dFont.pointSize() - 1);
             dFont.setItalic(true);

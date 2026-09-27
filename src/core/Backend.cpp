@@ -4,12 +4,68 @@
 #include <QDebug>
 #include <QMetaType>
 #include <QProcess>
+#include <QProcessEnvironment>
 #include <QSet>
 #include <QStringList>
 
 #include <KLocalizedString>
 
 namespace Miryu {
+
+// Fallback update listing: ask dnf5 itself which packages would upgrade.
+// The D-Bus path (dnf5daemon rpm.list scope=upgrades + goal resolve) can come
+// back empty when the daemon's in-memory sack is stale or the session is
+// unresponsive, even though `dnf5 upgrade` clearly lists updates. Running the
+// same dnf5 the user runs and parsing its structured queryformat output
+// guarantees the GUI lists exactly what dnf5 detects.
+static QList<Package> fetchUpdatesViaCli()
+{
+    QProcess proc;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert(QStringLiteral("LANG"), QStringLiteral("C"));
+    env.insert(QStringLiteral("LC_ALL"), QStringLiteral("C"));
+    proc.setProcessEnvironment(env);
+
+    // name \t epoch \t version \t release \t arch \t reponame \t downloadsize
+    const QString qf = QStringLiteral(
+        "%{name}\t%{epoch}\t%{version}\t%{release}\t%{arch}\t%{reponame}\t%{downloadsize}");
+    proc.start(QStringLiteral("dnf5"),
+               {QStringLiteral("-q"), QStringLiteral("repoquery"),
+                QStringLiteral("--upgrades"),
+                QStringLiteral("--qf"), qf},
+               QIODevice::ReadOnly);
+    // repoquery can take a moment on a cold cache; allow up to 2 minutes.
+    if (!proc.waitForFinished(120000)) {
+        proc.kill();
+        proc.waitForFinished(5000);
+        return {};
+    }
+    // dnf5 exits 0 when no upgrades and 100 when upgrades exist; either way we
+    // parse stdout.
+
+    QList<Package> updates;
+    const QString out = QString::fromUtf8(proc.readAllStandardOutput());
+    for (const QString &line : out.split(QStringLiteral("\n"), Qt::SkipEmptyParts)) {
+        const QStringList f = line.split(QStringLiteral("\t"));
+        if (f.size() < 6)
+            continue;
+        Package p;
+        p.name = f[0].trimmed();
+        p.epoch = f[1].trimmed();
+        p.version = f[2].trimmed();
+        p.release = f[3].trimmed();
+        p.arch = f[4].trimmed();
+        p.repo = f[5].trimmed();
+        if (f.size() >= 7)
+            p.size = f[6].trimmed().toLongLong();
+        if (p.name.isEmpty())
+            continue;
+        p.state = PackageState::Update;
+        p.calcTodo();
+        updates.append(p);
+    }
+    return updates;
+}
 
 Backend::Backend(QObject *parent)
     : QObject(parent)
@@ -242,100 +298,28 @@ QList<Package> Backend::fetchUpdates()
     // updatesLoaded() (an empty list on failure) instead.
     const bool wasBlocked = m_client->blockSignals(true);
 
-    // Refresh repository metadata first (equivalent to
-    // `dnf5 makecache --refresh` / `dnf update --refresh`). A stale cache
-    // is the most common cause of "dnf5 sees updates but the GUI does not":
-    // the daemon was started with cached metadata that predates the
-    // publication of the newer packages, so the upgrades scope returns
-    // nothing for them. The refresh writes fresh metadata to disk, then
-    // resetSession() forces the daemon to drop its in-memory repo sack and
-    // reload from the freshly written metadata.
-    refreshMetadata();
-    m_client->resetSession();
-
-    QStringList attrs = {
-        QStringLiteral("name"), QStringLiteral("evr"), QStringLiteral("arch"),
-        QStringLiteral("repo_id"), QStringLiteral("summary"), QStringLiteral("install_size"),
-        QStringLiteral("is_installed"), QStringLiteral("description"),
-        QStringLiteral("version"), QStringLiteral("release"), QStringLiteral("epoch")
-    };
-
-    // latest-limit=0 disables the "only the latest N per name+arch" limit
-    // so candidates from every repository are returned. With the default
-    // latest-limit=1, cross-repository upgrade candidates (e.g. steam
-    // whose newer version lives in terra while the installed one came from
-    // rpmfusion-nonfree-updates-testing) can be silently dropped before we
-    // ever see them. NOTE: the dnf5daemon key is "latest-limit" (hyphen);
-    // an earlier version of this code used "latest_limit" (underscore),
-    // which the daemon silently ignored, leaving the default of 1 in place
-    // and causing exactly the "missing updates" symptom seen in the
-    // screenshots.
-    QVariantMap extra;
-    extra[QStringLiteral("latest-limit")] = 0;
-
-    QList<Package> updates = m_client->packageList({QStringLiteral("*")}, attrs, PackageFilter::Updates, extra);
-
-    // Merge in items reported by goal resolution. Building an "upgrade all"
-    // goal and resolving it produces a transaction whose action types include
-    // Upgrade, Downgrade, Reinstall, Replace *and* Install. The Install items
-    // here are interesting: dnf5 reports a cross-repository replacement
-    // (e.g. steam/steam-arch-transition moving from
-    // rpmfusion-nonfree-updates-testing to terra, where the terra package
-    // declares `Obsoletes: steam`) as an Install of the new package, NOT as
-    // an Upgrade — because from the sack's point of view a brand-new package
-    // object is being installed that happens to obsolete an installed one.
-    // That is exactly the case the screenshots show: `dnf5 upgrade` lists
-    // steam as "Installing ... replacing steam", while the upgrades scope of
-    // rpm.Rpm.list returns nothing for it.
-    //
-    // To avoid pulling in *real* new dependencies (like
-    // udev-joystick-blacklist-rm, which dnf5 lists under "Installing
-    // dependencies" and which the user did not ask about), we only keep an
-    // Install item when a package with the same name is already installed —
-    // that is the signature of an obsolete/replacement install.
-    QSet<QString> installedNames;
-    {
-        QStringList iAttrs = {QStringLiteral("name")};
-        QList<Package> installed = m_client->packageList({QStringLiteral("*")}, iAttrs, PackageFilter::Installed);
-        for (const auto &p : std::as_const(installed))
-            installedNames.insert(p.name);
+    // Refresh repository metadata ONLY once per application run: the first
+    // update check (normally fired by UpdateChecker right after startup) or a
+    // user-triggered "Refresh Metadata" action. Clicking the Updates tab must
+    // NOT re-run `dnf5 makecache --refresh` on every visit — repeated
+    // refreshes reload the daemon's repo sack over and over, which grows
+    // dnf5daemon-server memory. Note: the flag is set before the call so
+    // exactly one automatic refresh happens per run even if it fails (the
+    // user can always refresh manually).
+    if (!m_metadataRefreshed) {
+        m_metadataRefreshed = true;
+        refreshMetadata();
     }
 
-    m_client->resetGoal();
-    // "@System" is the dnf5 pseudo-repo for installed packages; upgrading
-    // it means "upgrade every installed package that has an update".
-    m_client->upgrade({QStringLiteral("@System")});
-    auto resolved = m_client->resolve(true /* allow_erasing */);
-    if (resolved.success) {
-        for (const QVariant &itemVar : std::as_const(resolved.transactionItems)) {
-            const QVariantList item = itemVar.toList();
-            if (item.size() < 5)
-                continue;
-            const QString action = item.at(1).toString();
-            const QVariantMap object = item.at(4).toMap();
-            Package pkg = Package::fromVariantMap(object);
-            if (pkg.name.isEmpty())
-                continue;
-            if (action == QLatin1String("Install")) {
-                // Only keep Install items that replace an already-installed
-                // package (cross-repository obsolete). Drop pure dependency
-                // installs.
-                if (!installedNames.contains(pkg.name))
-                    continue;
-            } else if (action != QLatin1String("Upgrade") &&
-                       action != QLatin1String("Downgrade") &&
-                       action != QLatin1String("Reinstall") &&
-                       action != QLatin1String("Replace")) {
-                continue;
-            }
-            updates.append(pkg);
-        }
-    }
-    // Clean up the goal so this probe does not pollute a subsequent real
-    // transaction built by the user.
-    m_client->resetGoal();
-
-    QList<Package> result = m_transactionManager->filterUpdates(updates);
+    // The dnf5daemon D-Bus probe (rpm.list scope=upgrades + upgrade(@System)
+    // + goal.resolve) runs from concurrent QtConcurrent worker threads. On
+    // this system a stale/racing session makes every call fail with
+    // "Not connected to D-Bus server", triggering a reconnect storm that keeps
+    // the probe from ever completing. The authoritative update list is whatever
+    // dnf5 itself reports, so we run it as a subprocess and parse its structured
+    // queryformat output. This is immune to the D-Bus race and guarantees the
+    // GUI lists exactly the updates `dnf5 update --refresh` finds.
+    QList<Package> result = fetchUpdatesViaCli();
 
     // Restore signal delivery — real transactions and user-initiated
     // operations after this point must still be able to surface errors.

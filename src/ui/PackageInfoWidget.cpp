@@ -37,7 +37,13 @@ PackageInfoWidget::PackageInfoWidget(QWidget *parent)
     QFont sumFont = m_summaryLabel->font();
     sumFont.setPointSize(sumFont.pointSize() + 1);
     m_summaryLabel->setFont(sumFont);
-    m_summaryLabel->setStyleSheet(QStringLiteral("color: palette(mid);"));
+    // palette(mid) is a 3D/bevel shade that resolves to near-black in dark themes.
+    // Use the theme's window-text colour dimmed, so the summary stays readable.
+    QColor sumColor = palette().color(QPalette::WindowText);
+    sumColor.setAlpha(160);
+    m_summaryLabel->setStyleSheet(
+        QStringLiteral("color: rgba(%1, %2, %3, 0.627);")
+            .arg(sumColor.red()).arg(sumColor.green()).arg(sumColor.blue()));
 
     titleLayout->addWidget(m_nameLabel);
     titleLayout->addWidget(m_summaryLabel);

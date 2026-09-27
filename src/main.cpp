@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include <QStringList>
 #include <QIcon>
+#include <QUrl>
 
 #include <KAboutData>
 #include <KLocalizedString>
@@ -21,7 +22,7 @@ int main(int argc, char *argv[])
     app.setApplicationName(QStringLiteral("miryu"));
     app.setOrganizationName(QStringLiteral("miryu"));
     app.setApplicationDisplayName(QStringLiteral("Miryu Software Center"));
-    app.setApplicationVersion(QStringLiteral("1.0.1"));
+    app.setApplicationVersion(QStringLiteral("45.0.0"));
     app.setDesktopFileName(QStringLiteral("org.miryugaming.PackageManager"));
 
     // Set the translation domain so i18n() calls find the compiled .mo files.
@@ -32,10 +33,10 @@ int main(int argc, char *argv[])
     KAboutData aboutData(
         QStringLiteral("miryu"),
         i18n("Miryu Software Center"),
-        QStringLiteral("1.0.1"),
+        QStringLiteral("45.0.0"),
         i18n("A modern RPM package manager powered by dnf5daemon, built with Qt6 and KDE Frameworks 6."),
         KAboutLicense::GPL_V3,
-        QStringLiteral("© 2027 KairikiFedora and © 2027 MiryuGaming"),
+        QStringLiteral("© 2027 KairikiFedora © 2027 MiryuGaming"),
         QString(),
         QStringLiteral("https://github.com/evernightvista/miryu-package-manager"),
         QStringLiteral("https://github.com/evernightvista/miryu-package-manager/issues"));
@@ -73,15 +74,22 @@ int main(int argc, char *argv[])
     // Single instance
     KDBusService service(KDBusService::Unique);
 
-    // Collect RPM files from positional arguments
-    QStringList rpmFiles;
-    const QStringList args = parser.positionalArguments();
-    for (const QString &arg : args) {
-        QFileInfo fi(arg);
-        if (fi.exists() && fi.suffix().compare(QStringLiteral("rpm"), Qt::CaseInsensitive) == 0) {
-            rpmFiles.append(fi.absoluteFilePath());
+    // Extract existing, locally-accessible .rpm file paths from a list of
+    // command-line arguments / file names (shared by the first-launch path
+    // and the single-instance activation path below).
+    auto collectRpmFiles = [](const QStringList &arguments) {
+        QStringList rpmFiles;
+        for (const QString &arg : arguments) {
+            QFileInfo fi(arg);
+            if (fi.exists() && fi.suffix().compare(QStringLiteral("rpm"), Qt::CaseInsensitive) == 0) {
+                rpmFiles.append(fi.absoluteFilePath());
+            }
         }
-    }
+        return rpmFiles;
+    };
+
+    // Collect RPM files from positional arguments
+    QStringList rpmFiles = collectRpmFiles(parser.positionalArguments());
 
     // Initialize backend
     Miryu::Backend backend;
@@ -113,6 +121,43 @@ int main(int argc, char *argv[])
             window.installLocalRpmFiles(rpmFiles);
         });
     }
+
+    // Single-instance activation: when the main window is ALREADY open and the
+    // user double-clicks an RPM file (or picks "Open with" in the file
+    // manager), KDBusService::Unique delivers the new command line to this
+    // running instance instead of launching a second one. Without this handler
+    // the request was silently dropped — raise the window and react with the
+    // dnf5 transaction summary for the received RPM file(s).
+    auto handleActivation = [&window, collectRpmFiles](const QStringList &arguments) {
+        // Bring the existing window to the foreground so the reaction is
+        // visible even if it was minimized or hidden behind other windows.
+        window.show();
+        window.raise();
+        window.activateWindow();
+
+        const QStringList files = collectRpmFiles(arguments);
+        if (!files.isEmpty())
+            window.installLocalRpmFiles(files);
+    };
+    QObject::connect(&service, &KDBusService::activateRequested, &app, handleActivation);
+
+    // KIO / file managers may deliver "open" requests as a URL list instead
+    // of command-line arguments. KF6's KDBusService::openRequested takes
+    // const QList<QUrl>& (there is no separate openUrlRequested signal).
+    QObject::connect(&service, &KDBusService::openRequested, &app,
+                     [&window](const QList<QUrl> &urls) {
+                         window.show();
+                         window.raise();
+                         window.activateWindow();
+
+                         QStringList files;
+                         for (const QUrl &url : urls) {
+                             if (url.isLocalFile())
+                                 files.append(url.toLocalFile());
+                         }
+                         if (!files.isEmpty())
+                             window.installLocalRpmFiles(files);
+                     });
 
     return app.exec();
 }

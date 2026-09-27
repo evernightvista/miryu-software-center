@@ -37,6 +37,28 @@ static QVariant makeStringMap(const QMap<QString, QString> &map)
     return QVariant::fromValue(arg);
 }
 
+// How many times a fast-fail "Not connected"-style D-Bus error is retried
+// after a silent reconnect. Each retry sleeps 200ms * attempt first, giving a
+// restarting dbus-daemon / dnf5daemon-server time to come back before the
+// call is attempted again.
+static constexpr int kMaxDisconnectRetries = 3;
+// A real timeout (InvalidMessage — the daemon did not reply within the 60s
+// call timeout) is retried once only: repeatedly retrying a hung daemon
+// would block the caller for minutes.
+static constexpr int kMaxTimeoutRetries = 1;
+
+// Build a user-actionable message for a D-Bus connection failure instead of
+// surfacing the raw, terse "Not connected to D-Bus server" text to the user.
+static QString friendlyDisconnectError(const QString &detail)
+{
+    return i18n("The connection to the system D-Bus / dnf5daemon-server was lost"
+                " (\"%1\"). The service may have restarted.\n\n"
+                "Please try the operation again. If the problem persists, restart"
+                " the service with:\n"
+                "  sudo systemctl restart dnf5daemon-server")
+        .arg(detail);
+}
+
 // === Core D-Bus Communication ===
 // All calls use QDBusConnection::call() with QDBusMessage directly.
 // This completely bypasses QDBusInterface and its introspection mechanism,
@@ -46,6 +68,14 @@ static QVariant makeStringMap(const QMap<QString, QString> &map)
 QDBusMessage Dnf5DaemonClient::callMethod(const QString &path, const QString &interface,
                                           const QString &method, const QList<QVariant> &args)
 {
+    // Serialize all D-Bus traffic: the same session is shared by concurrent
+    // QtConcurrent workers, and a reconnect() must never run while another
+    // thread is mid-call on the (soon to be replaced) connection.
+    QMutexLocker locker(&m_callMutex);
+
+    // Self-heal a lost bus connection before sending.
+    ensureConnected();
+
     QDBusMessage msg = QDBusMessage::createMethodCall(
         QString::fromLatin1(BUS_NAME),
         path,
@@ -58,16 +88,118 @@ QDBusMessage Dnf5DaemonClient::callMethod(const QString &path, const QString &in
     return m_bus.call(msg, QDBus::Block, 60000);
 }
 
+bool Dnf5DaemonClient::ensureConnected()
+{
+    if (m_bus.isConnected()) {
+        m_connected = true;
+        return true;
+    }
+    return reconnect();
+}
+
+bool Dnf5DaemonClient::reconnect()
+{
+    // Must not run concurrently with another thread's D-Bus call or another
+    // reconnect — replacing m_bus / clearing m_sessionPath mid-use would
+    // corrupt the client state and produce spurious "Not connected" errors.
+    QMutexLocker locker(&m_callMutex);
+
+    qWarning() << "Reconnecting to the system D-Bus...";
+
+    // Drop signal wiring on the (dead) old connection before replacing it.
+    disconnectSignals();
+    m_sessionPath.clear();
+
+    // QDBusConnection::systemBus() returns the process-wide cached internal
+    // connection, which Qt does NOT reconnect after it drops. Opening a fresh
+    // connection via connectToBus() creates a brand-new socket to the system
+    // bus, so a restarted dbus-daemon / dnf5daemon-server is picked up.
+    ++m_reconnectCount;
+    m_bus = QDBusConnection::connectToBus(
+        QDBusConnection::SystemBus,
+        QStringLiteral("miryu-dnf5-%1").arg(m_reconnectCount));
+    m_connected = m_bus.isConnected();
+
+    if (!m_connected) {
+        qWarning() << "Fresh system bus connection failed:" << m_bus.lastError().message();
+        return false;
+    }
+
+    // Re-activate dnf5daemon-server on the freshly connected bus.
+    QDBusConnectionInterface *iface = m_bus.interface();
+    if (iface && !iface->isServiceRegistered(QString::fromLatin1(BUS_NAME))) {
+        QDBusReply<void> reply = iface->startService(QString::fromLatin1(BUS_NAME));
+        if (!reply.isValid())
+            qWarning() << "Re-activation of dnf5daemon-server failed:" << reply.error().message();
+    }
+
+    // The previous session object no longer exists after a daemon restart;
+    // open a new one (this also re-wires the per-session signal connections).
+    // Recovery must stay silent: a session re-open failure here is expected
+    // while the daemon is still starting. Blocking signals keeps it from
+    // popping a scary "Not connected to D-Bus server" dialog in the middle of
+    // the self-heal; the callers (callSync() / openSession()) report the
+    // final error only after their own retries are exhausted.
+    const bool wasBlocked = blockSignals(true);
+    openSession();
+    blockSignals(wasBlocked);
+    return m_connected;
+}
+
+bool Dnf5DaemonClient::looksLikeDisconnect(const QDBusMessage &m)
+{
+    // InvalidMessage = no reply within the call timeout; the daemon may have
+    // died mid-call or be restarting.
+    if (m.type() == QDBusMessage::InvalidMessage)
+        return true;
+    if (m.type() != QDBusMessage::ErrorMessage)
+        return false;
+    const QString em = m.errorMessage();
+    return em.contains(QLatin1String("Not connected to D-Bus"), Qt::CaseInsensitive) ||
+           em.contains(QLatin1String("NoReply"), Qt::CaseInsensitive) ||
+           em.contains(QLatin1String("ServiceUnknown"), Qt::CaseInsensitive) ||
+           em.contains(QLatin1String("disconnected"), Qt::CaseInsensitive);
+}
+
 bool Dnf5DaemonClient::callSync(const QString &path, const QString &interface,
                                  const QString &method, const QList<QVariant> &args,
                                  QVariant &result, QString &error)
 {
     QDBusMessage msg = callMethod(path, interface, method, args);
 
+    // A transient "not connected" / timeout can happen when the bus or the
+    // daemon just restarted (e.g. after a transaction upgraded dbus,
+    // dnf5daemon-server or systemd). Re-acquire the connection and retry with
+    // a short backoff before giving up, so a scary, user-facing "Not connected
+    // to D-Bus server" dialog is turned into a silent recovery. Recovery never
+    // emits errorOccurred() itself — only the final failure after all retries
+    // is reported, and even then with an actionable message.
+    // Note: we call reconnect() directly (not ensureConnected()) because the
+    // cached handle can report isConnected()==true while every actual send
+    // fails.
+    const int maxRetries = (msg.type() == QDBusMessage::InvalidMessage)
+        ? kMaxTimeoutRetries : kMaxDisconnectRetries;
+    for (int attempt = 1; attempt <= maxRetries && looksLikeDisconnect(msg); ++attempt) {
+        qWarning() << "DBus call" << interface << method << "failed (attempt" << attempt
+                   << "of" << maxRetries << "):" << msg.errorMessage();
+        // Give a restarting bus / daemon a moment before retrying — an
+        // immediate retry usually hits the same recovery window.
+        QThread::msleep(200 * attempt);
+        if (!reconnect()) {
+            qWarning() << "Reconnect failed; giving up on" << interface << method;
+            break;
+        }
+        msg = callMethod(path, interface, method, args);
+    }
+
     // Handle all error message types
     if (msg.type() == QDBusMessage::ErrorMessage) {
         error = msg.errorMessage();
         qWarning() << "DBus call failed:" << interface << method << ":" << error;
+        // Replace a raw, unhelpful "Not connected to D-Bus server" with an
+        // actionable message when the failure is (still) a disconnect.
+        if (looksLikeDisconnect(msg))
+            error = friendlyDisconnectError(error);
         Q_EMIT errorOccurred(error);
         return false;
     }
@@ -97,6 +229,10 @@ Dnf5DaemonClient::Dnf5DaemonClient(QObject *parent)
 
     // Check if the system bus itself is reachable.
     m_connected = m_bus.isConnected();
+
+    // NOTE: QDBusConnection has no disconnected() signal to hook; a dropped
+    // connection is detected lazily when a call fails with "Not connected",
+    // at which point callSync() forces reconnect().
 
     if (!m_connected) {
         qWarning() << "Cannot connect to system D-Bus";
@@ -142,12 +278,24 @@ Dnf5DaemonClient::~Dnf5DaemonClient()
 
 bool Dnf5DaemonClient::openSession(const QVariantMap &options)
 {
-    if (!m_connected) {
+    // The cached m_connected flag can go stale (e.g. the bus dropped after
+    // construction or after a system upgrade). Re-acquire the bus first so a
+    // transient outage self-heals instead of failing the session open
+    // immediately.
+    if (!ensureConnected()) {
         qWarning() << "Dnf5DaemonClient: not connected to bus";
-        m_lastError = QStringLiteral("Not connected to system D-Bus");
+        m_lastError = i18n("Cannot connect to the D-Bus system bus.\n\n"
+                           "Please make sure the D-Bus system bus is running "
+                           "(dbus-broker / dbus-daemon).");
         Q_EMIT errorOccurred(m_lastError);
         return false;
     }
+
+    // If a session was already opened while re-acquiring the bus
+    // (ensureConnected() → reconnect() → openSession()), reuse it instead of
+    // opening a second one (which would leak the first).
+    if (!m_sessionPath.isEmpty())
+        return true;
 
     m_lastError.clear();
 
@@ -174,15 +322,16 @@ bool Dnf5DaemonClient::openSession(const QVariantMap &options)
     // Retry loop: the service might still be starting up.
     // Try up to 3 times with 500ms delay between attempts.
     const int maxRetries = 3;
+    QDBusMessage msg;
 
     for (int attempt = 1; attempt <= maxRetries; ++attempt) {
         qInfo() << "open_session attempt" << attempt << "of" << maxRetries;
 
         // Call open_session via raw QDBusMessage — no QDBusInterface, no introspection.
-        QDBusMessage msg = callMethod(QString::fromLatin1(OBJECT_PATH),
-                                      QString::fromLatin1(IFACE_SESSION_MANAGER),
-                                      QStringLiteral("open_session"),
-                                      {QVariant(opts)});
+        msg = callMethod(QString::fromLatin1(OBJECT_PATH),
+                         QString::fromLatin1(IFACE_SESSION_MANAGER),
+                         QStringLiteral("open_session"),
+                         {QVariant(opts)});
 
         if (msg.type() == QDBusMessage::ReplyMessage && !msg.arguments().isEmpty()) {
             // Success — extract session path from the object path return value
@@ -210,18 +359,18 @@ bool Dnf5DaemonClient::openSession(const QVariantMap &options)
         qWarning() << "open_session attempt" << attempt << "failed:" << m_lastError
                    << "(type:" << msg.type() << ")";
 
-        // If this is a "service not found" type error, retry after a delay.
+        // If this is a transient service/bus error, retry after a delay.
         // For other errors (e.g., auth failures), no point retrying.
-        bool isServiceUnknown = m_lastError.contains(QStringLiteral("ServiceUnknown"), Qt::CaseInsensitive) ||
-                                m_lastError.contains(QStringLiteral("not provided"), Qt::CaseInsensitive) ||
-                                m_lastError.contains(QStringLiteral("NoReply"), Qt::CaseInsensitive);
+        bool isRetryable = looksLikeDisconnect(msg) ||
+                           m_lastError.contains(QStringLiteral("not provided"), Qt::CaseInsensitive);
 
-        if (attempt < maxRetries && isServiceUnknown) {
+        if (attempt < maxRetries && isRetryable) {
             QThread::msleep(500);
             continue;
         }
 
-        // Non-retryable error or out of retries — report the actual D-Bus error
+        // Non-retryable error or out of retries — report the actual D-Bus
+        // error so the user sees what really went wrong.
         break;
     }
 
@@ -232,6 +381,10 @@ bool Dnf5DaemonClient::openSession(const QVariantMap &options)
                                     "via the system D-Bus. Try:\n"
                                     "  sudo systemctl start dnf5daemon-server\n"
                                     "  sudo systemctl enable dnf5daemon-server");
+    } else if (looksLikeDisconnect(msg)) {
+        // The raw error is a terse disconnect message; replace it with an
+        // actionable one.
+        m_lastError = friendlyDisconnectError(m_lastError);
     }
     Q_EMIT errorOccurred(m_lastError);
     return false;
@@ -832,9 +985,19 @@ Dnf5DaemonClient::ResolveResult Dnf5DaemonClient::resolve(bool allowErasing)
 
     QDBusMessage msg = callMethod(m_sessionPath, QString::fromLatin1(IFACE_GOAL),
                                   QStringLiteral("resolve"), {QVariant(options)});
+
+    // NOTE: resolve() deliberately does NOT retry after a reconnect. The goal
+    // (install/upgrade/remove specs) is bound to the session, and reconnect()
+    // opens a brand-new session whose goal is empty — retrying resolve there
+    // would report a misleading empty transaction ("0 B / empty summary").
+    // On a disconnect we surface an actionable error and let the caller
+    // re-run the whole transaction: the goal-setting step (callSync) then
+    // self-heals and rebuilds the goal on the fresh session.
     if (msg.type() == QDBusMessage::ErrorMessage) {
         result.error = msg.errorMessage();
         qWarning() << "resolve failed:" << result.error;
+        if (looksLikeDisconnect(msg))
+            result.error = friendlyDisconnectError(result.error);
         Q_EMIT errorOccurred(result.error);
         return result;
     }
@@ -898,8 +1061,15 @@ bool Dnf5DaemonClient::doTransaction(const QVariantMap &options)
     QDBusMessage msg = callMethod(m_sessionPath, QString::fromLatin1(IFACE_GOAL),
                                   QStringLiteral("do_transaction"), {QVariant(opts)});
     if (msg.type() == QDBusMessage::ErrorMessage) {
-        qWarning() << "do_transaction failed:" << msg.errorMessage();
-        Q_EMIT errorOccurred(msg.errorMessage());
+        QString error = msg.errorMessage();
+        qWarning() << "do_transaction failed:" << error;
+        // do_transaction executes the goal that was resolved on THIS session;
+        // a reconnect would open an empty session, so there is nothing to
+        // auto-retry. Report the failure with an actionable message instead
+        // of the raw "Not connected to D-Bus server" text.
+        if (looksLikeDisconnect(msg))
+            error = friendlyDisconnectError(error);
+        Q_EMIT errorOccurred(error);
         return false;
     }
     return true;

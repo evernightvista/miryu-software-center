@@ -31,7 +31,12 @@ ProgressDialog::ProgressDialog(QWidget *parent)
     layout->addWidget(m_progressBar);
 
     m_detailLabel = new QLabel;
-    m_detailLabel->setStyleSheet(QStringLiteral("color: palette(mid);"));
+    // palette(mid) resolves to near-black in dark themes; dim the theme text colour instead.
+    QColor secondary = palette().color(QPalette::WindowText);
+    secondary.setAlpha(160);
+    m_detailLabel->setStyleSheet(
+        QStringLiteral("color: rgba(%1, %2, %3, 0.627);")
+            .arg(secondary.red()).arg(secondary.green()).arg(secondary.blue()));
     layout->addWidget(m_detailLabel);
 }
 

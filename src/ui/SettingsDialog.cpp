@@ -248,7 +248,12 @@ QWidget *SettingsDialog::createRepositoriesTab()
         "individual software repositories and to refresh their metadata."));
     desc->setWordWrap(true);
     desc->setAlignment(Qt::AlignCenter);
-    desc->setStyleSheet(QStringLiteral("color: palette(mid);"));
+    // palette(mid) resolves to near-black in dark themes; dim the theme text colour instead.
+    QColor secondary = palette().color(QPalette::WindowText);
+    secondary.setAlpha(160);
+    desc->setStyleSheet(
+        QStringLiteral("color: rgba(%1, %2, %3, 0.627);")
+            .arg(secondary.red()).arg(secondary.green()).arg(secondary.blue()));
     layout->addWidget(desc);
 
     layout->addStretch();

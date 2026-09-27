@@ -5,6 +5,7 @@
 #include <QDBusMessage>
 #include <QDBusObjectPath>
 #include <QHash>
+#include <QMutex>
 #include <QStringList>
 #include "Package.h"
 #include "Repository.h"
@@ -28,6 +29,13 @@ public:
     bool isSessionOpen() const { return !m_sessionPath.isEmpty(); }
     QString sessionPath() const { return m_sessionPath; }
     QString lastError() const { return m_lastError; }
+
+    // Number of times the client has re-connected (incremented whenever
+    // reconnect() replaces the connection and re-opens the session). Callers
+    // that set up state on the session (transaction goal specs) can detect a
+    // mid-operation reconnect — which invalidates state set on the old
+    // session — by comparing the value before and after the operation.
+    int reconnectCount() const { return m_reconnectCount; }
 
     // Session management
     bool openSession(const QVariantMap &options = {});
@@ -141,6 +149,15 @@ private:
     QString m_sessionPath;
     bool m_connected = false;
     QString m_lastError;
+    int m_reconnectCount = 0;
+
+    // Serializes every D-Bus operation (callMethod / reconnect) so that
+    // concurrent QtConcurrent workers (package list, repo list, update
+    // probe, …) cannot race each other's reconnect() and corrupt m_bus /
+    // m_sessionPath mid-recovery. Recursive so that the nested
+    // callMethod → ensureConnected → reconnect → openSession → callMethod
+    // chain can lock repeatedly from the same thread.
+    QRecursiveMutex m_callMutex;
 
     // Low-level D-Bus call using QDBusMessage directly (no introspection)
     QDBusMessage callMethod(const QString &path, const QString &interface,
@@ -148,6 +165,25 @@ private:
     bool callSync(const QString &path, const QString &interface,
                   const QString &method, const QList<QVariant> &args,
                   QVariant &result, QString &error);
+
+    // Re-acquire the system bus connection if it was lost (e.g. the bus or
+    // dnf5daemon-server restarted after a system upgrade). Returns true when
+    // a usable connection is available. Called before every D-Bus call so a
+    // transient disconnect self-heals instead of surfacing as
+    // "Not connected to D-Bus server".
+    bool ensureConnected();
+
+    // Open a brand-new connection to the system bus and re-open the
+    // dnf5daemon session. QDBusConnection::systemBus() returns a process-wide
+    // cached connection that does NOT reconnect after dropping; this uses
+    // QDBusConnection::connectToBus() to open a fresh socket instead.
+    // Recovery is always silent: reconnect() never emits errorOccurred()
+    // itself — callers report the final error only after their own retries.
+    bool reconnect();
+
+    // Detect transient D-Bus failures (stale bus handle, bus or daemon
+    // restarting) that are safe to retry after a silent reconnect.
+    static bool looksLikeDisconnect(const QDBusMessage &m);
 
     void connectSignals();
     void disconnectSignals();

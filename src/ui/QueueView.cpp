@@ -30,6 +30,11 @@ public:
         else if (opt.state & QStyle::State_MouseOver)
             painter->fillRect(opt.rect, opt.palette.color(QPalette::AlternateBase));
 
+        // Secondary text: same hue as the primary text, dimmed. QPalette::Mid is
+        // a 3D/bevel shade that resolves to near-black in dark themes.
+        QColor secondaryText = opt.palette.color(QPalette::WindowText);
+        secondaryText.setAlpha(160);
+
         bool isDep = index.data(QueueModel::IsDepRole).toBool();
         QString todoText = index.data(QueueModel::TodoTextRole).toString();
 
@@ -63,7 +68,7 @@ public:
             int tagWidth = fm.horizontalAdvance(depTag);
 
             // Draw the dependency tag in a muted colour.
-            painter->setPen(opt.palette.color(QPalette::Mid));
+            painter->setPen(secondaryText);
             painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, depTag);
 
             // Draw the package name in the normal window text colour.
@@ -80,7 +85,7 @@ public:
         QFont verFont = opt.font;
         verFont.setPointSize(verFont.pointSize() - 1);
         painter->setFont(verFont);
-        painter->setPen(opt.palette.color(QPalette::Mid));
+        painter->setPen(secondaryText);
         QString verText = index.data(QueueModel::VersionRole).toString() +
                           QStringLiteral("-") + index.data(QueueModel::ReleaseRole).toString() +
                           QStringLiteral("  (") + index.data(QueueModel::ArchRole).toString() + QStringLiteral(")");

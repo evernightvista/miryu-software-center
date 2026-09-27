@@ -46,6 +46,12 @@ public:
         else if (opt.state & QStyle::State_MouseOver)
             painter->fillRect(opt.rect, opt.palette.color(QPalette::AlternateBase));
 
+        // Secondary text: same hue as the primary text, dimmed. QPalette::Mid is
+        // a 3D/bevel shade that resolves to near-black in dark themes, which made
+        // the sub-lines (app id/version, size) nearly invisible on dark backgrounds.
+        QColor secondaryText = opt.palette.color(QPalette::WindowText);
+        secondaryText.setAlpha(160);
+
         bool installed = index.data(FlatpakAppModel::InstalledRole).toBool();
         bool upgradable = index.data(FlatpakAppModel::UpgradableRole).toBool();
 
@@ -79,7 +85,7 @@ public:
         QFont idFont = opt.font;
         idFont.setPointSize(idFont.pointSize() - 1);
         painter->setFont(idFont);
-        painter->setPen(opt.palette.color(QPalette::Mid));
+        painter->setPen(secondaryText);
         QString idText = index.data(FlatpakAppModel::AppIdRole).toString() +
                          QStringLiteral("  v") + index.data(FlatpakAppModel::VersionRole).toString();
         painter->drawText(idRect, Qt::AlignLeft | Qt::AlignTop, idText);
@@ -105,7 +111,7 @@ public:
         // Size
         QRect sizeRect = opt.rect.adjusted(opt.rect.width() - 110, opt.rect.height() / 2, -8, -4);
         painter->setFont(idFont);
-        painter->setPen(opt.palette.color(QPalette::Mid));
+        painter->setPen(secondaryText);
         painter->drawText(sizeRect, Qt::AlignRight | Qt::AlignTop,
                           index.data(FlatpakAppModel::SizeTextRole).toString());
 
@@ -373,10 +379,15 @@ void FlatpakPage::setupDetailView()
     m_detailName->setFont(nameFont);
 
     m_detailAppId = new QLabel;
-    m_detailAppId->setStyleSheet(QStringLiteral("color: palette(mid);"));
-
     m_detailVersion = new QLabel;
-    m_detailVersion->setStyleSheet(QStringLiteral("color: palette(mid);"));
+    // palette(mid) resolves to near-black in dark themes; dim the theme text colour instead.
+    QColor secondary = palette().color(QPalette::WindowText);
+    secondary.setAlpha(160);
+    const QString secondaryQss =
+        QStringLiteral("color: rgba(%1, %2, %3, 0.627);")
+            .arg(secondary.red()).arg(secondary.green()).arg(secondary.blue());
+    m_detailAppId->setStyleSheet(secondaryQss);
+    m_detailVersion->setStyleSheet(secondaryQss);
 
     titleLayout->addWidget(m_detailName);
     titleLayout->addWidget(m_detailAppId);

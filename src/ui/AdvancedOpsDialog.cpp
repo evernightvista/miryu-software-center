@@ -93,7 +93,12 @@ void AdvancedOpsDialog::setupUI()
     mainLayout->addWidget(header);
 
     auto *subtitle = new QLabel(i18n("System-level package operations that require root privileges."));
-    subtitle->setStyleSheet(QStringLiteral("color: palette(mid);"));
+    // palette(mid) resolves to near-black in dark themes; dim the theme text colour instead.
+    QColor secondary = palette().color(QPalette::WindowText);
+    secondary.setAlpha(160);
+    subtitle->setStyleSheet(
+        QStringLiteral("color: rgba(%1, %2, %3, 0.627);")
+            .arg(secondary.red()).arg(secondary.green()).arg(secondary.blue()));
     mainLayout->addWidget(subtitle);
 
     // ---- DNF cache refresh ----
@@ -193,7 +198,13 @@ void AdvancedOpsDialog::setupUI()
 
     // ---- Status / progress ----
     m_statusLabel = new QLabel;
-    m_statusLabel->setStyleSheet(QStringLiteral("color: palette(mid);"));
+    {
+        QColor secondary = palette().color(QPalette::WindowText);
+        secondary.setAlpha(160);
+        m_statusLabel->setStyleSheet(
+            QStringLiteral("color: rgba(%1, %2, %3, 0.627);")
+                .arg(secondary.red()).arg(secondary.green()).arg(secondary.blue()));
+    }
     mainLayout->addWidget(m_statusLabel);
 
     m_busyBar = new QProgressBar;
