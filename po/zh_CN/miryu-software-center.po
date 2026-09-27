@@ -1,0 +1,1253 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Simplified Chinese translation for miryu.
+# Copyright (C) 2027 KairikiFedora and MiryuGaming
+# This file is distributed under the same license as the miryu package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: miryu\n"
+"Report-Msgid-Bugs-To: https://github.com/EvernightFedora/miryu\n"
+"POT-Creation-Date: 2026-08-21 03:20+0000\n"
+"PO-Revision-Date: 2026-08-20 00:00+0800\n"
+"Last-Translator: KairikiFedora <kairiki@evernightfedora.org>\n"
+"Language-Team: Simplified Chinese <kairiki@evernightfedora.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: src/main.cpp:34
+msgid "Miryu Software Center"
+msgstr "Miryu 软件中心"
+
+#: src/main.cpp:35
+msgid ""
+"A modern RPM package manager powered by dnf5daemon, built with Qt6 and KDE "
+"Frameworks 6."
+msgstr "基于 dnf5daemon 的现代 RPM 软件包管理器，使用 Qt6 和 KDE Frameworks 6 构建。"
+
+#: src/main.cpp:54
+msgid "Install the specified RPM file(s)"
+msgstr "安装指定的 RPM 文件"
+
+#: src/main.cpp:58
+msgid "RPM package files to install"
+msgstr "要安装的 RPM 软件包文件"
+
+#: src/main.cpp:81
+msgid ""
+"Failed to connect to dnf5daemon-server.\n"
+"\n"
+"Please ensure the dnf5daemon-server service is running:\n"
+"\n"
+"  systemctl start dnf5daemon-server\n"
+"\n"
+"If you don't have it installed, install it with:\n"
+"  dnf install dnf5daemon-server"
+msgstr ""
+"连接 dnf5daemon-server 失败。\n"
+"\n"
+"请确保 dnf5daemon-server 服务正在运行：\n"
+"\n"
+"  systemctl start dnf5daemon-server\n"
+"\n"
+"如果未安装，请使用以下命令安装：\n"
+"  dnf install dnf5daemon-server"
+
+#: src/main.cpp:87
+msgid "D-Bus error details:"
+msgstr "D-Bus 错误详情："
+
+#: src/main.cpp:90
+msgid "Connection Error"
+msgstr "连接错误"
+
+#: src/core/Backend.cpp:49
+msgid "Downloading"
+msgstr "正在下载"
+
+#: src/core/Backend.cpp:53
+msgid "Download complete"
+msgstr "下载完成"
+
+#: src/core/Backend.cpp:59
+msgid "%1 %2"
+msgstr "%1 %2"
+
+#: src/core/Backend.cpp:63
+msgid "Processing %1"
+msgstr "正在处理 %1"
+
+#: src/core/Backend.cpp:66
+msgid "Verifying Packages"
+msgstr "正在验证软件包"
+
+#: src/core/Backend.cpp:70
+msgid "Verifying"
+msgstr "正在验证"
+
+#: src/core/Backend.cpp:73
+msgid "Applying Transaction"
+msgstr "正在应用事务"
+
+#: src/core/Backend.cpp:76
+msgid "Running scripts"
+msgstr "正在运行脚本"
+
+#: src/core/Enums.h:87
+msgid "Installing"
+msgstr "正在安装"
+
+#: src/core/Enums.h:88
+msgid "Upgrading"
+msgstr "正在升级"
+
+#: src/core/Enums.h:89
+msgid "Downgrading"
+msgstr "正在降级"
+
+#: src/core/Enums.h:90
+msgid "Reinstalling"
+msgstr "正在重新安装"
+
+#: src/core/Enums.h:91
+msgid "Removing"
+msgstr "正在移除"
+
+#: src/core/Enums.h:92
+msgid "Replacing"
+msgstr "正在替换"
+
+#: src/core/UpdateChecker.cpp:159
+msgid "Updates Available"
+msgstr "有可用更新"
+
+#: src/core/UpdateChecker.cpp:160
+msgid "%1 update is available for your system."
+msgid_plural "%1 updates are available for your system."
+msgstr[0] "您的系统有 %1 个可用更新。"
+
+#: src/ui/AdvancedOpsDialog.cpp:84 src/ui/AdvancedOpsDialog.cpp:92
+#: src/ui/MainWindow.cpp:421
+msgid "Advanced Operations"
+msgstr "高级操作"
+
+#: src/ui/AdvancedOpsDialog.cpp:95
+msgid "System-level package operations that require root privileges."
+msgstr "需要 root 权限的系统级软件包操作。"
+
+#: src/ui/AdvancedOpsDialog.cpp:104 src/ui/AdvancedOpsDialog.cpp:239
+#: src/ui/AdvancedOpsDialog.cpp:246
+msgid "Refresh DNF Cache"
+msgstr "刷新 DNF 缓存"
+
+#: src/ui/AdvancedOpsDialog.cpp:105
+msgid "Run: dnf makecache --refresh"
+msgstr "运行：dnf makecache --refresh"
+
+#: src/ui/AdvancedOpsDialog.cpp:109
+msgid "Download and rebuild metadata cache for all enabled repositories."
+msgstr "下载并重建所有已启用仓库的元数据缓存。"
+
+#: src/ui/AdvancedOpsDialog.cpp:119 src/ui/AdvancedOpsDialog.cpp:259
+#: src/ui/AdvancedOpsDialog.cpp:266 src/ui/MainWindow.cpp:413
+#: src/ui/MainWindow.cpp:822 src/ui/MainWindow.cpp:837
+#: src/ui/MainWindow.cpp:843
+msgid "Distro Sync"
+msgstr "同步发行版"
+
+#: src/ui/AdvancedOpsDialog.cpp:120
+msgid "Run: dnf distro-sync"
+msgstr "运行：dnf distro-sync"
+
+#: src/ui/AdvancedOpsDialog.cpp:124
+msgid ""
+"Synchronize all installed packages to the latest versions in repositories."
+msgstr "将所有已安装的软件包同步到仓库中的最新版本。"
+
+#: src/ui/AdvancedOpsDialog.cpp:132 src/ui/MainWindow.cpp:409
+#: src/ui/MainWindow.cpp:917 src/ui/MainWindow.cpp:944
+msgid "System Upgrade"
+msgstr "系统升级"
+
+#: src/ui/AdvancedOpsDialog.cpp:160
+msgid "Fedora Version"
+msgstr "Fedora 版本"
+
+#: src/ui/AdvancedOpsDialog.cpp:161
+msgid "Target Fedora release (VERSION_ID from /usr/lib/os-release)."
+msgstr "目标 Fedora 发行版（来自 /usr/lib/os-release 的 VERSION_ID）。"
+
+#: src/ui/AdvancedOpsDialog.cpp:182 src/ui/AdvancedOpsDialog.cpp:301
+msgid "Execute System Upgrade"
+msgstr "执行系统升级"
+
+#: src/ui/AdvancedOpsDialog.cpp:183
+msgid "Run: dnf system-upgrade download --releasever=<version>"
+msgstr "运行：dnf system-upgrade download --releasever=<version>"
+
+#: src/ui/AdvancedOpsDialog.cpp:206
+msgid "Command Output"
+msgstr "命令输出"
+
+#: src/ui/AdvancedOpsDialog.cpp:217
+msgid "Close"
+msgstr "关闭"
+
+#: src/ui/AdvancedOpsDialog.cpp:232 src/ui/AdvancedOpsDialog.cpp:252
+#: src/ui/AdvancedOpsDialog.cpp:272
+msgid "Another operation is still running."
+msgstr "另一个操作仍在运行中。"
+
+#: src/ui/AdvancedOpsDialog.cpp:237
+msgid ""
+"This will download and rebuild the metadata cache for all enabled "
+"repositories. Continue?"
+msgstr "这将下载并重建所有已启用仓库的元数据缓存。是否继续？"
+
+#: src/ui/AdvancedOpsDialog.cpp:240 src/ui/FlatpakPage.cpp:254
+#: src/ui/FlatpakPage.cpp:314 src/ui/MainWindow.cpp:404
+msgid "Refresh"
+msgstr "刷新"
+
+#: src/ui/AdvancedOpsDialog.cpp:257
+msgid ""
+"This will synchronise all installed packages to the latest version available"
+" in the repositories. Continue?"
+msgstr "这将把所有已安装的软件包同步到仓库中可用的最新版本。是否继续？"
+
+#: src/ui/AdvancedOpsDialog.cpp:260
+msgid "Sync"
+msgstr "同步"
+
+#: src/ui/AdvancedOpsDialog.cpp:278
+msgid "Please enter a target Fedora version."
+msgstr "请输入目标 Fedora 版本。"
+
+#: src/ui/AdvancedOpsDialog.cpp:286
+msgid ""
+"The target version (%1) is lower than the currently running version (%2). Downgrading the system is risky and may leave the system in an inconsistent state.\n"
+"\n"
+"Do you really want to continue?"
+msgstr ""
+"目标版本 (%1) 低于当前运行的版本 (%2)。降级系统有风险，可能导致系统状态不一致。\n"
+"\n"
+"确定要继续吗？"
+
+#: src/ui/AdvancedOpsDialog.cpp:291
+msgid "Version Downgrade Warning"
+msgstr "版本降级警告"
+
+#: src/ui/AdvancedOpsDialog.cpp:297
+msgid ""
+"This will download all packages needed to upgrade the system to Fedora %1. After the download completes you will need to reboot to apply the upgrade.\n"
+"\n"
+"Continue?"
+msgstr ""
+"这将下载升级系统到 Fedora %1 所需的所有软件包。下载完成后需要重启以应用升级。\n"
+"\n"
+"是否继续？"
+
+#: src/ui/AdvancedOpsDialog.cpp:302
+msgid "Download"
+msgstr "下载"
+
+#: src/ui/AdvancedOpsDialog.cpp:311
+msgid "System Upgrade (releasever=%1)"
+msgstr "系统升级 (releasever=%1)"
+
+#: src/ui/AdvancedOpsDialog.cpp:326
+msgid ""
+"Warning: Target version %1 is lower than current version %2. This is a "
+"version downgrade and carries risks."
+msgstr "警告：目标版本 %1 低于当前版本 %2。这是版本降级，存在风险。"
+
+#: src/ui/AdvancedOpsDialog.cpp:373
+msgid "Executing: %1 ..."
+msgstr "正在执行：%1 ..."
+
+#: src/ui/AdvancedOpsDialog.cpp:380
+msgid "[started]"
+msgstr "[已开始]"
+
+#: src/ui/AdvancedOpsDialog.cpp:401 src/ui/AdvancedOpsDialog.cpp:403
+#: src/ui/FlatpakPage.cpp:814
+msgid "Operation completed successfully."
+msgstr "操作已成功完成。"
+
+#: src/ui/AdvancedOpsDialog.cpp:402
+msgid "[completed successfully]"
+msgstr "[成功完成]"
+
+#: src/ui/AdvancedOpsDialog.cpp:407
+msgid "Operation cancelled or authentication failed."
+msgstr "操作已取消或认证失败。"
+
+#: src/ui/AdvancedOpsDialog.cpp:408
+msgid "[cancelled or authentication failed (exit %1)]"
+msgstr "[已取消或认证失败 (退出码 %1)]"
+
+#: src/ui/AdvancedOpsDialog.cpp:410
+msgid "Operation failed (exit code %1)."
+msgstr "操作失败（退出码 %1）。"
+
+#: src/ui/AdvancedOpsDialog.cpp:411
+msgid "[failed with exit code %1]"
+msgstr "[失败，退出码 %1]"
+
+#: src/ui/AdvancedOpsDialog.cpp:413
+msgid ""
+"Operation failed with exit code %1. Check the output below for details."
+msgstr "操作失败，退出码 %1。请查看下方输出了解详情。"
+
+#: src/ui/AdvancedOpsDialog.cpp:414
+msgid "Operation Failed"
+msgstr "操作失败"
+
+#: src/ui/AdvancedOpsDialog.cpp:422
+msgid "Failed to start command: %1"
+msgstr "启动命令失败：%1"
+
+#: src/ui/AdvancedOpsDialog.cpp:423
+msgid "[error: %1]"
+msgstr "[错误：%1]"
+
+#: src/ui/AdvancedOpsDialog.cpp:425
+msgid ""
+"Failed to start command.\n"
+"%1\n"
+"\n"
+"Make sure pkexec (polkit) is installed and available."
+msgstr ""
+"启动命令失败。\n"
+"%1\n"
+"\n"
+"请确保已安装并可用 pkexec (polkit)。"
+
+#: src/ui/AdvancedOpsDialog.cpp:427
+msgid "Command Start Failed"
+msgstr "命令启动失败"
+
+#: src/ui/FlatpakPage.cpp:96 src/ui/FlatpakPage.cpp:400
+#: src/ui/FlatpakPage.cpp:516 src/ui/FlatpakPage.cpp:834
+#: src/ui/FlatpakPage.cpp:849
+msgid "Update"
+msgstr "更新"
+
+#: src/ui/FlatpakPage.cpp:99 src/ui/MainWindow.cpp:151
+#: src/ui/PackageInfoWidget.cpp:112
+msgid "Installed"
+msgstr "已安装"
+
+#: src/ui/FlatpakPage.cpp:102 src/ui/FlatpakPage.cpp:391
+#: src/ui/FlatpakPage.cpp:828 src/ui/FlatpakPage.cpp:845
+#: src/ui/TransactionResultDialog.cpp:65
+msgid "Install"
+msgstr "安装"
+
+#: src/ui/FlatpakPage.cpp:167
+msgid "Flatpak Apps"
+msgstr "Flatpak 应用"
+
+#: src/ui/FlatpakPage.cpp:171
+msgid "Flatpak Store"
+msgstr "Flatpak 商店"
+
+#: src/ui/FlatpakPage.cpp:206 src/ui/MainWindow.cpp:666
+msgid "Loading..."
+msgstr "加载中..."
+
+#: src/ui/FlatpakPage.cpp:232
+msgid "Filter installed Flatpak apps..."
+msgstr "筛选已安装 Flatpak 应用..."
+
+#: src/ui/FlatpakPage.cpp:239 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:738
+msgid "Update All"
+msgstr "全部更新"
+
+#: src/ui/FlatpakPage.cpp:244 src/ui/FlatpakPage.cpp:919
+msgid "Uninstall Selected"
+msgstr "卸载选中"
+
+#: src/ui/FlatpakPage.cpp:249 src/ui/FlatpakPage.cpp:949
+msgid "Update Selected"
+msgstr "更新选中"
+
+#: src/ui/FlatpakPage.cpp:298
+msgid "Search Flatpak store..."
+msgstr "搜索 Flatpak 商店..."
+
+#: src/ui/FlatpakPage.cpp:304 src/ui/FlatpakPage.cpp:756
+msgid "All Remotes"
+msgstr "所有远程源"
+
+#: src/ui/FlatpakPage.cpp:309 src/ui/FlatpakPage.cpp:897
+msgid "Install Selected"
+msgstr "安装选中"
+
+#: src/ui/FlatpakPage.cpp:396 src/ui/FlatpakPage.cpp:525
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:672
+#: src/ui/FlatpakPage.cpp:831 src/ui/FlatpakPage.cpp:847
+msgid "Uninstall"
+msgstr "卸载"
+
+#: src/ui/FlatpakPage.cpp:404 src/ui/FlatpakPage.cpp:508
+msgid "Run"
+msgstr "运行"
+
+#: src/ui/FlatpakPage.cpp:434 src/ui/MainWindow.cpp:161
+#: src/ui/PackageInfoWidget.cpp:83
+msgid "Description"
+msgstr "描述"
+
+#: src/ui/FlatpakPage.cpp:446
+msgid "Back to List"
+msgstr "返回列表"
+
+#: src/ui/FlatpakPage.cpp:462 src/ui/FlatpakPage.cpp:715
+msgid "Loading installed Flatpak apps..."
+msgstr "加载已安装 Flatpak 应用..."
+
+#: src/ui/FlatpakPage.cpp:464
+msgid "Search the Flatpak store"
+msgstr "搜索 Flatpak 商店"
+
+#: src/ui/FlatpakPage.cpp:488 src/ui/FlatpakPage.cpp:784
+#: src/ui/MainWindow.cpp:1059
+msgid "%1 result"
+msgid_plural "%1 results"
+msgstr[0] "%1 个结果"
+
+#: src/ui/FlatpakPage.cpp:528 src/ui/FlatpakPage.cpp:671
+msgid "Uninstall '%1' (%2)?"
+msgstr "卸载 '%1' (%2)？"
+
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:672 src/ui/FlatpakPage.cpp:897
+#: src/ui/FlatpakPage.cpp:919 src/ui/FlatpakPage.cpp:949
+#: src/ui/MainWindow.cpp:936 src/ui/MainWindow.cpp:944
+#: src/ui/MainWindow.cpp:1135 src/ui/RepoView.cpp:116 src/ui/RepoView.cpp:140
+msgid "Yes"
+msgstr "是"
+
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:672 src/ui/FlatpakPage.cpp:897
+#: src/ui/FlatpakPage.cpp:919 src/ui/FlatpakPage.cpp:949
+#: src/ui/MainWindow.cpp:936 src/ui/MainWindow.cpp:944
+#: src/ui/MainWindow.cpp:1135 src/ui/RepoView.cpp:116 src/ui/RepoView.cpp:140
+msgid "No"
+msgstr "否"
+
+#: src/ui/FlatpakPage.cpp:546
+msgid "No updates available."
+msgstr "无可用更新。"
+
+#: src/ui/FlatpakPage.cpp:551
+msgid "Update %1 Flatpak application?"
+msgid_plural "Update %1 Flatpak applications?"
+msgstr[0] "更新 %1 个 Flatpak 应用？"
+
+#: src/ui/FlatpakPage.cpp:570
+msgid "Searching for '%1'..."
+msgstr "搜索 '%1' 中..."
+
+#: src/ui/FlatpakPage.cpp:612
+msgid "Application ID: %1"
+msgstr "应用 ID: %1"
+
+#: src/ui/FlatpakPage.cpp:613
+msgid "Version: %1"
+msgstr "版本: %1"
+
+#: src/ui/FlatpakPage.cpp:614
+msgid "Branch: %1"
+msgstr "分支: %1"
+
+#: src/ui/FlatpakPage.cpp:615
+msgid "Remote: %1"
+msgstr "远程源: %1"
+
+#: src/ui/FlatpakPage.cpp:616
+msgid "Installation: %1"
+msgstr "安装类型: %1"
+
+#: src/ui/FlatpakPage.cpp:618
+msgid "Size: %1"
+msgstr "大小: %1"
+
+#: src/ui/FlatpakPage.cpp:623 src/ui/PackageInfoWidget.cpp:127
+msgid "<i>No description available.</i>"
+msgstr "<i>暂无描述。</i>"
+
+#: src/ui/FlatpakPage.cpp:658
+msgid "Installing..."
+msgstr "安装中..."
+
+#: src/ui/FlatpakPage.cpp:677
+msgid "Uninstalling..."
+msgstr "卸载中..."
+
+#: src/ui/FlatpakPage.cpp:690
+msgid "Updating..."
+msgstr "更新中..."
+
+#: src/ui/FlatpakPage.cpp:736
+msgid "Update All (%1)"
+msgstr "全部更新 (%1)"
+
+#: src/ui/FlatpakPage.cpp:741
+msgid "%1 app installed, %2 update available"
+msgid_plural "%1 apps installed, %2 updates available"
+msgstr[0] "已安装 %1 个应用，%2 个更新可用"
+
+#: src/ui/FlatpakPage.cpp:745
+msgid "%1 app installed"
+msgid_plural "%1 apps installed"
+msgstr[0] "已安装 %1 个应用"
+
+#: src/ui/FlatpakPage.cpp:790
+msgid "Operation: %1"
+msgstr "操作: %1"
+
+#: src/ui/FlatpakPage.cpp:842
+msgid "Operation failed."
+msgstr "操作失败。"
+
+#: src/ui/FlatpakPage.cpp:852
+msgid "Flatpak Operation Error"
+msgstr "Flatpak 操作错误"
+
+#: src/ui/FlatpakPage.cpp:859 src/ui/MainWindow.cpp:1102
+#: src/ui/MainWindow.cpp:1103 src/ui/RepoView.cpp:130 src/ui/RepoView.cpp:154
+msgid "Error"
+msgstr "错误"
+
+#: src/ui/FlatpakPage.cpp:860
+msgid "Flatpak Error"
+msgstr "Flatpak 错误"
+
+#: src/ui/FlatpakPage.cpp:896
+msgid "Install %1 selected Flatpak application?"
+msgid_plural "Install %1 selected Flatpak applications?"
+msgstr[0] "安装 %1 个选中的 Flatpak 应用？"
+
+#: src/ui/FlatpakPage.cpp:903
+msgid "Installing %1 application..."
+msgid_plural "Installing %1 applications..."
+msgstr[0] "正在安装 %1 个应用..."
+
+#: src/ui/FlatpakPage.cpp:918
+msgid "Uninstall %1 selected Flatpak application?"
+msgid_plural "Uninstall %1 selected Flatpak applications?"
+msgstr[0] "卸载 %1 个选中的 Flatpak 应用？"
+
+#: src/ui/FlatpakPage.cpp:925
+msgid "Uninstalling %1 application..."
+msgid_plural "Uninstalling %1 applications..."
+msgstr[0] "正在卸载 %1 个应用..."
+
+#: src/ui/FlatpakPage.cpp:943
+msgid "No upgradable applications selected."
+msgstr "未选择可升级的应用。"
+
+#: src/ui/FlatpakPage.cpp:948
+msgid "Update %1 selected Flatpak application?"
+msgid_plural "Update %1 selected Flatpak applications?"
+msgstr[0] "更新 %1 个选中的 Flatpak 应用？"
+
+#: src/ui/FlatpakPage.cpp:955
+msgid "Updating %1 application..."
+msgid_plural "Updating %1 applications..."
+msgstr[0] "正在更新 %1 个应用..."
+
+#: src/ui/PackageInfoWidget.cpp:118
+msgid "Update Available"
+msgstr "有可用更新"
+
+#: src/ui/TransactionResultDialog.cpp:66
+msgid "Upgrade"
+msgstr "升级"
+
+#: src/ui/MainWindow.cpp:150
+msgid "All"
+msgstr "全部"
+
+#: src/ui/MainWindow.cpp:144
+msgid "Search packages..."
+msgstr "搜索软件包..."
+
+#: src/ui/MainWindow.cpp:152 src/ui/PackageInfoWidget.cpp:115
+msgid "Available"
+msgstr "可用"
+
+#: src/ui/MainWindow.cpp:153 src/ui/MainWindow.cpp:370
+#: src/ui/MainWindow.cpp:477
+msgid "Updates"
+msgstr "更新"
+
+#: src/ui/MainWindow.cpp:154
+msgid "Upgradable"
+msgstr "可升级"
+
+#: src/ui/MainWindow.cpp:158
+msgid "All Fields"
+msgstr "所有字段"
+
+#: src/ui/MainWindow.cpp:159
+msgid "Name"
+msgstr "名称"
+
+#: src/ui/MainWindow.cpp:160
+msgid "Summary"
+msgstr "摘要"
+
+#: src/ui/MainWindow.cpp:195
+msgid "Available Updates"
+msgstr "可用更新"
+
+#: src/ui/MainWindow.cpp:223 src/ui/TransactionResultDialog.cpp:126
+msgid "Apply"
+msgstr "应用"
+
+#: src/ui/MainWindow.cpp:224
+msgid "Clear"
+msgstr "清除"
+
+#: src/ui/MainWindow.cpp:225
+msgid "Resolve Dependencies"
+msgstr "解决依赖"
+
+#: src/ui/MainWindow.cpp:228
+msgid "Offline update"
+msgstr "离线更新"
+
+#: src/ui/MainWindow.cpp:229
+msgid "Download packages now, install on next reboot"
+msgstr "立即下载软件包，下次重启时安装"
+
+#: src/ui/MainWindow.cpp:283 src/ui/MainWindow.cpp:372
+#: src/ui/MainWindow.cpp:484 src/ui/SettingsDialog.cpp:93
+msgid "Repositories"
+msgstr "软件仓库"
+
+#: src/ui/MainWindow.cpp:328 src/ui/MainWindow.cpp:568
+#: src/ui/MainWindow.cpp:581 src/ui/MainWindow.cpp:619
+#: src/ui/MainWindow.cpp:734 src/ui/MainWindow.cpp:762
+#: src/ui/MainWindow.cpp:845 src/ui/MainWindow.cpp:881
+#: src/ui/MainWindow.cpp:972 src/ui/MainWindow.cpp:988
+#: src/ui/MainWindow.cpp:1066
+msgid "Ready"
+msgstr "就绪"
+
+#: src/ui/MainWindow.cpp:358
+msgid "Miryu"
+msgstr "Miryu"
+
+#: src/ui/MainWindow.cpp:369
+msgid "Packages"
+msgstr "软件包"
+
+#: src/ui/MainWindow.cpp:371
+msgid "Queue"
+msgstr "队列"
+
+#: src/ui/MainWindow.cpp:399 src/ui/MainWindow.cpp:1137
+msgid "Linglong Store"
+msgstr "玲珑应用商店"
+
+#: src/ui/MainWindow.cpp:375 src/ui/MainWindow.cpp:498
+msgid "Flatpak"
+msgstr "Flatpak"
+
+#: src/ui/MainWindow.cpp:417 src/ui/MainWindow.cpp:873
+#: src/ui/MainWindow.cpp:879 src/ui/RepoView.cpp:162
+msgid "Refresh Metadata"
+msgstr "刷新元数据"
+
+#: src/ui/MainWindow.cpp:425
+msgid "Install RPM File..."
+msgstr "安装 RPM 文件..."
+
+#: src/ui/MainWindow.cpp:429
+msgid "Configure Miryu..."
+msgstr "配置 Miryu..."
+
+#: src/ui/MainWindow.cpp:436
+msgid "Find"
+msgstr "查找"
+
+#: src/ui/MainWindow.cpp:442
+msgid "Select All"
+msgstr "全选"
+
+#: src/ui/MainWindow.cpp:453
+msgid "Deselect All"
+msgstr "取消全选"
+
+#: src/ui/MainWindow.cpp:472
+msgid "Package Browser"
+msgstr "软件包浏览"
+
+#: src/ui/MainWindow.cpp:481
+msgid "Transaction Queue"
+msgstr "事务队列"
+
+#: src/ui/MainWindow.cpp:502
+msgid "Flatpak is not installed on this system."
+msgstr "此系统上未安装 Flatpak。"
+
+#: src/ui/MainWindow.cpp:535
+msgid "The package backend is not initialized. Cannot install RPM files."
+msgstr "软件包后端未初始化。无法安装 RPM 文件。"
+
+#: src/ui/MainWindow.cpp:536 src/ui/MainWindow.cpp:612
+msgid "RPM Installation"
+msgstr "RPM 安装"
+
+#: src/ui/MainWindow.cpp:556
+msgid "Preparing RPM installation..."
+msgstr "准备 RPM 安装..."
+
+#: src/ui/MainWindow.cpp:567 src/ui/MainWindow.cpp:733
+msgid "Transaction Error"
+msgstr "事务错误"
+
+#: src/ui/MainWindow.cpp:600
+msgid "RPM installation completed successfully."
+msgstr "RPM 安装已成功完成。"
+
+#: src/ui/MainWindow.cpp:611
+msgid "Operation cancelled by user."
+msgstr "操作已被用户取消。"
+
+#: src/ui/MainWindow.cpp:615
+msgid "RPM installation failed."
+msgstr "RPM 安装失败。"
+
+#: src/ui/MainWindow.cpp:616 src/ui/MainWindow.cpp:760
+msgid "Transaction Failed"
+msgstr "事务失败"
+
+#: src/ui/MainWindow.cpp:622 src/ui/MainWindow.cpp:767
+msgid "Applying transaction..."
+msgstr "应用事务中..."
+
+#: src/ui/MainWindow.cpp:648
+msgid "Searching..."
+msgstr "搜索中..."
+
+#: src/ui/MainWindow.cpp:700
+msgid "%1 package queued"
+msgid_plural "%1 packages queued"
+msgstr[0] "%1 个软件包已排队"
+
+#: src/ui/MainWindow.cpp:715
+msgid "Queue is empty. Add packages to the queue first."
+msgstr "队列为空。请先将软件包添加到队列。"
+
+#: src/ui/MainWindow.cpp:720
+msgid "Resolving transaction..."
+msgstr "解决事务中..."
+
+#: src/ui/MainWindow.cpp:754
+msgid "Transaction completed successfully."
+msgstr "事务已成功完成。"
+
+#: src/ui/MainWindow.cpp:781
+msgid "Building transaction..."
+msgstr "构建事务中..."
+
+#: src/ui/MainWindow.cpp:820
+msgid ""
+"Distribution sync will synchronize all installed packages to the versions "
+"available in the repositories. This may downgrade or upgrade packages. "
+"Continue?"
+msgstr "发行版同步将把所有已安装的软件包同步到软件仓库中可用的版本。这可能会降级或升级软件包。是否继续？"
+
+#: src/ui/MainWindow.cpp:827
+msgid "Performing distribution sync..."
+msgstr "正在执行发行版同步..."
+
+#: src/ui/MainWindow.cpp:837
+msgid "Distribution sync completed successfully."
+msgstr "发行版同步已成功完成。"
+
+#: src/ui/MainWindow.cpp:842
+msgid "Distribution sync failed."
+msgstr "发行版同步失败。"
+
+#: src/ui/MainWindow.cpp:863
+msgid "Refreshing repository metadata..."
+msgstr "正在刷新软件仓库元数据..."
+
+#: src/ui/MainWindow.cpp:873
+msgid "Metadata refreshed successfully."
+msgstr "元数据刷新成功。"
+
+#: src/ui/MainWindow.cpp:878
+msgid "Failed to refresh metadata."
+msgstr "刷新元数据失败。"
+
+#: src/ui/MainWindow.cpp:918
+msgid "Enter the version you want to upgrade to:"
+msgstr "输入要升级到的版本号："
+
+#: src/ui/MainWindow.cpp:933
+msgid ""
+"The target version (%1) is lower than the current version (%2). Downgrading "
+"the system may cause instability. Continue anyway?"
+msgstr "目标版本 (%1) 低于当前版本 (%2)。降级系统可能导致不稳定。仍然继续？"
+
+#: src/ui/MainWindow.cpp:936
+msgid "Version Warning"
+msgstr "版本警告"
+
+#: src/ui/MainWindow.cpp:943
+msgid "This will prepare a system upgrade transaction. Continue?"
+msgstr "这将准备系统升级事务。是否继续?"
+
+#: src/ui/MainWindow.cpp:948
+msgid "Preparing system upgrade..."
+msgstr "准备系统升级中..."
+
+#: src/ui/MainWindow.cpp:969
+msgid "System upgrade transaction completed."
+msgstr "系统升级事务已完成。"
+
+#: src/ui/MainWindow.cpp:971
+msgid "System Upgrade Failed"
+msgstr "系统升级失败"
+
+#: src/ui/MainWindow.cpp:987
+msgid "System Upgrade Error"
+msgstr "系统升级错误"
+
+#: src/ui/MainWindow.cpp:1003
+msgid "Checking for updates..."
+msgstr "检查更新中..."
+
+#: src/ui/MainWindow.cpp:1031
+msgid "Select RPM Package Files"
+msgstr "选择 RPM 软件包文件"
+
+#: src/ui/MainWindow.cpp:1033
+msgid "RPM Packages (*.rpm)"
+msgstr "RPM 软件包 (*.rpm)"
+
+#: src/ui/MainWindow.cpp:1039
+msgid "Download now and install on next reboot (offline update)?"
+msgstr "立即下载并在下次重启时安装（离线更新）？"
+
+#: src/ui/MainWindow.cpp:1040
+msgid "Installation Mode"
+msgstr "安装模式"
+
+#: src/ui/MainWindow.cpp:1041
+msgid "Offline Update"
+msgstr "离线更新"
+
+#: src/ui/MainWindow.cpp:1041
+msgid "Install Now"
+msgstr "立即安装"
+
+#: src/ui/MainWindow.cpp:1052
+msgid "%1 package"
+msgid_plural "%1 packages"
+msgstr[0] "%1 个软件包"
+
+#: src/ui/MainWindow.cpp:1075
+msgid "%1 update available"
+msgid_plural "%1 updates available"
+msgstr[0] "%1 个更新可用"
+
+#: src/ui/MainWindow.cpp:1109
+msgid "%1 updates"
+msgstr "%1 个更新"
+
+#: src/ui/MainWindow.cpp:1122
+msgid "Queue: %1 items"
+msgstr "队列: %1 项"
+
+#: src/ui/MainWindow.cpp:1134
+msgid "There are pending operations in the queue. Close anyway?"
+msgstr "队列中有待处理的操作。仍然关闭?"
+
+#: src/ui/MainWindow.cpp:1135
+msgid "Pending Operations"
+msgstr "待处理操作"
+
+#: src/ui/MainWindow.cpp:1129
+msgid "About Miryu Software Center"
+msgstr "关于 Miryu 软件中心"
+
+#: src/ui/MainWindow.cpp:1143
+msgid "Version %1"
+msgstr "版本 %1"
+
+#: src/ui/MainWindow.cpp:1164
+msgid "Authors"
+msgstr "作者"
+
+#: src/ui/MainWindow.cpp:1207
+msgid "Need to Restart"
+msgstr "需要重启"
+
+#: src/ui/MainWindow.cpp:1208
+msgid ""
+"You have installed software packages that require a computer restart. "
+"Please restart the operating system as soon as possible to ensure the "
+"updates take full effect."
+msgstr "您已安装需要重启计算机的软件包，请尽快重启操作系统以确保更新完全生效。"
+
+#: src/ui/PackageInfoWidget.cpp:67
+msgid "Version:"
+msgstr "版本:"
+
+#: src/ui/PackageInfoWidget.cpp:68
+msgid "Repository:"
+msgstr "软件仓库:"
+
+#: src/ui/PackageInfoWidget.cpp:69
+msgid "Size:"
+msgstr "大小:"
+
+#: src/ui/PackageInfoWidget.cpp:70
+msgid "License:"
+msgstr "许可证:"
+
+#: src/ui/PackageInfoWidget.cpp:71
+msgid "URL:"
+msgstr "网址:"
+
+#: src/ui/PackageInfoWidget.cpp:72
+msgid "Status:"
+msgstr "状态:"
+
+#: src/ui/PackageInfoWidget.cpp:121
+msgid "Downgrade Available"
+msgstr "有可降级版本"
+
+#: src/ui/PackageView.cpp:205
+msgid "Install Selected (%1)"
+msgstr "安装选中 (%1)"
+
+#: src/ui/PackageView.cpp:219
+msgid "Update Selected (%1)"
+msgstr "更新选中 (%1)"
+
+#: src/ui/PackageView.cpp:233
+msgid "Remove Selected (%1)"
+msgstr "移除选中 (%1)"
+
+#: src/ui/PackageView.cpp:246
+msgid "Copy Selected Package Names"
+msgstr "复制选中软件包名"
+
+#: src/ui/PackageView.cpp:267 src/ui/QueueView.cpp:153
+msgid "Remove from Queue"
+msgstr "从队列中移除"
+
+#: src/ui/PackageView.cpp:271
+msgid "Queue for Removal"
+msgstr "加入移除队列"
+
+#: src/ui/PackageView.cpp:272
+msgid "Queue for Update"
+msgstr "加入更新队列"
+
+#: src/ui/PackageView.cpp:273
+msgid "Queue for Installation"
+msgstr "加入安装队列"
+
+#: src/ui/PackageView.cpp:279
+msgid "Copy Package Name"
+msgstr "复制软件包名"
+
+#: src/ui/ProgressDialog.cpp:13
+msgid "Processing"
+msgstr "处理中"
+
+#: src/ui/ProgressDialog.cpp:21
+msgid "Preparing..."
+msgstr "准备中..."
+
+#: src/ui/ProgressDialog.cpp:54
+msgid "Downloading %1: %2 MB / %3 MB"
+msgstr "下载 %1: %2 MB / %3 MB"
+
+#: src/ui/ProgressDialog.cpp:59
+msgid "Downloading %1..."
+msgstr "下载 %1 中..."
+
+#: src/ui/QueueView.cpp:61 src/ui/PackageInfoWidget.cpp:95
+msgid "Dependencies"
+msgstr "依赖"
+
+#: src/ui/QueueView.cpp:137 src/ui/TransactionResultDialog.cpp:68
+msgid "Reinstall"
+msgstr "重新安装"
+
+#: src/ui/QueueView.cpp:144 src/ui/TransactionResultDialog.cpp:67
+msgid "Downgrade"
+msgstr "降级"
+
+#: src/ui/RepoView.cpp:64
+msgid "Default"
+msgstr "默认"
+
+#: src/ui/RepoView.cpp:64
+msgid "Priority: %1"
+msgstr "优先级: %1"
+
+#: src/ui/RepoView.cpp:70
+msgid "Enabled"
+msgstr "已启用"
+
+#: src/ui/RepoView.cpp:70
+msgid "Disabled"
+msgstr "已禁用"
+
+#: src/ui/RepoView.cpp:112 src/ui/RepoView.cpp:116
+msgid "Disable Repository"
+msgstr "禁用软件仓库"
+
+#: src/ui/RepoView.cpp:115
+msgid "Disable repository '%1'?"
+msgstr "禁用软件仓库 '%1'?"
+
+#: src/ui/RepoView.cpp:128
+msgid "Failed to disable repository '%1'."
+msgstr "禁用仓库 '%1' 失败。"
+
+#: src/ui/RepoView.cpp:136 src/ui/RepoView.cpp:140
+msgid "Enable Repository"
+msgstr "启用软件仓库"
+
+#: src/ui/RepoView.cpp:139
+msgid "Enable repository '%1'?"
+msgstr "启用软件仓库 '%1'?"
+
+#: src/ui/RepoView.cpp:152
+msgid "Failed to enable repository '%1'."
+msgstr "启用仓库 '%1' 失败。"
+
+#: src/ui/SettingsDialog.cpp:84 src/ui/SettingsDialog.cpp:92
+msgid "Settings"
+msgstr "设置"
+
+#: src/ui/SettingsDialog.cpp:110
+msgid "Defaults"
+msgstr "默认值"
+
+#: src/ui/SettingsDialog.cpp:146
+msgid "Flatpak Settings"
+msgstr "Flatpak 设置"
+
+#: src/ui/SettingsDialog.cpp:153
+msgid "Default Location"
+msgstr "默认位置"
+
+#: src/ui/SettingsDialog.cpp:154
+msgid ""
+"Whether new Flatpak installs default to the user or system installation."
+msgstr "新 Flatpak 安装默认使用用户安装还是系统安装。"
+
+#: src/ui/SettingsDialog.cpp:158
+msgid "Default Remote Repository"
+msgstr "默认远程仓库"
+
+#: src/ui/SettingsDialog.cpp:159
+msgid "Remote repository name used for Flatpak operations by default."
+msgstr "Flatpak 操作默认使用的远程仓库名称。"
+
+#: src/ui/SettingsDialog.cpp:164
+msgid "Metadata Settings"
+msgstr "元数据设置"
+
+#: src/ui/SettingsDialog.cpp:170 src/ui/SettingsDialog.cpp:189
+msgid " minutes"
+msgstr " 分钟"
+
+#: src/ui/SettingsDialog.cpp:172
+msgid "Min Refresh Interval"
+msgstr "最小刷新间隔"
+
+#: src/ui/SettingsDialog.cpp:173
+msgid "Minimum interval between automatic repository metadata refreshes."
+msgstr "自动刷新仓库元数据的最小间隔。"
+
+#: src/ui/SettingsDialog.cpp:178
+msgid "Updater Settings"
+msgstr "更新器设置"
+
+#: src/ui/SettingsDialog.cpp:183
+msgid "e.g. /usr/bin/dnfdragora"
+msgstr "例如 /usr/bin/dnfdragora"
+
+#: src/ui/SettingsDialog.cpp:184
+msgid "Custom System Updater Path"
+msgstr "自定义系统更新器路径"
+
+#: src/ui/SettingsDialog.cpp:185
+msgid ""
+"Full path to an external system updater to launch instead of the built-in "
+"one."
+msgstr "要启动的外部系统更新器的完整路径，代替内置更新器。"
+
+#: src/ui/SettingsDialog.cpp:191
+msgid "Check Update Interval"
+msgstr "检查更新间隔"
+
+#: src/ui/SettingsDialog.cpp:192
+msgid "How often Miryu checks for available RPM updates in the background."
+msgstr "Miryu 在后台检查可用 RPM 更新的频率。"
+
+#: src/ui/SettingsDialog.cpp:195
+msgid "Show Tray Icon"
+msgstr "显示托盘图标"
+
+#: src/ui/SettingsDialog.cpp:200
+msgid "Show a system tray icon while Miryu is running."
+msgstr "Miryu 运行时显示系统托盘图标。"
+
+#: src/ui/SettingsDialog.cpp:202
+msgid "Dark Tray Icon"
+msgstr "暗色托盘图标"
+
+#: src/ui/SettingsDialog.cpp:205
+msgid "Use a dark tray icon for better visibility on light panels."
+msgstr "使用深色托盘图标，在浅色面板上更清晰可见。"
+
+#: src/ui/SettingsDialog.cpp:207
+msgid "Update Notifications"
+msgstr "更新通知"
+
+#: src/ui/SettingsDialog.cpp:210
+msgid "Show a desktop notification when updates become available."
+msgstr "有可用更新时显示桌面通知。"
+
+#: src/ui/SettingsDialog.cpp:240
+msgid "Repository Management"
+msgstr "仓库管理"
+
+#: src/ui/SettingsDialog.cpp:245
+msgid ""
+"Repository enable / disable management is performed from the main Repositories page in the sidebar.\n"
+"\n"
+"Use the sidebar \"Repositories\" entry to view, enable or disable individual software repositories and to refresh their metadata."
+msgstr ""
+"仓库的启用/禁用管理在侧边栏的主仓库页面中进行。\n"
+"\n"
+"使用侧边栏的\"仓库\"条目来查看、启用或禁用各个软件仓库，并刷新其元数据。"
+
+#: src/ui/TransactionResultDialog.cpp:36
+msgid "Transaction Summary"
+msgstr "事务摘要"
+
+#: src/ui/TransactionResultDialog.cpp:42
+msgid "The following operations will be performed:"
+msgstr "将执行以下操作:"
+
+#: src/ui/TransactionResultDialog.cpp:48
+msgid "Warnings"
+msgstr "警告"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Package"
+msgstr "软件包"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Repository"
+msgstr "仓库"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Size"
+msgstr "大小"
+
+#: src/ui/TransactionResultDialog.cpp:69
+msgid "Remove"
+msgstr "移除"
+
+#: src/ui/TransactionResultDialog.cpp:70
+msgid "Replace"
+msgstr "替换"
+
+#: src/ui/TransactionResultDialog.cpp:71
+msgid "Obsolete"
+msgstr "废弃"
+
+#: src/ui/TransactionResultDialog.cpp:117
+msgid "Total Download Size"
+msgstr "总下载大小"
+
+#: src/ui/TransactionResultDialog.cpp:121
+msgid "Apply offline (on next reboot)"
+msgstr "离线应用(下次重启时)"
+
+#: src/ui/PackageInfoWidget.cpp:100
+msgid "Provides"
+msgstr "提供"
+
+#: src/ui/PackageInfoWidget.cpp:105
+msgid "Changelog"
+msgstr "更新日志"
+
+#: src/ui/PackageInfoWidget.cpp:110
+msgid "Files"
+msgstr "文件"
+
+#: src/ui/PackageInfoWidget.cpp:177
+msgid "<i>No dependencies.</i>"
+msgstr "<i>无依赖。</i>"
+
+#: src/ui/PackageInfoWidget.cpp:184
+msgid "<i>No provides.</i>"
+msgstr "<i>无提供。</i>"
+
+#: src/ui/PackageInfoWidget.cpp:191
+msgid "<i>No changelog available.</i>"
+msgstr "<i>暂无更新日志。</i>"
+
+#: src/ui/PackageInfoWidget.cpp:198
+msgid "<i>No file list available.</i>"
+msgstr "<i>暂无文件列表。</i>"
+
+#: src/ui/MainWindow.cpp:757 src/ui/MainWindow.cpp:581
+msgid ""
+"Cannot remove protected packages or critical dependencies.\n"
+"\n"
+"Removing these packages would break the system.\n"
+"\n"
+"%1"
+msgstr ""
+"无法移除受保护的软件包或关键依赖。\n"
+"\n"
+"移除这些软件包将破坏系统。\n"
+"\n"
+"%1"
+
+#: src/ui/MainWindow.cpp:761 src/ui/MainWindow.cpp:585
+msgid "Protected Package Error"
+msgstr "受保护软件包错误"
+
+#: src/core/Dnf5DaemonClient.cpp:471
+msgid "Cannot load repositories."
+msgstr "无法加载软件源。"
+
+#: src/ui/MainWindow.cpp:1134
+msgid ""
+"Failed to launch the Linglong Store.\n"
+"\n"
+"Please ensure that the linglong-store application is installed\n"
+"and available at %1."
+msgstr ""
+"无法启动玲珑商店。\n"
+"\n"
+"请确保已安装 linglong-store 应用程序，\n"
+"并且可通过 %1 访问。"
+
+#: src/ui/MainWindow.cpp:404
+msgid "Launch the external Linglong Store application"
+msgstr "启动外部玲珑商店应用程序"

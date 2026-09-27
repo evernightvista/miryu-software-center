@@ -1,0 +1,1258 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Japanese translation for miryu.
+# Copyright (C) 2027 KairikiFedora and MiryuGaming
+# This file is distributed under the same license as the miryu package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: miryu\n"
+"Report-Msgid-Bugs-To: https://github.com/EvernightFedora/miryu\n"
+"POT-Creation-Date: 2026-08-21 03:20+0000\n"
+"PO-Revision-Date: 2026-08-20 00:00+0800\n"
+"Last-Translator: KairikiFedora <kairiki@evernightfedora.org>\n"
+"Language-Team: Japanese <miryu@example.com>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: src/main.cpp:34
+msgid "Miryu Software Center"
+msgstr "Miryu ソフトウェアセンター"
+
+#: src/main.cpp:35
+msgid ""
+"A modern RPM package manager powered by dnf5daemon, built with Qt6 and KDE "
+"Frameworks 6."
+msgstr "dnf5daemonを搭載したモダンなRPMパッケージマネージャー、Qt6とKDE Frameworks 6で構築。"
+
+#: src/main.cpp:54
+msgid "Install the specified RPM file(s)"
+msgstr "指定されたRPMファイルをインストール"
+
+#: src/main.cpp:58
+msgid "RPM package files to install"
+msgstr "インストールするRPMパッケージファイル"
+
+#: src/main.cpp:81
+msgid ""
+"Failed to connect to dnf5daemon-server.\n"
+"\n"
+"Please ensure the dnf5daemon-server service is running:\n"
+"\n"
+"  systemctl start dnf5daemon-server\n"
+"\n"
+"If you don't have it installed, install it with:\n"
+"  dnf install dnf5daemon-server"
+msgstr ""
+"dnf5daemon-serverへの接続に失敗しました。\n"
+"\n"
+"dnf5daemon-serverサービスが実行されていることを確認してください:\n"
+"\n"
+"  systemctl start dnf5daemon-server\n"
+"\n"
+"インストールされていない場合は、以下でインストールしてください:\n"
+"  dnf install dnf5daemon-server"
+
+#: src/main.cpp:87
+msgid "D-Bus error details:"
+msgstr "D-Busエラーの詳細:"
+
+#: src/main.cpp:90
+msgid "Connection Error"
+msgstr "接続エラー"
+
+#: src/core/Backend.cpp:49
+msgid "Downloading"
+msgstr "ダウンロード中"
+
+#: src/core/Backend.cpp:53
+msgid "Download complete"
+msgstr "ダウンロード完了"
+
+#: src/core/Backend.cpp:59
+msgid "%1 %2"
+msgstr "%1 %2"
+
+#: src/core/Backend.cpp:63
+msgid "Processing %1"
+msgstr "%1 を処理中"
+
+#: src/core/Backend.cpp:66
+msgid "Verifying Packages"
+msgstr "パッケージを検証中"
+
+#: src/core/Backend.cpp:70
+msgid "Verifying"
+msgstr "検証中"
+
+#: src/core/Backend.cpp:73
+msgid "Applying Transaction"
+msgstr "トランザクションを適用中"
+
+#: src/core/Backend.cpp:76
+msgid "Running scripts"
+msgstr "スクリプトを実行中"
+
+#: src/core/Enums.h:87
+msgid "Installing"
+msgstr "インストール中"
+
+#: src/core/Enums.h:88
+msgid "Upgrading"
+msgstr "アップグレード中"
+
+#: src/core/Enums.h:89
+msgid "Downgrading"
+msgstr "ダウングレード中"
+
+#: src/core/Enums.h:90
+msgid "Reinstalling"
+msgstr "再インストール中"
+
+#: src/core/Enums.h:91
+msgid "Removing"
+msgstr "削除中"
+
+#: src/core/Enums.h:92
+msgid "Replacing"
+msgstr "置換中"
+
+#: src/core/UpdateChecker.cpp:159
+msgid "Updates Available"
+msgstr "更新が利用可能です"
+
+#: src/core/UpdateChecker.cpp:160
+msgid "%1 update is available for your system."
+msgid_plural "%1 updates are available for your system."
+msgstr[0] "システムに %1 個の更新が利用可能です。"
+
+#: src/ui/AdvancedOpsDialog.cpp:84 src/ui/AdvancedOpsDialog.cpp:92
+#: src/ui/MainWindow.cpp:421
+msgid "Advanced Operations"
+msgstr "詳細操作"
+
+#: src/ui/AdvancedOpsDialog.cpp:95
+msgid "System-level package operations that require root privileges."
+msgstr "root権限が必要なシステムレベルのパッケージ操作。"
+
+#: src/ui/AdvancedOpsDialog.cpp:104 src/ui/AdvancedOpsDialog.cpp:239
+#: src/ui/AdvancedOpsDialog.cpp:246
+msgid "Refresh DNF Cache"
+msgstr "DNFキャッシュを更新"
+
+#: src/ui/AdvancedOpsDialog.cpp:105
+msgid "Run: dnf makecache --refresh"
+msgstr "実行: dnf makecache --refresh"
+
+#: src/ui/AdvancedOpsDialog.cpp:109
+msgid "Download and rebuild metadata cache for all enabled repositories."
+msgstr "有効なすべてのリポジトリのメタデータキャッシュをダウンロードして再構築します。"
+
+#: src/ui/AdvancedOpsDialog.cpp:119 src/ui/AdvancedOpsDialog.cpp:259
+#: src/ui/AdvancedOpsDialog.cpp:266 src/ui/MainWindow.cpp:413
+#: src/ui/MainWindow.cpp:822 src/ui/MainWindow.cpp:837
+#: src/ui/MainWindow.cpp:843
+msgid "Distro Sync"
+msgstr "ディストリ同期"
+
+#: src/ui/AdvancedOpsDialog.cpp:120
+msgid "Run: dnf distro-sync"
+msgstr "実行: dnf distro-sync"
+
+#: src/ui/AdvancedOpsDialog.cpp:124
+msgid ""
+"Synchronize all installed packages to the latest versions in repositories."
+msgstr "インストール済みのすべてのパッケージをリポジトリの最新バージョンに同期します。"
+
+#: src/ui/AdvancedOpsDialog.cpp:132 src/ui/MainWindow.cpp:409
+#: src/ui/MainWindow.cpp:917 src/ui/MainWindow.cpp:944
+msgid "System Upgrade"
+msgstr "システムアップグレード"
+
+#: src/ui/AdvancedOpsDialog.cpp:160
+msgid "Fedora Version"
+msgstr "Fedoraバージョン"
+
+#: src/ui/AdvancedOpsDialog.cpp:161
+msgid "Target Fedora release (VERSION_ID from /usr/lib/os-release)."
+msgstr "対象のFedoraリリース（/usr/lib/os-releaseのVERSION_ID）。"
+
+#: src/ui/AdvancedOpsDialog.cpp:182 src/ui/AdvancedOpsDialog.cpp:301
+msgid "Execute System Upgrade"
+msgstr "システムアップグレードを実行"
+
+#: src/ui/AdvancedOpsDialog.cpp:183
+msgid "Run: dnf system-upgrade download --releasever=<version>"
+msgstr "実行: dnf system-upgrade download --releasever=<version>"
+
+#: src/ui/AdvancedOpsDialog.cpp:206
+msgid "Command Output"
+msgstr "コマンド出力"
+
+#: src/ui/AdvancedOpsDialog.cpp:217
+msgid "Close"
+msgstr "閉じる"
+
+#: src/ui/AdvancedOpsDialog.cpp:232 src/ui/AdvancedOpsDialog.cpp:252
+#: src/ui/AdvancedOpsDialog.cpp:272
+msgid "Another operation is still running."
+msgstr "別の操作がまだ実行中です。"
+
+#: src/ui/AdvancedOpsDialog.cpp:237
+msgid ""
+"This will download and rebuild the metadata cache for all enabled "
+"repositories. Continue?"
+msgstr "有効なすべてのリポジトリのメタデータキャッシュをダウンロードして再構築します。続行しますか？"
+
+#: src/ui/AdvancedOpsDialog.cpp:240 src/ui/FlatpakPage.cpp:254
+#: src/ui/FlatpakPage.cpp:314 src/ui/MainWindow.cpp:404
+msgid "Refresh"
+msgstr "更新"
+
+#: src/ui/AdvancedOpsDialog.cpp:257
+msgid ""
+"This will synchronise all installed packages to the latest version available"
+" in the repositories. Continue?"
+msgstr "インストール済みのすべてのパッケージをリポジトリで利用可能な最新バージョンに同期します。続行しますか？"
+
+#: src/ui/AdvancedOpsDialog.cpp:260
+msgid "Sync"
+msgstr "同期"
+
+#: src/ui/AdvancedOpsDialog.cpp:278
+msgid "Please enter a target Fedora version."
+msgstr "対象のFedoraバージョンを入力してください。"
+
+#: src/ui/AdvancedOpsDialog.cpp:286
+msgid ""
+"The target version (%1) is lower than the currently running version (%2). Downgrading the system is risky and may leave the system in an inconsistent state.\n"
+"\n"
+"Do you really want to continue?"
+msgstr ""
+"対象バージョン (%1) は現在実行中のバージョン (%2) より低いです。システムのダウングレードは危険であり、システムが不整合状態になる可能性があります。\n"
+"\n"
+"本当に続行しますか？"
+
+#: src/ui/AdvancedOpsDialog.cpp:291
+msgid "Version Downgrade Warning"
+msgstr "バージョンダウングレード警告"
+
+#: src/ui/AdvancedOpsDialog.cpp:297
+msgid ""
+"This will download all packages needed to upgrade the system to Fedora %1. After the download completes you will need to reboot to apply the upgrade.\n"
+"\n"
+"Continue?"
+msgstr ""
+"システムをFedora %1にアップグレードするために必要なすべてのパッケージをダウンロードします。ダウンロード完了後、アップグレードを適用するために再起動が必要です。\n"
+"\n"
+"続行しますか？"
+
+#: src/ui/AdvancedOpsDialog.cpp:302
+msgid "Download"
+msgstr "ダウンロード"
+
+#: src/ui/AdvancedOpsDialog.cpp:311
+msgid "System Upgrade (releasever=%1)"
+msgstr "システムアップグレード (releasever=%1)"
+
+#: src/ui/AdvancedOpsDialog.cpp:326
+msgid ""
+"Warning: Target version %1 is lower than current version %2. This is a "
+"version downgrade and carries risks."
+msgstr "警告: 対象バージョン %1 は現在のバージョン %2 より低いです。これはバージョンのダウングレードであり、リスクを伴います。"
+
+#: src/ui/AdvancedOpsDialog.cpp:373
+msgid "Executing: %1 ..."
+msgstr "実行中: %1 ..."
+
+#: src/ui/AdvancedOpsDialog.cpp:380
+msgid "[started]"
+msgstr "[開始]"
+
+#: src/ui/AdvancedOpsDialog.cpp:401 src/ui/AdvancedOpsDialog.cpp:403
+#: src/ui/FlatpakPage.cpp:814
+msgid "Operation completed successfully."
+msgstr "操作が正常に完了しました。"
+
+#: src/ui/AdvancedOpsDialog.cpp:402
+msgid "[completed successfully]"
+msgstr "[完了]"
+
+#: src/ui/AdvancedOpsDialog.cpp:407
+msgid "Operation cancelled or authentication failed."
+msgstr "操作がキャンセルされたか、認証に失敗しました。"
+
+#: src/ui/AdvancedOpsDialog.cpp:408
+msgid "[cancelled or authentication failed (exit %1)]"
+msgstr "[キャンセルまたは認証失敗 (終了 %1)]"
+
+#: src/ui/AdvancedOpsDialog.cpp:410
+msgid "Operation failed (exit code %1)."
+msgstr "操作が失敗しました（終了コード %1）。"
+
+#: src/ui/AdvancedOpsDialog.cpp:411
+msgid "[failed with exit code %1]"
+msgstr "[失敗、終了コード %1]"
+
+#: src/ui/AdvancedOpsDialog.cpp:413
+msgid ""
+"Operation failed with exit code %1. Check the output below for details."
+msgstr "操作が終了コード %1 で失敗しました。詳細は以下の出力を確認してください。"
+
+#: src/ui/AdvancedOpsDialog.cpp:414
+msgid "Operation Failed"
+msgstr "操作失敗"
+
+#: src/ui/AdvancedOpsDialog.cpp:422
+msgid "Failed to start command: %1"
+msgstr "コマンドの起動に失敗しました: %1"
+
+#: src/ui/AdvancedOpsDialog.cpp:423
+msgid "[error: %1]"
+msgstr "[エラー: %1]"
+
+#: src/ui/AdvancedOpsDialog.cpp:425
+msgid ""
+"Failed to start command.\n"
+"%1\n"
+"\n"
+"Make sure pkexec (polkit) is installed and available."
+msgstr ""
+"コマンドの起動に失敗しました。\n"
+"%1\n"
+"\n"
+"pkexec (polkit) がインストールされて利用可能であることを確認してください。"
+
+#: src/ui/AdvancedOpsDialog.cpp:427
+msgid "Command Start Failed"
+msgstr "コマンド起動失敗"
+
+#: src/ui/FlatpakPage.cpp:96 src/ui/FlatpakPage.cpp:400
+#: src/ui/FlatpakPage.cpp:516 src/ui/FlatpakPage.cpp:834
+#: src/ui/FlatpakPage.cpp:849
+msgid "Update"
+msgstr "更新"
+
+#: src/ui/FlatpakPage.cpp:99 src/ui/MainWindow.cpp:151
+#: src/ui/PackageInfoWidget.cpp:112
+msgid "Installed"
+msgstr "インストール済み"
+
+#: src/ui/FlatpakPage.cpp:102 src/ui/FlatpakPage.cpp:391
+#: src/ui/FlatpakPage.cpp:828 src/ui/FlatpakPage.cpp:845
+#: src/ui/TransactionResultDialog.cpp:65
+msgid "Install"
+msgstr "インストール"
+
+#: src/ui/FlatpakPage.cpp:167
+msgid "Flatpak Apps"
+msgstr "Flatpakアプリ"
+
+#: src/ui/FlatpakPage.cpp:171
+msgid "Flatpak Store"
+msgstr "Flatpakストア"
+
+#: src/ui/FlatpakPage.cpp:206 src/ui/MainWindow.cpp:666
+msgid "Loading..."
+msgstr "読み込み中..."
+
+#: src/ui/FlatpakPage.cpp:232
+msgid "Filter installed Flatpak apps..."
+msgstr "インストール済みFlatpakアプリを絞り込む..."
+
+#: src/ui/FlatpakPage.cpp:239 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:738
+msgid "Update All"
+msgstr "すべて更新"
+
+#: src/ui/FlatpakPage.cpp:244 src/ui/FlatpakPage.cpp:919
+msgid "Uninstall Selected"
+msgstr "選択したものをアンインストール"
+
+#: src/ui/FlatpakPage.cpp:249 src/ui/FlatpakPage.cpp:949
+msgid "Update Selected"
+msgstr "選択したものを更新"
+
+#: src/ui/FlatpakPage.cpp:298
+msgid "Search Flatpak store..."
+msgstr "Flatpakストアを検索..."
+
+#: src/ui/FlatpakPage.cpp:304 src/ui/FlatpakPage.cpp:756
+msgid "All Remotes"
+msgstr "すべてのリモート"
+
+#: src/ui/FlatpakPage.cpp:309 src/ui/FlatpakPage.cpp:897
+msgid "Install Selected"
+msgstr "選択したものをインストール"
+
+#: src/ui/FlatpakPage.cpp:396 src/ui/FlatpakPage.cpp:525
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:672
+#: src/ui/FlatpakPage.cpp:831 src/ui/FlatpakPage.cpp:847
+msgid "Uninstall"
+msgstr "アンインストール"
+
+#: src/ui/FlatpakPage.cpp:404 src/ui/FlatpakPage.cpp:508
+msgid "Run"
+msgstr "実行"
+
+#: src/ui/FlatpakPage.cpp:434 src/ui/MainWindow.cpp:161
+#: src/ui/PackageInfoWidget.cpp:83
+msgid "Description"
+msgstr "説明"
+
+#: src/ui/FlatpakPage.cpp:446
+msgid "Back to List"
+msgstr "リストに戻る"
+
+#: src/ui/FlatpakPage.cpp:462 src/ui/FlatpakPage.cpp:715
+msgid "Loading installed Flatpak apps..."
+msgstr "インストール済みFlatpakアプリを読み込み中..."
+
+#: src/ui/FlatpakPage.cpp:464
+msgid "Search the Flatpak store"
+msgstr "Flatpakストアを検索"
+
+#: src/ui/FlatpakPage.cpp:488 src/ui/FlatpakPage.cpp:784
+#: src/ui/MainWindow.cpp:1059
+msgid "%1 result"
+msgid_plural "%1 results"
+msgstr[0] "%1 件の結果"
+
+#: src/ui/FlatpakPage.cpp:528 src/ui/FlatpakPage.cpp:671
+msgid "Uninstall '%1' (%2)?"
+msgstr "'%1' (%2) をアンインストールしますか？"
+
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:672 src/ui/FlatpakPage.cpp:897
+#: src/ui/FlatpakPage.cpp:919 src/ui/FlatpakPage.cpp:949
+#: src/ui/MainWindow.cpp:936 src/ui/MainWindow.cpp:944
+#: src/ui/MainWindow.cpp:1135 src/ui/RepoView.cpp:116 src/ui/RepoView.cpp:140
+msgid "Yes"
+msgstr "はい"
+
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:672 src/ui/FlatpakPage.cpp:897
+#: src/ui/FlatpakPage.cpp:919 src/ui/FlatpakPage.cpp:949
+#: src/ui/MainWindow.cpp:936 src/ui/MainWindow.cpp:944
+#: src/ui/MainWindow.cpp:1135 src/ui/RepoView.cpp:116 src/ui/RepoView.cpp:140
+msgid "No"
+msgstr "いいえ"
+
+#: src/ui/FlatpakPage.cpp:546
+msgid "No updates available."
+msgstr "利用可能な更新はありません。"
+
+#: src/ui/FlatpakPage.cpp:551
+msgid "Update %1 Flatpak application?"
+msgid_plural "Update %1 Flatpak applications?"
+msgstr[0] "%1 個のFlatpakアプリを更新しますか？"
+
+#: src/ui/FlatpakPage.cpp:570
+msgid "Searching for '%1'..."
+msgstr "'%1' を検索中..."
+
+#: src/ui/FlatpakPage.cpp:612
+msgid "Application ID: %1"
+msgstr "アプリケーション ID: %1"
+
+#: src/ui/FlatpakPage.cpp:613
+msgid "Version: %1"
+msgstr "バージョン: %1"
+
+#: src/ui/FlatpakPage.cpp:614
+msgid "Branch: %1"
+msgstr "ブランチ: %1"
+
+#: src/ui/FlatpakPage.cpp:615
+msgid "Remote: %1"
+msgstr "リモート: %1"
+
+#: src/ui/FlatpakPage.cpp:616
+msgid "Installation: %1"
+msgstr "インストール: %1"
+
+#: src/ui/FlatpakPage.cpp:618
+msgid "Size: %1"
+msgstr "サイズ: %1"
+
+#: src/ui/FlatpakPage.cpp:623 src/ui/PackageInfoWidget.cpp:127
+msgid "<i>No description available.</i>"
+msgstr "<i>説明はありません。</i>"
+
+#: src/ui/FlatpakPage.cpp:658
+msgid "Installing..."
+msgstr "インストール中..."
+
+#: src/ui/FlatpakPage.cpp:677
+msgid "Uninstalling..."
+msgstr "アンインストール中..."
+
+#: src/ui/FlatpakPage.cpp:690
+msgid "Updating..."
+msgstr "更新中..."
+
+#: src/ui/FlatpakPage.cpp:736
+msgid "Update All (%1)"
+msgstr "すべて更新 (%1)"
+
+#: src/ui/FlatpakPage.cpp:741
+msgid "%1 app installed, %2 update available"
+msgid_plural "%1 apps installed, %2 updates available"
+msgstr[0] "%1 個のアプリがインストール済み、%2 個の更新が利用可能"
+
+#: src/ui/FlatpakPage.cpp:745
+msgid "%1 app installed"
+msgid_plural "%1 apps installed"
+msgstr[0] "%1 個のアプリがインストール済み"
+
+#: src/ui/FlatpakPage.cpp:790
+msgid "Operation: %1"
+msgstr "操作: %1"
+
+#: src/ui/FlatpakPage.cpp:842
+msgid "Operation failed."
+msgstr "操作が失敗しました。"
+
+#: src/ui/FlatpakPage.cpp:852
+msgid "Flatpak Operation Error"
+msgstr "Flatpak操作エラー"
+
+#: src/ui/FlatpakPage.cpp:859 src/ui/MainWindow.cpp:1102
+#: src/ui/MainWindow.cpp:1103 src/ui/RepoView.cpp:130 src/ui/RepoView.cpp:154
+msgid "Error"
+msgstr "エラー"
+
+#: src/ui/FlatpakPage.cpp:860
+msgid "Flatpak Error"
+msgstr "Flatpakエラー"
+
+#: src/ui/FlatpakPage.cpp:896
+msgid "Install %1 selected Flatpak application?"
+msgid_plural "Install %1 selected Flatpak applications?"
+msgstr[0] "選択した %1 個のFlatpakアプリをインストールしますか？"
+
+#: src/ui/FlatpakPage.cpp:903
+msgid "Installing %1 application..."
+msgid_plural "Installing %1 applications..."
+msgstr[0] "%1 個のアプリをインストール中..."
+
+#: src/ui/FlatpakPage.cpp:918
+msgid "Uninstall %1 selected Flatpak application?"
+msgid_plural "Uninstall %1 selected Flatpak applications?"
+msgstr[0] "選択した %1 個のFlatpakアプリをアンインストールしますか？"
+
+#: src/ui/FlatpakPage.cpp:925
+msgid "Uninstalling %1 application..."
+msgid_plural "Uninstalling %1 applications..."
+msgstr[0] "%1 個のアプリをアンインストール中..."
+
+#: src/ui/FlatpakPage.cpp:943
+msgid "No upgradable applications selected."
+msgstr "アップグレード可能なアプリケーションが選択されていません。"
+
+#: src/ui/FlatpakPage.cpp:948
+msgid "Update %1 selected Flatpak application?"
+msgid_plural "Update %1 selected Flatpak applications?"
+msgstr[0] "選択した %1 個のFlatpakアプリを更新しますか？"
+
+#: src/ui/FlatpakPage.cpp:955
+msgid "Updating %1 application..."
+msgid_plural "Updating %1 applications..."
+msgstr[0] "%1 個のアプリを更新中..."
+
+#: src/ui/PackageInfoWidget.cpp:118
+msgid "Update Available"
+msgstr "更新あり"
+
+#: src/ui/TransactionResultDialog.cpp:66
+msgid "Upgrade"
+msgstr "アップグレード"
+
+#: src/ui/MainWindow.cpp:150
+msgid "All"
+msgstr "すべて"
+
+#: src/ui/MainWindow.cpp:144
+msgid "Search packages..."
+msgstr "パッケージを検索..."
+
+#: src/ui/MainWindow.cpp:152 src/ui/PackageInfoWidget.cpp:115
+msgid "Available"
+msgstr "利用可能"
+
+#: src/ui/MainWindow.cpp:153 src/ui/MainWindow.cpp:370
+#: src/ui/MainWindow.cpp:477
+msgid "Updates"
+msgstr "更新"
+
+#: src/ui/MainWindow.cpp:154
+msgid "Upgradable"
+msgstr "アップグレード可能"
+
+#: src/ui/MainWindow.cpp:158
+msgid "All Fields"
+msgstr "すべてのフィールド"
+
+#: src/ui/MainWindow.cpp:159
+msgid "Name"
+msgstr "名前"
+
+#: src/ui/MainWindow.cpp:160
+msgid "Summary"
+msgstr "概要"
+
+#: src/ui/MainWindow.cpp:195
+msgid "Available Updates"
+msgstr "利用可能な更新"
+
+#: src/ui/MainWindow.cpp:223 src/ui/TransactionResultDialog.cpp:126
+msgid "Apply"
+msgstr "適用"
+
+#: src/ui/MainWindow.cpp:224
+msgid "Clear"
+msgstr "クリア"
+
+#: src/ui/MainWindow.cpp:225
+msgid "Resolve Dependencies"
+msgstr "依存関係を解決"
+
+#: src/ui/MainWindow.cpp:228
+msgid "Offline update"
+msgstr "オフライン更新"
+
+#: src/ui/MainWindow.cpp:229
+msgid "Download packages now, install on next reboot"
+msgstr "今すぐパッケージをダウンロードし、次回再起動時にインストール"
+
+#: src/ui/MainWindow.cpp:283 src/ui/MainWindow.cpp:372
+#: src/ui/MainWindow.cpp:484 src/ui/SettingsDialog.cpp:93
+msgid "Repositories"
+msgstr "リポジトリ"
+
+#: src/ui/MainWindow.cpp:328 src/ui/MainWindow.cpp:568
+#: src/ui/MainWindow.cpp:581 src/ui/MainWindow.cpp:619
+#: src/ui/MainWindow.cpp:734 src/ui/MainWindow.cpp:762
+#: src/ui/MainWindow.cpp:845 src/ui/MainWindow.cpp:881
+#: src/ui/MainWindow.cpp:972 src/ui/MainWindow.cpp:988
+#: src/ui/MainWindow.cpp:1066
+msgid "Ready"
+msgstr "準備完了"
+
+#: src/ui/MainWindow.cpp:358
+msgid "Miryu"
+msgstr "Miryu"
+
+#: src/ui/MainWindow.cpp:369
+msgid "Packages"
+msgstr "パッケージ"
+
+#: src/ui/MainWindow.cpp:371
+msgid "Queue"
+msgstr "キュー"
+
+#: src/ui/MainWindow.cpp:399 src/ui/MainWindow.cpp:1137
+msgid "Linglong Store"
+msgstr "Linglongストア"
+
+#: src/ui/MainWindow.cpp:375 src/ui/MainWindow.cpp:498
+msgid "Flatpak"
+msgstr "Flatpak"
+
+#: src/ui/MainWindow.cpp:417 src/ui/MainWindow.cpp:873
+#: src/ui/MainWindow.cpp:879 src/ui/RepoView.cpp:162
+msgid "Refresh Metadata"
+msgstr "メタデータを更新"
+
+#: src/ui/MainWindow.cpp:425
+msgid "Install RPM File..."
+msgstr "RPM ファイルをインストール..."
+
+#: src/ui/MainWindow.cpp:429
+msgid "Configure Miryu..."
+msgstr "Miryu を設定..."
+
+#: src/ui/MainWindow.cpp:436
+msgid "Find"
+msgstr "検索"
+
+#: src/ui/MainWindow.cpp:442
+msgid "Select All"
+msgstr "すべて選択"
+
+#: src/ui/MainWindow.cpp:453
+msgid "Deselect All"
+msgstr "選択解除"
+
+#: src/ui/MainWindow.cpp:472
+msgid "Package Browser"
+msgstr "パッケージブラウザ"
+
+#: src/ui/MainWindow.cpp:481
+msgid "Transaction Queue"
+msgstr "トランザクションキュー"
+
+#: src/ui/MainWindow.cpp:502
+msgid "Flatpak is not installed on this system."
+msgstr "このシステムには Flatpak がインストールされていません。"
+
+#: src/ui/MainWindow.cpp:535
+msgid "The package backend is not initialized. Cannot install RPM files."
+msgstr "パッケージバックエンドが初期化されていません。RPMファイルをインストールできません。"
+
+#: src/ui/MainWindow.cpp:536 src/ui/MainWindow.cpp:612
+msgid "RPM Installation"
+msgstr "RPM インストール"
+
+#: src/ui/MainWindow.cpp:556
+msgid "Preparing RPM installation..."
+msgstr "RPMインストールを準備中..."
+
+#: src/ui/MainWindow.cpp:567 src/ui/MainWindow.cpp:733
+msgid "Transaction Error"
+msgstr "トランザクションエラー"
+
+#: src/ui/MainWindow.cpp:600
+msgid "RPM installation completed successfully."
+msgstr "RPM インストールが正常に完了しました。"
+
+#: src/ui/MainWindow.cpp:611
+msgid "Operation cancelled by user."
+msgstr "操作はユーザーによってキャンセルされました。"
+
+#: src/ui/MainWindow.cpp:615
+msgid "RPM installation failed."
+msgstr "RPM インストールに失敗しました。"
+
+#: src/ui/MainWindow.cpp:616 src/ui/MainWindow.cpp:760
+msgid "Transaction Failed"
+msgstr "トランザクション失敗"
+
+#: src/ui/MainWindow.cpp:622 src/ui/MainWindow.cpp:767
+msgid "Applying transaction..."
+msgstr "トランザクションを適用中..."
+
+#: src/ui/MainWindow.cpp:648
+msgid "Searching..."
+msgstr "検索中..."
+
+#: src/ui/MainWindow.cpp:700
+msgid "%1 package queued"
+msgid_plural "%1 packages queued"
+msgstr[0] "%1 個のパッケージがキューに追加されました"
+
+#: src/ui/MainWindow.cpp:715
+msgid "Queue is empty. Add packages to the queue first."
+msgstr "キューが空です。最初にパッケージをキューに追加してください。"
+
+#: src/ui/MainWindow.cpp:720
+msgid "Resolving transaction..."
+msgstr "トランザクションを解決中..."
+
+#: src/ui/MainWindow.cpp:754
+msgid "Transaction completed successfully."
+msgstr "トランザクションが正常に完了しました。"
+
+#: src/ui/MainWindow.cpp:781
+msgid "Building transaction..."
+msgstr "トランザクションを構築中..."
+
+#: src/ui/MainWindow.cpp:820
+msgid ""
+"Distribution sync will synchronize all installed packages to the versions "
+"available in the repositories. This may downgrade or upgrade packages. "
+"Continue?"
+msgstr ""
+"ディストリ同期は、インストール済みのすべてのパッケージをリポジトリで利用可能なバージョンに同期します。パッケージのダウングレードまたはアップグレードが行われる場合があります。続行しますか?"
+
+#: src/ui/MainWindow.cpp:827
+msgid "Performing distribution sync..."
+msgstr "ディストリ同期を実行中..."
+
+#: src/ui/MainWindow.cpp:837
+msgid "Distribution sync completed successfully."
+msgstr "ディストリ同期が正常に完了しました。"
+
+#: src/ui/MainWindow.cpp:842
+msgid "Distribution sync failed."
+msgstr "ディストリ同期に失敗しました。"
+
+#: src/ui/MainWindow.cpp:863
+msgid "Refreshing repository metadata..."
+msgstr "リポジトリメタデータを更新中..."
+
+#: src/ui/MainWindow.cpp:873
+msgid "Metadata refreshed successfully."
+msgstr "メタデータの更新に成功しました。"
+
+#: src/ui/MainWindow.cpp:878
+msgid "Failed to refresh metadata."
+msgstr "メタデータの更新に失敗しました。"
+
+#: src/ui/MainWindow.cpp:918
+msgid "Enter the version you want to upgrade to:"
+msgstr "アップグレード先のバージョンを入力してください:"
+
+#: src/ui/MainWindow.cpp:933
+msgid ""
+"The target version (%1) is lower than the current version (%2). Downgrading "
+"the system may cause instability. Continue anyway?"
+msgstr ""
+"対象バージョン (%1) は現在のバージョン (%2) より低いです。システムをダウングレードすると不安定になる可能性があります。それでも続行しますか?"
+
+#: src/ui/MainWindow.cpp:936
+msgid "Version Warning"
+msgstr "バージョン警告"
+
+#: src/ui/MainWindow.cpp:943
+msgid "This will prepare a system upgrade transaction. Continue?"
+msgstr "システムアップグレードトランザクションを準備します。続行しますか?"
+
+#: src/ui/MainWindow.cpp:948
+msgid "Preparing system upgrade..."
+msgstr "システムアップグレードを準備中..."
+
+#: src/ui/MainWindow.cpp:969
+msgid "System upgrade transaction completed."
+msgstr "システムアップグレードトランザクションが完了しました。"
+
+#: src/ui/MainWindow.cpp:971
+msgid "System Upgrade Failed"
+msgstr "システムアップグレード失敗"
+
+#: src/ui/MainWindow.cpp:987
+msgid "System Upgrade Error"
+msgstr "システムアップグレードエラー"
+
+#: src/ui/MainWindow.cpp:1003
+msgid "Checking for updates..."
+msgstr "更新を確認中..."
+
+#: src/ui/MainWindow.cpp:1031
+msgid "Select RPM Package Files"
+msgstr "RPMパッケージファイルを選択"
+
+#: src/ui/MainWindow.cpp:1033
+msgid "RPM Packages (*.rpm)"
+msgstr "RPMパッケージ (*.rpm)"
+
+#: src/ui/MainWindow.cpp:1039
+msgid "Download now and install on next reboot (offline update)?"
+msgstr "今すぐダウンロードし、次回再起動時にインストールしますか（オフラインアップデート）?"
+
+#: src/ui/MainWindow.cpp:1040
+msgid "Installation Mode"
+msgstr "インストールモード"
+
+#: src/ui/MainWindow.cpp:1041
+msgid "Offline Update"
+msgstr "オフラインアップデート"
+
+#: src/ui/MainWindow.cpp:1041
+msgid "Install Now"
+msgstr "今すぐインストール"
+
+#: src/ui/MainWindow.cpp:1052
+msgid "%1 package"
+msgid_plural "%1 packages"
+msgstr[0] "%1 個のパッケージ"
+
+#: src/ui/MainWindow.cpp:1075
+msgid "%1 update available"
+msgid_plural "%1 updates available"
+msgstr[0] "%1 個の更新が利用可能"
+
+#: src/ui/MainWindow.cpp:1109
+msgid "%1 updates"
+msgstr "%1 件の更新"
+
+#: src/ui/MainWindow.cpp:1122
+msgid "Queue: %1 items"
+msgstr "キュー: %1 項目"
+
+#: src/ui/MainWindow.cpp:1134
+msgid "There are pending operations in the queue. Close anyway?"
+msgstr "キューに保留中の操作があります。それでも閉じますか?"
+
+#: src/ui/MainWindow.cpp:1135
+msgid "Pending Operations"
+msgstr "保留中の操作"
+
+#: src/ui/MainWindow.cpp:1129
+msgid "About Miryu Software Center"
+msgstr "Miryu ソフトウェアセンターについて"
+
+#: src/ui/MainWindow.cpp:1143
+msgid "Version %1"
+msgstr "バージョン %1"
+
+#: src/ui/MainWindow.cpp:1164
+msgid "Authors"
+msgstr "作者"
+
+#: src/ui/MainWindow.cpp:1207
+msgid "Need to Restart"
+msgstr "再起動が必要です"
+
+#: src/ui/MainWindow.cpp:1208
+msgid ""
+"You have installed software packages that require a computer restart. "
+"Please restart the operating system as soon as possible to ensure the "
+"updates take full effect."
+msgstr ""
+"コンピュータの再起動が必要なソフトウェアパッケージがインストールされました。"
+"更新が完全に反映されるように、できるだけ早くオペレーティングシステムを"
+"再起動してください。"
+
+#: src/ui/PackageInfoWidget.cpp:67
+msgid "Version:"
+msgstr "バージョン:"
+
+#: src/ui/PackageInfoWidget.cpp:68
+msgid "Repository:"
+msgstr "リポジトリ:"
+
+#: src/ui/PackageInfoWidget.cpp:69
+msgid "Size:"
+msgstr "サイズ:"
+
+#: src/ui/PackageInfoWidget.cpp:70
+msgid "License:"
+msgstr "ライセンス:"
+
+#: src/ui/PackageInfoWidget.cpp:71
+msgid "URL:"
+msgstr "URL:"
+
+#: src/ui/PackageInfoWidget.cpp:72
+msgid "Status:"
+msgstr "状態:"
+
+#: src/ui/PackageInfoWidget.cpp:121
+msgid "Downgrade Available"
+msgstr "ダウングレード可能"
+
+#: src/ui/PackageView.cpp:205
+msgid "Install Selected (%1)"
+msgstr "選択したものをインストール (%1)"
+
+#: src/ui/PackageView.cpp:219
+msgid "Update Selected (%1)"
+msgstr "選択したものを更新 (%1)"
+
+#: src/ui/PackageView.cpp:233
+msgid "Remove Selected (%1)"
+msgstr "選択したものを削除 (%1)"
+
+#: src/ui/PackageView.cpp:246
+msgid "Copy Selected Package Names"
+msgstr "選択したパッケージ名をコピー"
+
+#: src/ui/PackageView.cpp:267 src/ui/QueueView.cpp:153
+msgid "Remove from Queue"
+msgstr "キューから削除"
+
+#: src/ui/PackageView.cpp:271
+msgid "Queue for Removal"
+msgstr "削除キューに追加"
+
+#: src/ui/PackageView.cpp:272
+msgid "Queue for Update"
+msgstr "更新キューに追加"
+
+#: src/ui/PackageView.cpp:273
+msgid "Queue for Installation"
+msgstr "インストールキューに追加"
+
+#: src/ui/PackageView.cpp:279
+msgid "Copy Package Name"
+msgstr "パッケージ名をコピー"
+
+#: src/ui/ProgressDialog.cpp:13
+msgid "Processing"
+msgstr "処理中"
+
+#: src/ui/ProgressDialog.cpp:21
+msgid "Preparing..."
+msgstr "準備中..."
+
+#: src/ui/ProgressDialog.cpp:54
+msgid "Downloading %1: %2 MB / %3 MB"
+msgstr "ダウンロード %1: %2 MB / %3 MB"
+
+#: src/ui/ProgressDialog.cpp:59
+msgid "Downloading %1..."
+msgstr "ダウンロード %1..."
+
+#: src/ui/QueueView.cpp:61 src/ui/PackageInfoWidget.cpp:95
+msgid "Dependencies"
+msgstr "依存関係"
+
+#: src/ui/QueueView.cpp:137 src/ui/TransactionResultDialog.cpp:68
+msgid "Reinstall"
+msgstr "再インストール"
+
+#: src/ui/QueueView.cpp:144 src/ui/TransactionResultDialog.cpp:67
+msgid "Downgrade"
+msgstr "ダウングレード"
+
+#: src/ui/RepoView.cpp:64
+msgid "Default"
+msgstr "デフォルト"
+
+#: src/ui/RepoView.cpp:64
+msgid "Priority: %1"
+msgstr "優先度: %1"
+
+#: src/ui/RepoView.cpp:70
+msgid "Enabled"
+msgstr "有効"
+
+#: src/ui/RepoView.cpp:70
+msgid "Disabled"
+msgstr "無効"
+
+#: src/ui/RepoView.cpp:112 src/ui/RepoView.cpp:116
+msgid "Disable Repository"
+msgstr "リポジトリを無効化"
+
+#: src/ui/RepoView.cpp:115
+msgid "Disable repository '%1'?"
+msgstr "リポジトリ '%1' を無効化しますか?"
+
+#: src/ui/RepoView.cpp:128
+msgid "Failed to disable repository '%1'."
+msgstr "リポジトリ '%1' の無効化に失敗しました。"
+
+#: src/ui/RepoView.cpp:136 src/ui/RepoView.cpp:140
+msgid "Enable Repository"
+msgstr "リポジトリを有効化"
+
+#: src/ui/RepoView.cpp:139
+msgid "Enable repository '%1'?"
+msgstr "リポジトリ '%1' を有効化しますか?"
+
+#: src/ui/RepoView.cpp:152
+msgid "Failed to enable repository '%1'."
+msgstr "リポジトリ '%1' の有効化に失敗しました。"
+
+#: src/ui/SettingsDialog.cpp:84 src/ui/SettingsDialog.cpp:92
+msgid "Settings"
+msgstr "設定"
+
+#: src/ui/SettingsDialog.cpp:110
+msgid "Defaults"
+msgstr "デフォルト"
+
+#: src/ui/SettingsDialog.cpp:146
+msgid "Flatpak Settings"
+msgstr "Flatpak設定"
+
+#: src/ui/SettingsDialog.cpp:153
+msgid "Default Location"
+msgstr "デフォルトの場所"
+
+#: src/ui/SettingsDialog.cpp:154
+msgid ""
+"Whether new Flatpak installs default to the user or system installation."
+msgstr "新しいFlatpakインストールがユーザーインストールかシステムインストールかのデフォルト。"
+
+#: src/ui/SettingsDialog.cpp:158
+msgid "Default Remote Repository"
+msgstr "デフォルトのリモートリポジトリ"
+
+#: src/ui/SettingsDialog.cpp:159
+msgid "Remote repository name used for Flatpak operations by default."
+msgstr "Flatpak操作でデフォルトで使用されるリモートリポジトリ名。"
+
+#: src/ui/SettingsDialog.cpp:164
+msgid "Metadata Settings"
+msgstr "メタデータ設定"
+
+#: src/ui/SettingsDialog.cpp:170 src/ui/SettingsDialog.cpp:189
+msgid " minutes"
+msgstr " 分"
+
+#: src/ui/SettingsDialog.cpp:172
+msgid "Min Refresh Interval"
+msgstr "最小更新間隔"
+
+#: src/ui/SettingsDialog.cpp:173
+msgid "Minimum interval between automatic repository metadata refreshes."
+msgstr "リポジトリメタデータの自動更新の最小間隔。"
+
+#: src/ui/SettingsDialog.cpp:178
+msgid "Updater Settings"
+msgstr "アップデータ設定"
+
+#: src/ui/SettingsDialog.cpp:183
+msgid "e.g. /usr/bin/dnfdragora"
+msgstr "例: /usr/bin/dnfdragora"
+
+#: src/ui/SettingsDialog.cpp:184
+msgid "Custom System Updater Path"
+msgstr "カスタムシステムアップデータパス"
+
+#: src/ui/SettingsDialog.cpp:185
+msgid ""
+"Full path to an external system updater to launch instead of the built-in "
+"one."
+msgstr "内蔵のものの代わりに起動する外部システムアップデータのフルパス。"
+
+#: src/ui/SettingsDialog.cpp:191
+msgid "Check Update Interval"
+msgstr "更新確認間隔"
+
+#: src/ui/SettingsDialog.cpp:192
+msgid "How often Miryu checks for available RPM updates in the background."
+msgstr "Miryuがバックグラウンドで利用可能なRPM更新を確認する頻度。"
+
+#: src/ui/SettingsDialog.cpp:195
+msgid "Show Tray Icon"
+msgstr "トレイアイコンを表示"
+
+#: src/ui/SettingsDialog.cpp:200
+msgid "Show a system tray icon while Miryu is running."
+msgstr "Miryuの実行中にシステムトレイアイコンを表示します。"
+
+#: src/ui/SettingsDialog.cpp:202
+msgid "Dark Tray Icon"
+msgstr "ダークトレイアイコン"
+
+#: src/ui/SettingsDialog.cpp:205
+msgid "Use a dark tray icon for better visibility on light panels."
+msgstr "明るいパネルでの視認性を向上させるために暗いトレイアイコンを使用します。"
+
+#: src/ui/SettingsDialog.cpp:207
+msgid "Update Notifications"
+msgstr "更新通知"
+
+#: src/ui/SettingsDialog.cpp:210
+msgid "Show a desktop notification when updates become available."
+msgstr "更新が利用可能になったときにデスクトップ通知を表示します。"
+
+#: src/ui/SettingsDialog.cpp:240
+msgid "Repository Management"
+msgstr "リポジトリ管理"
+
+#: src/ui/SettingsDialog.cpp:245
+msgid ""
+"Repository enable / disable management is performed from the main Repositories page in the sidebar.\n"
+"\n"
+"Use the sidebar \"Repositories\" entry to view, enable or disable individual software repositories and to refresh their metadata."
+msgstr ""
+"リポジトリの有効化/無効化管理はサイドバーのメインリポジトリページから行います。\n"
+"\n"
+"サイドバーの「リポジトリ」エントリを使用して、個々のソフトウェアリポジトリを表示、有効化、無効化し、メタデータを更新してください。"
+
+#: src/ui/TransactionResultDialog.cpp:36
+msgid "Transaction Summary"
+msgstr "トランザクション概要"
+
+#: src/ui/TransactionResultDialog.cpp:42
+msgid "The following operations will be performed:"
+msgstr "以下の操作が実行されます:"
+
+#: src/ui/TransactionResultDialog.cpp:48
+msgid "Warnings"
+msgstr "警告"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Package"
+msgstr "パッケージ"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Repository"
+msgstr "リポジトリ"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Size"
+msgstr "サイズ"
+
+#: src/ui/TransactionResultDialog.cpp:69
+msgid "Remove"
+msgstr "削除"
+
+#: src/ui/TransactionResultDialog.cpp:70
+msgid "Replace"
+msgstr "置換"
+
+#: src/ui/TransactionResultDialog.cpp:71
+msgid "Obsolete"
+msgstr "廃止"
+
+#: src/ui/TransactionResultDialog.cpp:117
+msgid "Total Download Size"
+msgstr "総ダウンロードサイズ"
+
+#: src/ui/TransactionResultDialog.cpp:121
+msgid "Apply offline (on next reboot)"
+msgstr "オフライン適用(次回再起動時)"
+
+#: src/ui/PackageInfoWidget.cpp:100
+msgid "Provides"
+msgstr "提供"
+
+#: src/ui/PackageInfoWidget.cpp:105
+msgid "Changelog"
+msgstr "変更履歴"
+
+#: src/ui/PackageInfoWidget.cpp:110
+msgid "Files"
+msgstr "ファイル"
+
+#: src/ui/PackageInfoWidget.cpp:177
+msgid "<i>No dependencies.</i>"
+msgstr "<i>依存関係なし。</i>"
+
+#: src/ui/PackageInfoWidget.cpp:184
+msgid "<i>No provides.</i>"
+msgstr "<i>提供なし。</i>"
+
+#: src/ui/PackageInfoWidget.cpp:191
+msgid "<i>No changelog available.</i>"
+msgstr "<i>変更履歴はありません。</i>"
+
+#: src/ui/PackageInfoWidget.cpp:198
+msgid "<i>No file list available.</i>"
+msgstr "<i>ファイルリストはありません。</i>"
+
+#: src/ui/MainWindow.cpp:757 src/ui/MainWindow.cpp:581
+msgid ""
+"Cannot remove protected packages or critical dependencies.\n"
+"\n"
+"Removing these packages would break the system.\n"
+"\n"
+"%1"
+msgstr ""
+"保護されたパッケージや重要な依存関係を削除できません。\n"
+"\n"
+"これらのパッケージを削除するとシステムが破損します。\n"
+"\n"
+"%1"
+
+#: src/ui/MainWindow.cpp:761 src/ui/MainWindow.cpp:585
+msgid "Protected Package Error"
+msgstr "保護パッケージエラー"
+
+#: src/core/Dnf5DaemonClient.cpp:471
+msgid "Cannot load repositories."
+msgstr "リポジトリを読み込めません。"
+
+#: src/ui/MainWindow.cpp:1134
+msgid ""
+"Failed to launch the Linglong Store.\n"
+"\n"
+"Please ensure that the linglong-store application is installed\n"
+"and available at %1."
+msgstr ""
+"Linglongストアを起動できません。\n"
+"\n"
+"linglong-storeアプリケーションがインストールされ、\n"
+"%1 から利用可能であることを確認してください。"
+
+#: src/ui/MainWindow.cpp:404
+msgid "Launch the external Linglong Store application"
+msgstr "外部Linglongストアアプリケーションを起動"

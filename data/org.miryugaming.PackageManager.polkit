@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
+
+<!--
+  Polkit policy for Miryu Software Center.
+  Allows active users to perform package management operations
+  through dnf5daemon-server with interactive authentication.
+
+  © 2027 KairikiFedora and © 2027 MiryuGaming
+-->
+
+<policyconfig>
+
+  <action id="org.miryugaming.PackageManager.manage-packages">
+    <description>Manage RPM packages</description>
+    <description xml:lang="zh_CN">管理 RPM 软件包</description>
+    <description xml:lang="zh_TW">管理 RPM 軟體包</description>
+    <description xml:lang="ja">RPMパッケージの管理</description>
+    <description xml:lang="ko">RPM 패키지 관리</description>
+    <description xml:lang="de">RPM-Pakete verwalten</description>
+    <description xml:lang="fr">Gérer les paquets RPM</description>
+    <message>Authentication is required to install, update, or remove RPM packages.</message>
+    <message xml:lang="zh_CN">安装、更新或删除 RPM 软件包需要认证。</message>
+    <message xml:lang="zh_TW">安裝、更新或移除 RPM 軟體包需要認證。</message>
+    <message xml:lang="ja">RPMパッケージのインストール、更新、削除には認証が必要です。</message>
+    <message xml:lang="ko">RPM 패키지를 설치, 업데이트 또는 제거하려면 인증이 필요합니다.</message>
+    <message xml:lang="de">Authentifizierung ist zum Installieren, Aktualisieren oder Entfernen von RPM-Paketen erforderlich.</message>
+    <message xml:lang="fr">Une authentification est requise pour installer, mettre à jour ou supprimer des paquets RPM.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/miryu-software-center</annotate>
+  </action>
+
+  <action id="org.miryugaming.PackageManager.manage-repos">
+    <description>Manage software repositories</description>
+    <description xml:lang="zh_CN">管理软件仓库</description>
+    <description xml:lang="zh_TW">管理軟體倉庫</description>
+    <description xml:lang="ja">リポジトリの管理</description>
+    <description xml:lang="ko">소프트웨어 저장소 관리</description>
+    <description xml:lang="de">Software-Paketquellen verwalten</description>
+    <description xml:lang="fr">Gérer les dépôts de logiciels</description>
+    <message>Authentication is required to enable or disable software repositories.</message>
+    <message xml:lang="zh_CN">启用或禁用软件仓库需要认证。</message>
+    <message xml:lang="zh_TW">啟用或停用軟體倉庫需要認證。</message>
+    <message xml:lang="ja">リポジトリの有効化または無効化には認証が必要です。</message>
+    <message xml:lang="ko">소프트웨어 저장소를 활성화 또는 비활성화하려면 인증이 필요합니다.</message>
+    <message xml:lang="de">Authentifizierung ist zum Aktivieren oder Deaktivieren von Software-Paketquellen erforderlich.</message>
+    <message xml:lang="fr">Une authentification est requise pour activer ou désactiver les dépôts de logiciels.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
+  <action id="org.miryugaming.PackageManager.system-upgrade">
+    <description>Perform system upgrade</description>
+    <description xml:lang="zh_CN">执行系统升级</description>
+    <description xml:lang="zh_TW">執行系統升級</description>
+    <description xml:lang="ja">システムアップグレードを実行</description>
+    <description xml:lang="ko">시스템 업그레이드 수행</description>
+    <description xml:lang="de">Systemaktualisierung durchführen</description>
+    <description xml:lang="fr">Effectuer une mise à niveau du système</description>
+    <message>Authentication is required to perform a system upgrade.</message>
+    <message xml:lang="zh_CN">执行系统升级需要认证。</message>
+    <message xml:lang="zh_TW">執行系統升級需要認證。</message>
+    <message xml:lang="ja">システムアップグレードの実行には認証が必要です。</message>
+    <message xml:lang="ko">시스템 업그레이드를 수행하려면 인증이 필요합니다.</message>
+    <message xml:lang="de">Authentifizierung ist zum Durchführen einer Systemaktualisierung erforderlich.</message>
+    <message xml:lang="fr">Une authentification est requise pour effectuer une mise à niveau du système.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
+  <action id="org.miryugaming.PackageManager.install-local-rpm">
+    <description>Install local RPM packages</description>
+    <description xml:lang="zh_CN">安装本地 RPM 软件包</description>
+    <description xml:lang="zh_TW">安裝本地 RPM 軟體包</description>
+    <description xml:lang="ja">ローカルRPMパッケージのインストール</description>
+    <description xml:lang="ko">로컬 RPM 패키지 설치</description>
+    <description xml:lang="de">Lokale RPM-Pakete installieren</description>
+    <description xml:lang="fr">Installer des paquets RPM locaux</description>
+    <message>Authentication is required to install local RPM packages.</message>
+    <message xml:lang="zh_CN">安装本地 RPM 软件包需要认证。</message>
+    <message xml:lang="zh_TW">安裝本地 RPM 軟體包需要認證。</message>
+    <message xml:lang="ja">ローカルRPMパッケージのインストールには認証が必要です。</message>
+    <message xml:lang="ko">로컬 RPM 패키지를 설치하려면 인증이 필요합니다.</message>
+    <message xml:lang="de">Authentifizierung ist zum Installieren lokaler RPM-Pakete erforderlich.</message>
+    <message xml:lang="fr">Une authentification est requise pour installer des paquets RPM locaux.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/miryu-software-center</annotate>
+  </action>
+
+</policyconfig>

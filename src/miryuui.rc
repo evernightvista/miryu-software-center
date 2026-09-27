@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gui name="miryu"
+     version="3"
+     xmlns="http://www.kde.org/standards/kxmlgui/1.0"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0
+                         http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
+
+    <MenuBar>
+        <Menu name="file">
+            <text>File</text>
+            <Action name="install_rpm"/>
+            <Separator/>
+            <Action name="system_upgrade"/>
+            <Action name="distro_sync"/>
+            <Action name="refresh_metadata"/>
+            <Action name="advanced_ops"/>
+            <Separator/>
+            <Action name="quit"/>
+        </Menu>
+        <Menu name="edit">
+            <text>Edit</text>
+            <Action name="find"/>
+            <Separator/>
+            <Action name="select_all"/>
+            <Action name="deselect_all"/>
+        </Menu>
+        <Menu name="view">
+            <text>View</text>
+            <Action name="refresh"/>
+        </Menu>
+        <Menu name="help">
+            <text>Help</text>
+            <Action name="about_miryu"/>
+        </Menu>
+    </MenuBar>
+
+    <ToolBar name="mainToolBar" noMerge="1">
+        <text>Main Toolbar</text>
+        <Action name="refresh"/>
+        <Action name="find"/>
+        <Action name="install_rpm"/>
+        <Action name="system_upgrade"/>
+    </ToolBar>
+
+</gui>

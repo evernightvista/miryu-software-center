@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.miryugaming.PackageManager</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <name>Miryu Software Center</name>
+  <summary>A modern RPM package manager powered by dnf5daemon</summary>
+  <summary xml:lang="zh_CN">使用 dnf5daemon 的现代 RPM 软件中心</summary>
+  <description>
+    <p>
+      Miryu is a modern graphical package manager for RPM-based Linux distributions
+      (Fedora, RHEL, CentOS Stream, openEuler, deepin, etc.). It uses the dnf5daemon-server DBus API
+      for all RPM package operations and provides an external launcher for the Linglong Store.
+      It is built with Qt6 and KDE Frameworks 6.
+    </p>
+    <p xml:lang="zh_CN">
+      Miryu 是一个用于基于 RPM 的 Linux 发行版（Fedora、RHEL、CentOS Stream、openEuler、deepin 等）的
+      现代图形软件包管理器。它使用 dnf5daemon-server DBus API 进行所有 RPM 软件包操作，
+      并提供如意玲珑商店的外部启动入口。
+      使用 Qt6 和 KDE Frameworks 6 构建。
+    </p>
+    <p>Features include:</p>
+    <ul>
+      <li>Browse installed, available, and upgradable RPM packages</li>
+      <li>Search packages by name, summary, or description</li>
+      <li>Install, update, remove, downgrade, and reinstall RPM packages</li>
+      <li>Transaction queue with dependency resolution</li>
+      <li>Repository management</li>
+      <li>System upgrade support</li>
+      <li>Offline transaction support</li>
+      <li>Update checking with repository priority filtering</li>
+      <li>External launcher for the Linglong Store (/usr/bin/linglong-store)</li>
+      <li>Flatpak package management support</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">org.miryugaming.PackageManager.desktop</launchable>
+  <url type="homepage">https://github.com/evernightvista/miryu-package-manager</url>
+  <url type="bugtracker">https://github.com/evernightvista/miryu-package-manager/issues</url>
+  <provides>
+    <binary>miryu</binary>
+  </provides>
+  <releases>
+    <release version="1.0.1" date="2026-08-28">
+      <description>
+        <p>Remove built-in Linglong store and management pages; replace with external launcher for /usr/bin/linglong-store.</p>
+        <p>Add jtgg114514 as contributor.</p>
+      </description>
+    </release>
+    <release version="1.0.0" date="2026-08-20">
+      <description>
+        <p>Initial release of Miryu Software Center.</p>
+      </description>
+    </release>
+  </releases>
+  <content_rating type="oars-1.1" />
+  <recommends>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </recommends>
+  <developer id="org.miryugaming">
+    <name>KairikiFedora &amp; MiryuGaming</name>
+  </developer>
+  <copyright>© 2027 KairikiFedora and © 2027 MiryuGaming</copyright>
+</component>

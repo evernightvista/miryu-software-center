@@ -1,0 +1,1308 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# German translation for miryu.
+# Copyright (C) 2027 KairikiFedora and MiryuGaming
+# This file is distributed under the same license as the miryu package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: miryu\n"
+"Report-Msgid-Bugs-To: https://github.com/EvernightFedora/miryu\n"
+"POT-Creation-Date: 2026-08-21 03:20+0000\n"
+"PO-Revision-Date: 2026-08-20 00:00+0800\n"
+"Last-Translator: KairikiFedora <kairiki@evernightfedora.org>\n"
+"Language-Team: German <miryu@example.com>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/main.cpp:34
+msgid "Miryu Software Center"
+msgstr "Miryu Software-Center"
+
+#: src/main.cpp:35
+msgid ""
+"A modern RPM package manager powered by dnf5daemon, built with Qt6 and KDE "
+"Frameworks 6."
+msgstr ""
+"Eine moderne RPM-Paketverwaltung mit dnf5daemon, erstellt mit Qt6 und KDE "
+"Frameworks 6."
+
+#: src/main.cpp:54
+msgid "Install the specified RPM file(s)"
+msgstr "Angegebene RPM-Datei(en) installieren"
+
+#: src/main.cpp:58
+msgid "RPM package files to install"
+msgstr "Zu installierende RPM-Paketdateien"
+
+#: src/main.cpp:81
+msgid ""
+"Failed to connect to dnf5daemon-server.\n"
+"\n"
+"Please ensure the dnf5daemon-server service is running:\n"
+"\n"
+"  systemctl start dnf5daemon-server\n"
+"\n"
+"If you don't have it installed, install it with:\n"
+"  dnf install dnf5daemon-server"
+msgstr ""
+"Verbindung zum dnf5daemon-server fehlgeschlagen.\n"
+"\n"
+"Bitte stellen Sie sicher, dass der dnf5daemon-server-Dienst läuft:\n"
+"\n"
+"  systemctl start dnf5daemon-server\n"
+"\n"
+"Falls nicht installiert, installieren Sie mit:\n"
+"  dnf install dnf5daemon-server"
+
+#: src/main.cpp:87
+msgid "D-Bus error details:"
+msgstr "D-Bus-Fehlerdetails:"
+
+#: src/main.cpp:90
+msgid "Connection Error"
+msgstr "Verbindungsfehler"
+
+#: src/core/Backend.cpp:49
+msgid "Downloading"
+msgstr "Wird heruntergeladen"
+
+#: src/core/Backend.cpp:53
+msgid "Download complete"
+msgstr "Download abgeschlossen"
+
+#: src/core/Backend.cpp:59
+msgid "%1 %2"
+msgstr "%1 %2"
+
+#: src/core/Backend.cpp:63
+msgid "Processing %1"
+msgstr "%1 wird verarbeitet"
+
+#: src/core/Backend.cpp:66
+msgid "Verifying Packages"
+msgstr "Pakete werden überprüft"
+
+#: src/core/Backend.cpp:70
+msgid "Verifying"
+msgstr "Wird überprüft"
+
+#: src/core/Backend.cpp:73
+msgid "Applying Transaction"
+msgstr "Transaktion wird angewendet"
+
+#: src/core/Backend.cpp:76
+msgid "Running scripts"
+msgstr "Skripte werden ausgeführt"
+
+#: src/core/Enums.h:87
+msgid "Installing"
+msgstr "Wird installiert"
+
+#: src/core/Enums.h:88
+msgid "Upgrading"
+msgstr "Wird aktualisiert"
+
+#: src/core/Enums.h:89
+msgid "Downgrading"
+msgstr "Wird heruntergestuft"
+
+#: src/core/Enums.h:90
+msgid "Reinstalling"
+msgstr "Wird neu installiert"
+
+#: src/core/Enums.h:91
+msgid "Removing"
+msgstr "Wird entfernt"
+
+#: src/core/Enums.h:92
+msgid "Replacing"
+msgstr "Wird ersetzt"
+
+#: src/core/UpdateChecker.cpp:159
+msgid "Updates Available"
+msgstr "Aktualisierungen verfügbar"
+
+#: src/core/UpdateChecker.cpp:160
+msgid "%1 update is available for your system."
+msgid_plural "%1 updates are available for your system."
+msgstr[0] "%1 Aktualisierung ist für Ihr System verfügbar."
+msgstr[1] "%1 Aktualisierungen sind für Ihr System verfügbar."
+
+#: src/ui/AdvancedOpsDialog.cpp:84 src/ui/AdvancedOpsDialog.cpp:92
+#: src/ui/MainWindow.cpp:421
+msgid "Advanced Operations"
+msgstr "Erweiterte Operationen"
+
+#: src/ui/AdvancedOpsDialog.cpp:95
+msgid "System-level package operations that require root privileges."
+msgstr "Systemweite Paketoperationen, die Root-Rechte erfordern."
+
+#: src/ui/AdvancedOpsDialog.cpp:104 src/ui/AdvancedOpsDialog.cpp:239
+#: src/ui/AdvancedOpsDialog.cpp:246
+msgid "Refresh DNF Cache"
+msgstr "DNF-Cache aktualisieren"
+
+#: src/ui/AdvancedOpsDialog.cpp:105
+msgid "Run: dnf makecache --refresh"
+msgstr "Ausführen: dnf makecache --refresh"
+
+#: src/ui/AdvancedOpsDialog.cpp:109
+msgid "Download and rebuild metadata cache for all enabled repositories."
+msgstr ""
+"Metadaten-Cache für alle aktivierten Repositories herunterladen und neu "
+"aufbauen."
+
+#: src/ui/AdvancedOpsDialog.cpp:119 src/ui/AdvancedOpsDialog.cpp:259
+#: src/ui/AdvancedOpsDialog.cpp:266 src/ui/MainWindow.cpp:413
+#: src/ui/MainWindow.cpp:822 src/ui/MainWindow.cpp:837
+#: src/ui/MainWindow.cpp:843
+msgid "Distro Sync"
+msgstr "Distribution synchronisieren"
+
+#: src/ui/AdvancedOpsDialog.cpp:120
+msgid "Run: dnf distro-sync"
+msgstr "Ausführen: dnf distro-sync"
+
+#: src/ui/AdvancedOpsDialog.cpp:124
+msgid ""
+"Synchronize all installed packages to the latest versions in repositories."
+msgstr ""
+"Alle installierten Pakete auf die neuesten Versionen in den Repositories "
+"synchronisieren."
+
+#: src/ui/AdvancedOpsDialog.cpp:132 src/ui/MainWindow.cpp:409
+#: src/ui/MainWindow.cpp:917 src/ui/MainWindow.cpp:944
+msgid "System Upgrade"
+msgstr "Systemaktualisierung"
+
+#: src/ui/AdvancedOpsDialog.cpp:160
+msgid "Fedora Version"
+msgstr "Fedora-Version"
+
+#: src/ui/AdvancedOpsDialog.cpp:161
+msgid "Target Fedora release (VERSION_ID from /usr/lib/os-release)."
+msgstr "Ziel-Fedora-Release (VERSION_ID aus /usr/lib/os-release)."
+
+#: src/ui/AdvancedOpsDialog.cpp:182 src/ui/AdvancedOpsDialog.cpp:301
+msgid "Execute System Upgrade"
+msgstr "Systemaktualisierung ausführen"
+
+#: src/ui/AdvancedOpsDialog.cpp:183
+msgid "Run: dnf system-upgrade download --releasever=<version>"
+msgstr "Ausführen: dnf system-upgrade download --releasever=<version>"
+
+#: src/ui/AdvancedOpsDialog.cpp:206
+msgid "Command Output"
+msgstr "Befehlsausgabe"
+
+#: src/ui/AdvancedOpsDialog.cpp:217
+msgid "Close"
+msgstr "Schließen"
+
+#: src/ui/AdvancedOpsDialog.cpp:232 src/ui/AdvancedOpsDialog.cpp:252
+#: src/ui/AdvancedOpsDialog.cpp:272
+msgid "Another operation is still running."
+msgstr "Ein anderer Vorgang läuft noch."
+
+#: src/ui/AdvancedOpsDialog.cpp:237
+msgid ""
+"This will download and rebuild the metadata cache for all enabled "
+"repositories. Continue?"
+msgstr ""
+"Dadurch wird der Metadaten-Cache für alle aktivierten Repositories "
+"heruntergeladen und neu aufgebaut. Fortfahren?"
+
+#: src/ui/AdvancedOpsDialog.cpp:240 src/ui/FlatpakPage.cpp:254
+#: src/ui/FlatpakPage.cpp:314 src/ui/MainWindow.cpp:404
+msgid "Refresh"
+msgstr "Aktualisieren"
+
+#: src/ui/AdvancedOpsDialog.cpp:257
+msgid ""
+"This will synchronise all installed packages to the latest version available"
+" in the repositories. Continue?"
+msgstr ""
+"Dadurch werden alle installierten Pakete auf die neueste in den Repositories"
+" verfügbare Version synchronisiert. Fortfahren?"
+
+#: src/ui/AdvancedOpsDialog.cpp:260
+msgid "Sync"
+msgstr "Synchronisieren"
+
+#: src/ui/AdvancedOpsDialog.cpp:278
+msgid "Please enter a target Fedora version."
+msgstr "Bitte eine Ziel-Fedora-Version eingeben."
+
+#: src/ui/AdvancedOpsDialog.cpp:286
+msgid ""
+"The target version (%1) is lower than the currently running version (%2). Downgrading the system is risky and may leave the system in an inconsistent state.\n"
+"\n"
+"Do you really want to continue?"
+msgstr ""
+"Die Zielversion (%1) ist niedriger als die aktuell laufende Version (%2). Ein Downgrade des Systems ist riskant und kann das System in einem inkonsistenten Zustand hinterlassen.\n"
+"\n"
+"Wirklich fortfahren?"
+
+#: src/ui/AdvancedOpsDialog.cpp:291
+msgid "Version Downgrade Warning"
+msgstr "Warnung zur Versionsherabstufung"
+
+#: src/ui/AdvancedOpsDialog.cpp:297
+msgid ""
+"This will download all packages needed to upgrade the system to Fedora %1. After the download completes you will need to reboot to apply the upgrade.\n"
+"\n"
+"Continue?"
+msgstr ""
+"Dadurch werden alle Pakete heruntergeladen, die zum Upgrade des Systems auf Fedora %1 erforderlich sind. Nach Abschluss des Downloads müssen Sie neu starten, um das Upgrade anzuwenden.\n"
+"\n"
+"Fortfahren?"
+
+#: src/ui/AdvancedOpsDialog.cpp:302
+msgid "Download"
+msgstr "Herunterladen"
+
+#: src/ui/AdvancedOpsDialog.cpp:311
+msgid "System Upgrade (releasever=%1)"
+msgstr "System-Upgrade (releasever=%1)"
+
+#: src/ui/AdvancedOpsDialog.cpp:326
+msgid ""
+"Warning: Target version %1 is lower than current version %2. This is a "
+"version downgrade and carries risks."
+msgstr ""
+"Warnung: Zielversion %1 ist niedriger als die aktuelle Version %2. Dies ist "
+"ein Versions-Downgrade und birgt Risiken."
+
+#: src/ui/AdvancedOpsDialog.cpp:373
+msgid "Executing: %1 ..."
+msgstr "Wird ausgeführt: %1 ..."
+
+#: src/ui/AdvancedOpsDialog.cpp:380
+msgid "[started]"
+msgstr "[gestartet]"
+
+#: src/ui/AdvancedOpsDialog.cpp:401 src/ui/AdvancedOpsDialog.cpp:403
+#: src/ui/FlatpakPage.cpp:814
+msgid "Operation completed successfully."
+msgstr "Vorgang erfolgreich abgeschlossen."
+
+#: src/ui/AdvancedOpsDialog.cpp:402
+msgid "[completed successfully]"
+msgstr "[erfolgreich abgeschlossen]"
+
+#: src/ui/AdvancedOpsDialog.cpp:407
+msgid "Operation cancelled or authentication failed."
+msgstr "Vorgang abgebrochen oder Authentifizierung fehlgeschlagen."
+
+#: src/ui/AdvancedOpsDialog.cpp:408
+msgid "[cancelled or authentication failed (exit %1)]"
+msgstr "[abgebrochen oder Authentifizierung fehlgeschlagen (Exit %1)]"
+
+#: src/ui/AdvancedOpsDialog.cpp:410
+msgid "Operation failed (exit code %1)."
+msgstr "Vorgang fehlgeschlagen (Exit-Code %1)."
+
+#: src/ui/AdvancedOpsDialog.cpp:411
+msgid "[failed with exit code %1]"
+msgstr "[fehlgeschlagen mit Exit-Code %1]"
+
+#: src/ui/AdvancedOpsDialog.cpp:413
+msgid ""
+"Operation failed with exit code %1. Check the output below for details."
+msgstr ""
+"Vorgang mit Exit-Code %1 fehlgeschlagen. Siehe Ausgabe unten für Details."
+
+#: src/ui/AdvancedOpsDialog.cpp:414
+msgid "Operation Failed"
+msgstr "Vorgang fehlgeschlagen"
+
+#: src/ui/AdvancedOpsDialog.cpp:422
+msgid "Failed to start command: %1"
+msgstr "Befehl konnte nicht gestartet werden: %1"
+
+#: src/ui/AdvancedOpsDialog.cpp:423
+msgid "[error: %1]"
+msgstr "[Fehler: %1]"
+
+#: src/ui/AdvancedOpsDialog.cpp:425
+msgid ""
+"Failed to start command.\n"
+"%1\n"
+"\n"
+"Make sure pkexec (polkit) is installed and available."
+msgstr ""
+"Befehl konnte nicht gestartet werden.\n"
+"%1\n"
+"\n"
+"Stellen Sie sicher, dass pkexec (polkit) installiert und verfügbar ist."
+
+#: src/ui/AdvancedOpsDialog.cpp:427
+msgid "Command Start Failed"
+msgstr "Befehlsstart fehlgeschlagen"
+
+#: src/ui/FlatpakPage.cpp:96 src/ui/FlatpakPage.cpp:400
+#: src/ui/FlatpakPage.cpp:516 src/ui/FlatpakPage.cpp:834
+#: src/ui/FlatpakPage.cpp:849
+msgid "Update"
+msgstr "Aktualisieren"
+
+#: src/ui/FlatpakPage.cpp:99 src/ui/MainWindow.cpp:151
+#: src/ui/PackageInfoWidget.cpp:112
+msgid "Installed"
+msgstr "Installiert"
+
+#: src/ui/FlatpakPage.cpp:102 src/ui/FlatpakPage.cpp:391
+#: src/ui/FlatpakPage.cpp:828 src/ui/FlatpakPage.cpp:845
+#: src/ui/TransactionResultDialog.cpp:65
+msgid "Install"
+msgstr "Installieren"
+
+#: src/ui/FlatpakPage.cpp:167
+msgid "Flatpak Apps"
+msgstr "Flatpak-Apps"
+
+#: src/ui/FlatpakPage.cpp:171
+msgid "Flatpak Store"
+msgstr "Flatpak-Store"
+
+#: src/ui/FlatpakPage.cpp:206 src/ui/MainWindow.cpp:666
+msgid "Loading..."
+msgstr "Wird geladen..."
+
+#: src/ui/FlatpakPage.cpp:232
+msgid "Filter installed Flatpak apps..."
+msgstr "Installierte Flatpak-Apps filtern..."
+
+#: src/ui/FlatpakPage.cpp:239 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:738
+msgid "Update All"
+msgstr "Alle aktualisieren"
+
+#: src/ui/FlatpakPage.cpp:244 src/ui/FlatpakPage.cpp:919
+msgid "Uninstall Selected"
+msgstr "Ausgewählte deinstallieren"
+
+#: src/ui/FlatpakPage.cpp:249 src/ui/FlatpakPage.cpp:949
+msgid "Update Selected"
+msgstr "Ausgewählte aktualisieren"
+
+#: src/ui/FlatpakPage.cpp:298
+msgid "Search Flatpak store..."
+msgstr "Flatpak-Store durchsuchen..."
+
+#: src/ui/FlatpakPage.cpp:304 src/ui/FlatpakPage.cpp:756
+msgid "All Remotes"
+msgstr "Alle Remotes"
+
+#: src/ui/FlatpakPage.cpp:309 src/ui/FlatpakPage.cpp:897
+msgid "Install Selected"
+msgstr "Ausgewählte installieren"
+
+#: src/ui/FlatpakPage.cpp:396 src/ui/FlatpakPage.cpp:525
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:672
+#: src/ui/FlatpakPage.cpp:831 src/ui/FlatpakPage.cpp:847
+msgid "Uninstall"
+msgstr "Deinstallieren"
+
+#: src/ui/FlatpakPage.cpp:404 src/ui/FlatpakPage.cpp:508
+msgid "Run"
+msgstr "Ausführen"
+
+#: src/ui/FlatpakPage.cpp:434 src/ui/MainWindow.cpp:161
+#: src/ui/PackageInfoWidget.cpp:83
+msgid "Description"
+msgstr "Beschreibung"
+
+#: src/ui/FlatpakPage.cpp:446
+msgid "Back to List"
+msgstr "Zurück zur Liste"
+
+#: src/ui/FlatpakPage.cpp:462 src/ui/FlatpakPage.cpp:715
+msgid "Loading installed Flatpak apps..."
+msgstr "Installierte Flatpak-Apps werden geladen..."
+
+#: src/ui/FlatpakPage.cpp:464
+msgid "Search the Flatpak store"
+msgstr "Flatpak-Store durchsuchen"
+
+#: src/ui/FlatpakPage.cpp:488 src/ui/FlatpakPage.cpp:784
+#: src/ui/MainWindow.cpp:1059
+msgid "%1 result"
+msgid_plural "%1 results"
+msgstr[0] "%1 Ergebnis"
+msgstr[1] "%1 Ergebnisse"
+
+#: src/ui/FlatpakPage.cpp:528 src/ui/FlatpakPage.cpp:671
+msgid "Uninstall '%1' (%2)?"
+msgstr "'%1' (%2) deinstallieren?"
+
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:672 src/ui/FlatpakPage.cpp:897
+#: src/ui/FlatpakPage.cpp:919 src/ui/FlatpakPage.cpp:949
+#: src/ui/MainWindow.cpp:936 src/ui/MainWindow.cpp:944
+#: src/ui/MainWindow.cpp:1135 src/ui/RepoView.cpp:116 src/ui/RepoView.cpp:140
+msgid "Yes"
+msgstr "Ja"
+
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:672 src/ui/FlatpakPage.cpp:897
+#: src/ui/FlatpakPage.cpp:919 src/ui/FlatpakPage.cpp:949
+#: src/ui/MainWindow.cpp:936 src/ui/MainWindow.cpp:944
+#: src/ui/MainWindow.cpp:1135 src/ui/RepoView.cpp:116 src/ui/RepoView.cpp:140
+msgid "No"
+msgstr "Nein"
+
+#: src/ui/FlatpakPage.cpp:546
+msgid "No updates available."
+msgstr "Keine Aktualisierungen verfügbar."
+
+#: src/ui/FlatpakPage.cpp:551
+msgid "Update %1 Flatpak application?"
+msgid_plural "Update %1 Flatpak applications?"
+msgstr[0] "%1 Flatpak-App aktualisieren?"
+msgstr[1] "%1 Flatpak-Apps aktualisieren?"
+
+#: src/ui/FlatpakPage.cpp:570
+msgid "Searching for '%1'..."
+msgstr "Suche nach '%1'..."
+
+#: src/ui/FlatpakPage.cpp:612
+msgid "Application ID: %1"
+msgstr "Anwendungs-ID: %1"
+
+#: src/ui/FlatpakPage.cpp:613
+msgid "Version: %1"
+msgstr "Version: %1"
+
+#: src/ui/FlatpakPage.cpp:614
+msgid "Branch: %1"
+msgstr "Branch: %1"
+
+#: src/ui/FlatpakPage.cpp:615
+msgid "Remote: %1"
+msgstr "Remote: %1"
+
+#: src/ui/FlatpakPage.cpp:616
+msgid "Installation: %1"
+msgstr "Installation: %1"
+
+#: src/ui/FlatpakPage.cpp:618
+msgid "Size: %1"
+msgstr "Größe: %1"
+
+#: src/ui/FlatpakPage.cpp:623 src/ui/PackageInfoWidget.cpp:127
+msgid "<i>No description available.</i>"
+msgstr "<i>Keine Beschreibung verfügbar.</i>"
+
+#: src/ui/FlatpakPage.cpp:658
+msgid "Installing..."
+msgstr "Wird installiert..."
+
+#: src/ui/FlatpakPage.cpp:677
+msgid "Uninstalling..."
+msgstr "Wird deinstalliert..."
+
+#: src/ui/FlatpakPage.cpp:690
+msgid "Updating..."
+msgstr "Wird aktualisiert..."
+
+#: src/ui/FlatpakPage.cpp:736
+msgid "Update All (%1)"
+msgstr "Alle aktualisieren (%1)"
+
+#: src/ui/FlatpakPage.cpp:741
+msgid "%1 app installed, %2 update available"
+msgid_plural "%1 apps installed, %2 updates available"
+msgstr[0] "%1 App installiert, %2 Aktualisierung verfügbar"
+msgstr[1] "%1 Apps installiert, %2 Aktualisierungen verfügbar"
+
+#: src/ui/FlatpakPage.cpp:745
+msgid "%1 app installed"
+msgid_plural "%1 apps installed"
+msgstr[0] "%1 App installiert"
+msgstr[1] "%1 Apps installiert"
+
+#: src/ui/FlatpakPage.cpp:790
+msgid "Operation: %1"
+msgstr "Vorgang: %1"
+
+#: src/ui/FlatpakPage.cpp:842
+msgid "Operation failed."
+msgstr "Vorgang fehlgeschlagen."
+
+#: src/ui/FlatpakPage.cpp:852
+msgid "Flatpak Operation Error"
+msgstr "Flatpak-Vorgangsfehler"
+
+#: src/ui/FlatpakPage.cpp:859 src/ui/MainWindow.cpp:1102
+#: src/ui/MainWindow.cpp:1103 src/ui/RepoView.cpp:130 src/ui/RepoView.cpp:154
+msgid "Error"
+msgstr "Fehler"
+
+#: src/ui/FlatpakPage.cpp:860
+msgid "Flatpak Error"
+msgstr "Flatpak-Fehler"
+
+#: src/ui/FlatpakPage.cpp:896
+msgid "Install %1 selected Flatpak application?"
+msgid_plural "Install %1 selected Flatpak applications?"
+msgstr[0] "%1 ausgewählte Flatpak-App installieren?"
+msgstr[1] "%1 ausgewählte Flatpak-Apps installieren?"
+
+#: src/ui/FlatpakPage.cpp:903
+msgid "Installing %1 application..."
+msgid_plural "Installing %1 applications..."
+msgstr[0] "%1 App wird installiert..."
+msgstr[1] "%1 Apps werden installiert..."
+
+#: src/ui/FlatpakPage.cpp:918
+msgid "Uninstall %1 selected Flatpak application?"
+msgid_plural "Uninstall %1 selected Flatpak applications?"
+msgstr[0] "%1 ausgewählte Flatpak-App deinstallieren?"
+msgstr[1] "%1 ausgewählte Flatpak-Apps deinstallieren?"
+
+#: src/ui/FlatpakPage.cpp:925
+msgid "Uninstalling %1 application..."
+msgid_plural "Uninstalling %1 applications..."
+msgstr[0] "%1 App wird deinstalliert..."
+msgstr[1] "%1 Apps werden deinstalliert..."
+
+#: src/ui/FlatpakPage.cpp:943
+msgid "No upgradable applications selected."
+msgstr "Keine aktualisierbaren Anwendungen ausgewählt."
+
+#: src/ui/FlatpakPage.cpp:948
+msgid "Update %1 selected Flatpak application?"
+msgid_plural "Update %1 selected Flatpak applications?"
+msgstr[0] "%1 ausgewählte Flatpak-App aktualisieren?"
+msgstr[1] "%1 ausgewählte Flatpak-Apps aktualisieren?"
+
+#: src/ui/FlatpakPage.cpp:955
+msgid "Updating %1 application..."
+msgid_plural "Updating %1 applications..."
+msgstr[0] "%1 App wird aktualisiert..."
+msgstr[1] "%1 Apps werden aktualisiert..."
+
+#: src/ui/PackageInfoWidget.cpp:118
+msgid "Update Available"
+msgstr "Aktualisierung verfügbar"
+
+#: src/ui/TransactionResultDialog.cpp:66
+msgid "Upgrade"
+msgstr "Aktualisieren"
+
+#: src/ui/MainWindow.cpp:150
+msgid "All"
+msgstr "Alle"
+
+#: src/ui/MainWindow.cpp:144
+msgid "Search packages..."
+msgstr "Pakete suchen..."
+
+#: src/ui/MainWindow.cpp:152 src/ui/PackageInfoWidget.cpp:115
+msgid "Available"
+msgstr "Verfügbar"
+
+#: src/ui/MainWindow.cpp:153 src/ui/MainWindow.cpp:370
+#: src/ui/MainWindow.cpp:477
+msgid "Updates"
+msgstr "Aktualisierungen"
+
+#: src/ui/MainWindow.cpp:154
+msgid "Upgradable"
+msgstr "Aktualisierbar"
+
+#: src/ui/MainWindow.cpp:158
+msgid "All Fields"
+msgstr "Alle Felder"
+
+#: src/ui/MainWindow.cpp:159
+msgid "Name"
+msgstr "Name"
+
+#: src/ui/MainWindow.cpp:160
+msgid "Summary"
+msgstr "Zusammenfassung"
+
+#: src/ui/MainWindow.cpp:195
+msgid "Available Updates"
+msgstr "Verfügbare Aktualisierungen"
+
+#: src/ui/MainWindow.cpp:223 src/ui/TransactionResultDialog.cpp:126
+msgid "Apply"
+msgstr "Anwenden"
+
+#: src/ui/MainWindow.cpp:224
+msgid "Clear"
+msgstr "Leeren"
+
+#: src/ui/MainWindow.cpp:225
+msgid "Resolve Dependencies"
+msgstr "Abhängigkeiten auflösen"
+
+#: src/ui/MainWindow.cpp:228
+msgid "Offline update"
+msgstr "Offline-Aktualisierung"
+
+#: src/ui/MainWindow.cpp:229
+msgid "Download packages now, install on next reboot"
+msgstr "Pakete jetzt herunterladen, beim nächsten Neustart installieren"
+
+#: src/ui/MainWindow.cpp:283 src/ui/MainWindow.cpp:372
+#: src/ui/MainWindow.cpp:484 src/ui/SettingsDialog.cpp:93
+msgid "Repositories"
+msgstr "Paketquellen"
+
+#: src/ui/MainWindow.cpp:328 src/ui/MainWindow.cpp:568
+#: src/ui/MainWindow.cpp:581 src/ui/MainWindow.cpp:619
+#: src/ui/MainWindow.cpp:734 src/ui/MainWindow.cpp:762
+#: src/ui/MainWindow.cpp:845 src/ui/MainWindow.cpp:881
+#: src/ui/MainWindow.cpp:972 src/ui/MainWindow.cpp:988
+#: src/ui/MainWindow.cpp:1066
+msgid "Ready"
+msgstr "Bereit"
+
+#: src/ui/MainWindow.cpp:358
+msgid "Miryu"
+msgstr "Miryu"
+
+#: src/ui/MainWindow.cpp:369
+msgid "Packages"
+msgstr "Pakete"
+
+#: src/ui/MainWindow.cpp:371
+msgid "Queue"
+msgstr "Warteschlange"
+
+#: src/ui/MainWindow.cpp:399 src/ui/MainWindow.cpp:1137
+msgid "Linglong Store"
+msgstr "Linglong Store"
+
+#: src/ui/MainWindow.cpp:375 src/ui/MainWindow.cpp:498
+msgid "Flatpak"
+msgstr "Flatpak"
+
+#: src/ui/MainWindow.cpp:417 src/ui/MainWindow.cpp:873
+#: src/ui/MainWindow.cpp:879 src/ui/RepoView.cpp:162
+msgid "Refresh Metadata"
+msgstr "Metadaten aktualisieren"
+
+#: src/ui/MainWindow.cpp:425
+msgid "Install RPM File..."
+msgstr "RPM-Datei installieren..."
+
+#: src/ui/MainWindow.cpp:429
+msgid "Configure Miryu..."
+msgstr "Miryu einrichten..."
+
+#: src/ui/MainWindow.cpp:436
+msgid "Find"
+msgstr "Suchen"
+
+#: src/ui/MainWindow.cpp:442
+msgid "Select All"
+msgstr "Alle auswählen"
+
+#: src/ui/MainWindow.cpp:453
+msgid "Deselect All"
+msgstr "Auswahl aufheben"
+
+#: src/ui/MainWindow.cpp:472
+msgid "Package Browser"
+msgstr "Paketbrowser"
+
+#: src/ui/MainWindow.cpp:481
+msgid "Transaction Queue"
+msgstr "Transaktionswarteschlange"
+
+#: src/ui/MainWindow.cpp:502
+msgid "Flatpak is not installed on this system."
+msgstr "Flatpak ist auf diesem System nicht installiert."
+
+#: src/ui/MainWindow.cpp:535
+msgid "The package backend is not initialized. Cannot install RPM files."
+msgstr ""
+"Das Paket-Backend ist nicht initialisiert. RPM-Dateien können nicht "
+"installiert werden."
+
+#: src/ui/MainWindow.cpp:536 src/ui/MainWindow.cpp:612
+msgid "RPM Installation"
+msgstr "RPM-Installation"
+
+#: src/ui/MainWindow.cpp:556
+msgid "Preparing RPM installation..."
+msgstr "RPM-Installation wird vorbereitet..."
+
+#: src/ui/MainWindow.cpp:567 src/ui/MainWindow.cpp:733
+msgid "Transaction Error"
+msgstr "Transaktionsfehler"
+
+#: src/ui/MainWindow.cpp:600
+msgid "RPM installation completed successfully."
+msgstr "RPM-Installation erfolgreich abgeschlossen."
+
+#: src/ui/MainWindow.cpp:611
+msgid "Operation cancelled by user."
+msgstr "Vorgang vom Benutzer abgebrochen."
+
+#: src/ui/MainWindow.cpp:615
+msgid "RPM installation failed."
+msgstr "RPM-Installation fehlgeschlagen."
+
+#: src/ui/MainWindow.cpp:616 src/ui/MainWindow.cpp:760
+msgid "Transaction Failed"
+msgstr "Transaktion fehlgeschlagen"
+
+#: src/ui/MainWindow.cpp:622 src/ui/MainWindow.cpp:767
+msgid "Applying transaction..."
+msgstr "Transaktion wird angewendet..."
+
+#: src/ui/MainWindow.cpp:648
+msgid "Searching..."
+msgstr "Suche läuft..."
+
+#: src/ui/MainWindow.cpp:700
+msgid "%1 package queued"
+msgid_plural "%1 packages queued"
+msgstr[0] "%1 Paket in Warteschlange"
+msgstr[1] "%1 Pakete in Warteschlange"
+
+#: src/ui/MainWindow.cpp:715
+msgid "Queue is empty. Add packages to the queue first."
+msgstr ""
+"Warteschlange ist leer. Bitte zuerst Pakete zur Warteschlange hinzufügen."
+
+#: src/ui/MainWindow.cpp:720
+msgid "Resolving transaction..."
+msgstr "Transaktion wird aufgelöst..."
+
+#: src/ui/MainWindow.cpp:754
+msgid "Transaction completed successfully."
+msgstr "Transaktion erfolgreich abgeschlossen."
+
+#: src/ui/MainWindow.cpp:781
+msgid "Building transaction..."
+msgstr "Transaktion wird erstellt..."
+
+#: src/ui/MainWindow.cpp:820
+msgid ""
+"Distribution sync will synchronize all installed packages to the versions "
+"available in the repositories. This may downgrade or upgrade packages. "
+"Continue?"
+msgstr ""
+"Die Distributionssynchronisierung wird alle installierten Pakete auf die in "
+"den Paketquellen verfügbaren Versionen synchronisieren. Dies kann Pakete "
+"herab- oder heraufstufen. Fortfahren?"
+
+#: src/ui/MainWindow.cpp:827
+msgid "Performing distribution sync..."
+msgstr "Distributionssynchronisierung wird durchgeführt..."
+
+#: src/ui/MainWindow.cpp:837
+msgid "Distribution sync completed successfully."
+msgstr "Distributionssynchronisierung erfolgreich abgeschlossen."
+
+#: src/ui/MainWindow.cpp:842
+msgid "Distribution sync failed."
+msgstr "Distributionssynchronisierung fehlgeschlagen."
+
+#: src/ui/MainWindow.cpp:863
+msgid "Refreshing repository metadata..."
+msgstr "Paketquellen-Metadaten werden aktualisiert..."
+
+#: src/ui/MainWindow.cpp:873
+msgid "Metadata refreshed successfully."
+msgstr "Metadaten erfolgreich aktualisiert."
+
+#: src/ui/MainWindow.cpp:878
+msgid "Failed to refresh metadata."
+msgstr "Aktualisierung der Metadaten fehlgeschlagen."
+
+#: src/ui/MainWindow.cpp:918
+msgid "Enter the version you want to upgrade to:"
+msgstr "Geben Sie die Version ein, auf die Sie aktualisieren möchten:"
+
+#: src/ui/MainWindow.cpp:933
+msgid ""
+"The target version (%1) is lower than the current version (%2). Downgrading "
+"the system may cause instability. Continue anyway?"
+msgstr ""
+"Die Zielversion (%1) ist niedriger als die aktuelle Version (%2). Ein "
+"Herabstufen des Systems kann zu Instabilität führen. Trotzdem fortsetzen?"
+
+#: src/ui/MainWindow.cpp:936
+msgid "Version Warning"
+msgstr "Versionswarnung"
+
+#: src/ui/MainWindow.cpp:943
+msgid "This will prepare a system upgrade transaction. Continue?"
+msgstr ""
+"Dies wird eine Systemaktualisierungstransaktion vorbereiten. Fortfahren?"
+
+#: src/ui/MainWindow.cpp:948
+msgid "Preparing system upgrade..."
+msgstr "Systemaktualisierung wird vorbereitet..."
+
+#: src/ui/MainWindow.cpp:969
+msgid "System upgrade transaction completed."
+msgstr "Systemaktualisierungstransaktion abgeschlossen."
+
+#: src/ui/MainWindow.cpp:971
+msgid "System Upgrade Failed"
+msgstr "Systemaktualisierung fehlgeschlagen"
+
+#: src/ui/MainWindow.cpp:987
+msgid "System Upgrade Error"
+msgstr "Systemaktualisierungsfehler"
+
+#: src/ui/MainWindow.cpp:1003
+msgid "Checking for updates..."
+msgstr "Auf Aktualisierungen wird geprüft..."
+
+#: src/ui/MainWindow.cpp:1031
+msgid "Select RPM Package Files"
+msgstr "RPM-Paketdateien auswählen"
+
+#: src/ui/MainWindow.cpp:1033
+msgid "RPM Packages (*.rpm)"
+msgstr "RPM-Pakete (*.rpm)"
+
+#: src/ui/MainWindow.cpp:1039
+msgid "Download now and install on next reboot (offline update)?"
+msgstr ""
+"Jetzt herunterladen und beim nächsten Neustart installieren (Offline-"
+"Aktualisierung)?"
+
+#: src/ui/MainWindow.cpp:1040
+msgid "Installation Mode"
+msgstr "Installationsmodus"
+
+#: src/ui/MainWindow.cpp:1041
+msgid "Offline Update"
+msgstr "Offline-Aktualisierung"
+
+#: src/ui/MainWindow.cpp:1041
+msgid "Install Now"
+msgstr "Jetzt installieren"
+
+#: src/ui/MainWindow.cpp:1052
+msgid "%1 package"
+msgid_plural "%1 packages"
+msgstr[0] "%1 Paket"
+msgstr[1] "%1 Pakete"
+
+#: src/ui/MainWindow.cpp:1075
+msgid "%1 update available"
+msgid_plural "%1 updates available"
+msgstr[0] "%1 Aktualisierung verfügbar"
+msgstr[1] "%1 Aktualisierungen verfügbar"
+
+#: src/ui/MainWindow.cpp:1109
+msgid "%1 updates"
+msgstr "%1 Aktualisierungen"
+
+#: src/ui/MainWindow.cpp:1122
+msgid "Queue: %1 items"
+msgstr "Warteschlange: %1 Einträge"
+
+#: src/ui/MainWindow.cpp:1134
+msgid "There are pending operations in the queue. Close anyway?"
+msgstr ""
+"Es gibt ausstehende Vorgänge in der Warteschlange. Trotzdem schließen?"
+
+#: src/ui/MainWindow.cpp:1135
+msgid "Pending Operations"
+msgstr "Ausstehende Vorgänge"
+
+#: src/ui/MainWindow.cpp:1129
+msgid "About Miryu Software Center"
+msgstr "Über Miryu Software-Center"
+
+#: src/ui/MainWindow.cpp:1143
+msgid "Version %1"
+msgstr "Version %1"
+
+#: src/ui/MainWindow.cpp:1164
+msgid "Authors"
+msgstr "Autoren"
+
+#: src/ui/MainWindow.cpp:1207
+msgid "Need to Restart"
+msgstr "Neustart erforderlich"
+
+#: src/ui/MainWindow.cpp:1208
+msgid ""
+"You have installed software packages that require a computer restart. "
+"Please restart the operating system as soon as possible to ensure the "
+"updates take full effect."
+msgstr ""
+"Sie haben Softwarepakete installiert, die einen Computerneustart erfordern. "
+"Bitte starten Sie das Betriebssystem so bald wie möglich neu, um "
+"sicherzustellen, dass die Updates vollständig wirksam werden."
+
+#: src/ui/PackageInfoWidget.cpp:67
+msgid "Version:"
+msgstr "Version:"
+
+#: src/ui/PackageInfoWidget.cpp:68
+msgid "Repository:"
+msgstr "Paketquelle:"
+
+#: src/ui/PackageInfoWidget.cpp:69
+msgid "Size:"
+msgstr "Größe:"
+
+#: src/ui/PackageInfoWidget.cpp:70
+msgid "License:"
+msgstr "Lizenz:"
+
+#: src/ui/PackageInfoWidget.cpp:71
+msgid "URL:"
+msgstr "URL:"
+
+#: src/ui/PackageInfoWidget.cpp:72
+msgid "Status:"
+msgstr "Status:"
+
+#: src/ui/PackageInfoWidget.cpp:121
+msgid "Downgrade Available"
+msgstr "Herabstufung verfügbar"
+
+#: src/ui/PackageView.cpp:205
+msgid "Install Selected (%1)"
+msgstr "Ausgewählte installieren (%1)"
+
+#: src/ui/PackageView.cpp:219
+msgid "Update Selected (%1)"
+msgstr "Ausgewählte aktualisieren (%1)"
+
+#: src/ui/PackageView.cpp:233
+msgid "Remove Selected (%1)"
+msgstr "Ausgewählte entfernen (%1)"
+
+#: src/ui/PackageView.cpp:246
+msgid "Copy Selected Package Names"
+msgstr "Ausgewählte Paketnamen kopieren"
+
+#: src/ui/PackageView.cpp:267 src/ui/QueueView.cpp:153
+msgid "Remove from Queue"
+msgstr "Aus Warteschlange entfernen"
+
+#: src/ui/PackageView.cpp:271
+msgid "Queue for Removal"
+msgstr "Zur Entfernungs-Warteschlange hinzufügen"
+
+#: src/ui/PackageView.cpp:272
+msgid "Queue for Update"
+msgstr "Zur Aktualisierungs-Warteschlange hinzufügen"
+
+#: src/ui/PackageView.cpp:273
+msgid "Queue for Installation"
+msgstr "Zur Installations-Warteschlange hinzufügen"
+
+#: src/ui/PackageView.cpp:279
+msgid "Copy Package Name"
+msgstr "Paketname kopieren"
+
+#: src/ui/ProgressDialog.cpp:13
+msgid "Processing"
+msgstr "Verarbeitung"
+
+#: src/ui/ProgressDialog.cpp:21
+msgid "Preparing..."
+msgstr "Wird vorbereitet..."
+
+#: src/ui/ProgressDialog.cpp:54
+msgid "Downloading %1: %2 MB / %3 MB"
+msgstr "Download %1: %2 MB / %3 MB"
+
+#: src/ui/ProgressDialog.cpp:59
+msgid "Downloading %1..."
+msgstr "Download %1..."
+
+#: src/ui/QueueView.cpp:61 src/ui/PackageInfoWidget.cpp:95
+msgid "Dependencies"
+msgstr "Abhängigkeiten"
+
+#: src/ui/QueueView.cpp:137 src/ui/TransactionResultDialog.cpp:68
+msgid "Reinstall"
+msgstr "Neu installieren"
+
+#: src/ui/QueueView.cpp:144 src/ui/TransactionResultDialog.cpp:67
+msgid "Downgrade"
+msgstr "Herabstufen"
+
+#: src/ui/RepoView.cpp:64
+msgid "Default"
+msgstr "Standard"
+
+#: src/ui/RepoView.cpp:64
+msgid "Priority: %1"
+msgstr "Priorität: %1"
+
+#: src/ui/RepoView.cpp:70
+msgid "Enabled"
+msgstr "Aktiviert"
+
+#: src/ui/RepoView.cpp:70
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+#: src/ui/RepoView.cpp:112 src/ui/RepoView.cpp:116
+msgid "Disable Repository"
+msgstr "Paketquelle deaktivieren"
+
+#: src/ui/RepoView.cpp:115
+msgid "Disable repository '%1'?"
+msgstr "Paketquelle '%1' deaktivieren?"
+
+#: src/ui/RepoView.cpp:128
+msgid "Failed to disable repository '%1'."
+msgstr "Repository '%1' konnte nicht deaktiviert werden."
+
+#: src/ui/RepoView.cpp:136 src/ui/RepoView.cpp:140
+msgid "Enable Repository"
+msgstr "Paketquelle aktivieren"
+
+#: src/ui/RepoView.cpp:139
+msgid "Enable repository '%1'?"
+msgstr "Paketquelle '%1' aktivieren?"
+
+#: src/ui/RepoView.cpp:152
+msgid "Failed to enable repository '%1'."
+msgstr "Repository '%1' konnte nicht aktiviert werden."
+
+#: src/ui/SettingsDialog.cpp:84 src/ui/SettingsDialog.cpp:92
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: src/ui/SettingsDialog.cpp:110
+msgid "Defaults"
+msgstr "Standards"
+
+#: src/ui/SettingsDialog.cpp:146
+msgid "Flatpak Settings"
+msgstr "Flatpak-Einstellungen"
+
+#: src/ui/SettingsDialog.cpp:153
+msgid "Default Location"
+msgstr "Standardort"
+
+#: src/ui/SettingsDialog.cpp:154
+msgid ""
+"Whether new Flatpak installs default to the user or system installation."
+msgstr ""
+"Ob neue Flatpak-Installationen standardmäßig als Benutzer- oder "
+"Systeminstallation erfolgen."
+
+#: src/ui/SettingsDialog.cpp:158
+msgid "Default Remote Repository"
+msgstr "Standard-Remote-Paketquelle"
+
+#: src/ui/SettingsDialog.cpp:159
+msgid "Remote repository name used for Flatpak operations by default."
+msgstr ""
+"Name des Remote-Repositorys, das standardmäßig für Flatpak-Operationen "
+"verwendet wird."
+
+#: src/ui/SettingsDialog.cpp:164
+msgid "Metadata Settings"
+msgstr "Metadaten-Einstellungen"
+
+#: src/ui/SettingsDialog.cpp:170 src/ui/SettingsDialog.cpp:189
+msgid " minutes"
+msgstr " Minuten"
+
+#: src/ui/SettingsDialog.cpp:172
+msgid "Min Refresh Interval"
+msgstr "Minimales Aktualisierungsintervall"
+
+#: src/ui/SettingsDialog.cpp:173
+msgid "Minimum interval between automatic repository metadata refreshes."
+msgstr ""
+"Mindestintervall zwischen automatischen Repository-Metadaten-"
+"Aktualisierungen."
+
+#: src/ui/SettingsDialog.cpp:178
+msgid "Updater Settings"
+msgstr "Updater-Einstellungen"
+
+#: src/ui/SettingsDialog.cpp:183
+msgid "e.g. /usr/bin/dnfdragora"
+msgstr "z.B. /usr/bin/dnfdragora"
+
+#: src/ui/SettingsDialog.cpp:184
+msgid "Custom System Updater Path"
+msgstr "Benutzerdefinierter System-Updater-Pfad"
+
+#: src/ui/SettingsDialog.cpp:185
+msgid ""
+"Full path to an external system updater to launch instead of the built-in "
+"one."
+msgstr ""
+"Vollständiger Pfad zu einem externen System-Updater, der anstelle des "
+"integrierten gestartet wird."
+
+#: src/ui/SettingsDialog.cpp:191
+msgid "Check Update Interval"
+msgstr "Aktualisierungsprüfungsintervall"
+
+#: src/ui/SettingsDialog.cpp:192
+msgid "How often Miryu checks for available RPM updates in the background."
+msgstr ""
+"Wie oft Miryu im Hintergrund nach verfügbaren RPM-Aktualisierungen sucht."
+
+#: src/ui/SettingsDialog.cpp:195
+msgid "Show Tray Icon"
+msgstr "Tray-Symbol anzeigen"
+
+#: src/ui/SettingsDialog.cpp:200
+msgid "Show a system tray icon while Miryu is running."
+msgstr "Ein System-Tray-Symbol anzeigen, während Miryu läuft."
+
+#: src/ui/SettingsDialog.cpp:202
+msgid "Dark Tray Icon"
+msgstr "Dunkles Tray-Symbol"
+
+#: src/ui/SettingsDialog.cpp:205
+msgid "Use a dark tray icon for better visibility on light panels."
+msgstr ""
+"Ein dunkles Tray-Symbol für bessere Sichtbarkeit auf hellen Panels "
+"verwenden."
+
+#: src/ui/SettingsDialog.cpp:207
+msgid "Update Notifications"
+msgstr "Aktualisierungsbenachrichtigungen"
+
+#: src/ui/SettingsDialog.cpp:210
+msgid "Show a desktop notification when updates become available."
+msgstr ""
+"Eine Desktop-Benachrichtigung anzeigen, wenn Aktualisierungen verfügbar "
+"werden."
+
+#: src/ui/SettingsDialog.cpp:240
+msgid "Repository Management"
+msgstr "Repository-Verwaltung"
+
+#: src/ui/SettingsDialog.cpp:245
+msgid ""
+"Repository enable / disable management is performed from the main Repositories page in the sidebar.\n"
+"\n"
+"Use the sidebar \"Repositories\" entry to view, enable or disable individual software repositories and to refresh their metadata."
+msgstr ""
+"Die Aktivierung/Deaktivierung von Repositories erfolgt über die Haupt-Seite \"Repositories\" in der Seitenleiste.\n"
+"\n"
+"Verwenden Sie den Eintrag \"Repositories\" in der Seitenleiste, um einzelne Software-Repositories anzuzeigen, zu aktivieren oder zu deaktivieren und deren Metadaten zu aktualisieren."
+
+#: src/ui/TransactionResultDialog.cpp:36
+msgid "Transaction Summary"
+msgstr "Transaktionsübersicht"
+
+#: src/ui/TransactionResultDialog.cpp:42
+msgid "The following operations will be performed:"
+msgstr "Die folgenden Vorgänge werden ausgeführt:"
+
+#: src/ui/TransactionResultDialog.cpp:48
+msgid "Warnings"
+msgstr "Warnungen"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Package"
+msgstr "Paket"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Repository"
+msgstr "Repository"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Size"
+msgstr "Größe"
+
+#: src/ui/TransactionResultDialog.cpp:69
+msgid "Remove"
+msgstr "Entfernen"
+
+#: src/ui/TransactionResultDialog.cpp:70
+msgid "Replace"
+msgstr "Ersetzen"
+
+#: src/ui/TransactionResultDialog.cpp:71
+msgid "Obsolete"
+msgstr "Veraltet"
+
+#: src/ui/TransactionResultDialog.cpp:117
+msgid "Total Download Size"
+msgstr "Gesamte Downloadgröße"
+
+#: src/ui/TransactionResultDialog.cpp:121
+msgid "Apply offline (on next reboot)"
+msgstr "Offline anwenden (beim nächsten Neustart)"
+
+#: src/ui/PackageInfoWidget.cpp:100
+msgid "Provides"
+msgstr "Bereitgestellt"
+
+#: src/ui/PackageInfoWidget.cpp:105
+msgid "Changelog"
+msgstr "Änderungsprotokoll"
+
+#: src/ui/PackageInfoWidget.cpp:110
+msgid "Files"
+msgstr "Dateien"
+
+#: src/ui/PackageInfoWidget.cpp:177
+msgid "<i>No dependencies.</i>"
+msgstr "<i>Keine Abhängigkeiten.</i>"
+
+#: src/ui/PackageInfoWidget.cpp:184
+msgid "<i>No provides.</i>"
+msgstr "<i>Keine Bereitstellungen.</i>"
+
+#: src/ui/PackageInfoWidget.cpp:191
+msgid "<i>No changelog available.</i>"
+msgstr "<i>Kein Änderungsprotokoll verfügbar.</i>"
+
+#: src/ui/PackageInfoWidget.cpp:198
+msgid "<i>No file list available.</i>"
+msgstr "<i>Keine Dateiliste verfügbar.</i>"
+
+#: src/ui/MainWindow.cpp:757 src/ui/MainWindow.cpp:581
+msgid ""
+"Cannot remove protected packages or critical dependencies.\n"
+"\n"
+"Removing these packages would break the system.\n"
+"\n"
+"%1"
+msgstr ""
+"Geschützte Pakete oder kritische Abhängigkeiten können nicht entfernt werden.\n"
+"\n"
+"Das Entfernen dieser Pakete würde das System beschädigen.\n"
+"\n"
+"%1"
+
+#: src/ui/MainWindow.cpp:761 src/ui/MainWindow.cpp:585
+msgid "Protected Package Error"
+msgstr "Fehler bei geschütztem Paket"
+
+#: src/core/Dnf5DaemonClient.cpp:471
+msgid "Cannot load repositories."
+msgstr "Paketquellen können nicht geladen werden."
+
+#: src/ui/MainWindow.cpp:1134
+msgid ""
+"Failed to launch the Linglong Store.\n"
+"\n"
+"Please ensure that the linglong-store application is installed\n"
+"and available at %1."
+msgstr ""
+"Linglong Store konnte nicht gestartet werden.\n"
+"\n"
+"Bitte stellen Sie sicher, dass die linglong-store-Anwendung installiert ist\n"
+"und unter %1 zur Verfügung steht."
+
+#: src/ui/MainWindow.cpp:404
+msgid "Launch the external Linglong Store application"
+msgstr "Externe Linglong Store-Anwendung starten"

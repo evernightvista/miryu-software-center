@@ -1,0 +1,64 @@
+#include "ProgressDialog.h"
+
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QProgressBar>
+#include <KLocalizedString>
+
+namespace Miryu {
+
+ProgressDialog::ProgressDialog(QWidget *parent)
+    : QDialog(parent)
+{
+    setWindowTitle(i18n("Processing"));
+    setModal(true);
+    setMinimumWidth(400);
+
+    auto *layout = new QVBoxLayout(this);
+    layout->setSpacing(12);
+    layout->setContentsMargins(20, 20, 20, 20);
+
+    m_messageLabel = new QLabel(i18n("Preparing..."));
+    QFont msgFont = m_messageLabel->font();
+    msgFont.setBold(true);
+    msgFont.setPointSize(msgFont.pointSize() + 1);
+    m_messageLabel->setFont(msgFont);
+    layout->addWidget(m_messageLabel);
+
+    m_progressBar = new QProgressBar;
+    m_progressBar->setRange(0, 100);
+    m_progressBar->setValue(0);
+    layout->addWidget(m_progressBar);
+
+    m_detailLabel = new QLabel;
+    m_detailLabel->setStyleSheet(QStringLiteral("color: palette(mid);"));
+    layout->addWidget(m_detailLabel);
+}
+
+void ProgressDialog::setMessage(const QString &message)
+{
+    m_messageLabel->setText(message);
+}
+
+void ProgressDialog::setProgress(int percent)
+{
+    m_progressBar->setValue(percent);
+}
+
+void ProgressDialog::setDownloadProgress(const QString &downloadId, qint64 total, qint64 downloaded)
+{
+    QString detail;
+    if (total > 0) {
+        double mbTotal = total / (1024.0 * 1024);
+        double mbDownloaded = downloaded / (1024.0 * 1024);
+        detail = i18n("Downloading %1: %2 MB / %3 MB",
+                       downloadId,
+                       QString::number(mbDownloaded, 'f', 1),
+                       QString::number(mbTotal, 'f', 1));
+    } else {
+        detail = i18n("Downloading %1...", downloadId);
+    }
+    m_detailLabel->setText(detail);
+}
+
+}

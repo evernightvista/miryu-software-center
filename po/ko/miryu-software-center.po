@@ -1,0 +1,1258 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Korean translation for miryu.
+# Copyright (C) 2027 KairikiFedora and MiryuGaming
+# This file is distributed under the same license as the miryu package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: miryu\n"
+"Report-Msgid-Bugs-To: https://github.com/EvernightFedora/miryu\n"
+"POT-Creation-Date: 2026-08-21 03:20+0000\n"
+"PO-Revision-Date: 2026-08-20 00:00+0800\n"
+"Last-Translator: KairikiFedora <kairiki@evernightfedora.org>\n"
+"Language-Team: Korean <miryu@example.com>\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: src/main.cpp:34
+msgid "Miryu Software Center"
+msgstr "Miryu 소프트웨어 센터"
+
+#: src/main.cpp:35
+msgid ""
+"A modern RPM package manager powered by dnf5daemon, built with Qt6 and KDE "
+"Frameworks 6."
+msgstr "dnf5daemon 기반의 현대적인 RPM 패키지 관리자, Qt6 및 KDE Frameworks 6로 구축됨."
+
+#: src/main.cpp:54
+msgid "Install the specified RPM file(s)"
+msgstr "지정된 RPM 파일 설치"
+
+#: src/main.cpp:58
+msgid "RPM package files to install"
+msgstr "설치할 RPM 패키지 파일"
+
+#: src/main.cpp:81
+msgid ""
+"Failed to connect to dnf5daemon-server.\n"
+"\n"
+"Please ensure the dnf5daemon-server service is running:\n"
+"\n"
+"  systemctl start dnf5daemon-server\n"
+"\n"
+"If you don't have it installed, install it with:\n"
+"  dnf install dnf5daemon-server"
+msgstr ""
+"dnf5daemon-server에 연결하지 못했습니다.\n"
+"\n"
+"dnf5daemon-server 서비스가 실행 중인지 확인하세요:\n"
+"\n"
+"  systemctl start dnf5daemon-server\n"
+"\n"
+"설치되어 있지 않으면 다음으로 설치하세요:\n"
+"  dnf install dnf5daemon-server"
+
+#: src/main.cpp:87
+msgid "D-Bus error details:"
+msgstr "D-Bus 오류 세부 정보:"
+
+#: src/main.cpp:90
+msgid "Connection Error"
+msgstr "연결 오류"
+
+#: src/core/Backend.cpp:49
+msgid "Downloading"
+msgstr "다운로드 중"
+
+#: src/core/Backend.cpp:53
+msgid "Download complete"
+msgstr "다운로드 완료"
+
+#: src/core/Backend.cpp:59
+msgid "%1 %2"
+msgstr "%1 %2"
+
+#: src/core/Backend.cpp:63
+msgid "Processing %1"
+msgstr "%1 처리 중"
+
+#: src/core/Backend.cpp:66
+msgid "Verifying Packages"
+msgstr "패키지 검증 중"
+
+#: src/core/Backend.cpp:70
+msgid "Verifying"
+msgstr "검증 중"
+
+#: src/core/Backend.cpp:73
+msgid "Applying Transaction"
+msgstr "트랜잭션 적용 중"
+
+#: src/core/Backend.cpp:76
+msgid "Running scripts"
+msgstr "스크립트 실행 중"
+
+#: src/core/Enums.h:87
+msgid "Installing"
+msgstr "설치 중"
+
+#: src/core/Enums.h:88
+msgid "Upgrading"
+msgstr "업그레이드 중"
+
+#: src/core/Enums.h:89
+msgid "Downgrading"
+msgstr "다운그레이드 중"
+
+#: src/core/Enums.h:90
+msgid "Reinstalling"
+msgstr "재설치 중"
+
+#: src/core/Enums.h:91
+msgid "Removing"
+msgstr "제거 중"
+
+#: src/core/Enums.h:92
+msgid "Replacing"
+msgstr "교체 중"
+
+#: src/core/UpdateChecker.cpp:159
+msgid "Updates Available"
+msgstr "업데이트 사용 가능"
+
+#: src/core/UpdateChecker.cpp:160
+msgid "%1 update is available for your system."
+msgid_plural "%1 updates are available for your system."
+msgstr[0] "시스템에 %1개의 업데이트가 있습니다."
+
+#: src/ui/AdvancedOpsDialog.cpp:84 src/ui/AdvancedOpsDialog.cpp:92
+#: src/ui/MainWindow.cpp:421
+msgid "Advanced Operations"
+msgstr "고급 작업"
+
+#: src/ui/AdvancedOpsDialog.cpp:95
+msgid "System-level package operations that require root privileges."
+msgstr "root 권한이 필요한 시스템 수준 패키지 작업입니다."
+
+#: src/ui/AdvancedOpsDialog.cpp:104 src/ui/AdvancedOpsDialog.cpp:239
+#: src/ui/AdvancedOpsDialog.cpp:246
+msgid "Refresh DNF Cache"
+msgstr "DNF 캐시 새로고침"
+
+#: src/ui/AdvancedOpsDialog.cpp:105
+msgid "Run: dnf makecache --refresh"
+msgstr "실행: dnf makecache --refresh"
+
+#: src/ui/AdvancedOpsDialog.cpp:109
+msgid "Download and rebuild metadata cache for all enabled repositories."
+msgstr "활성화된 모든 저장소의 메타데이터 캐시를 다운로드하고 재구축합니다."
+
+#: src/ui/AdvancedOpsDialog.cpp:119 src/ui/AdvancedOpsDialog.cpp:259
+#: src/ui/AdvancedOpsDialog.cpp:266 src/ui/MainWindow.cpp:413
+#: src/ui/MainWindow.cpp:822 src/ui/MainWindow.cpp:837
+#: src/ui/MainWindow.cpp:843
+msgid "Distro Sync"
+msgstr "배포판 동기화"
+
+#: src/ui/AdvancedOpsDialog.cpp:120
+msgid "Run: dnf distro-sync"
+msgstr "실행: dnf distro-sync"
+
+#: src/ui/AdvancedOpsDialog.cpp:124
+msgid ""
+"Synchronize all installed packages to the latest versions in repositories."
+msgstr "설치된 모든 패키지를 저장소의 최신 버전으로 동기화합니다."
+
+#: src/ui/AdvancedOpsDialog.cpp:132 src/ui/MainWindow.cpp:409
+#: src/ui/MainWindow.cpp:917 src/ui/MainWindow.cpp:944
+msgid "System Upgrade"
+msgstr "시스템 업그레이드"
+
+#: src/ui/AdvancedOpsDialog.cpp:160
+msgid "Fedora Version"
+msgstr "Fedora 버전"
+
+#: src/ui/AdvancedOpsDialog.cpp:161
+msgid "Target Fedora release (VERSION_ID from /usr/lib/os-release)."
+msgstr "대상 Fedora 릴리스 (/usr/lib/os-release의 VERSION_ID)."
+
+#: src/ui/AdvancedOpsDialog.cpp:182 src/ui/AdvancedOpsDialog.cpp:301
+msgid "Execute System Upgrade"
+msgstr "시스템 업그레이드 실행"
+
+#: src/ui/AdvancedOpsDialog.cpp:183
+msgid "Run: dnf system-upgrade download --releasever=<version>"
+msgstr "실행: dnf system-upgrade download --releasever=<version>"
+
+#: src/ui/AdvancedOpsDialog.cpp:206
+msgid "Command Output"
+msgstr "명령 출력"
+
+#: src/ui/AdvancedOpsDialog.cpp:217
+msgid "Close"
+msgstr "닫기"
+
+#: src/ui/AdvancedOpsDialog.cpp:232 src/ui/AdvancedOpsDialog.cpp:252
+#: src/ui/AdvancedOpsDialog.cpp:272
+msgid "Another operation is still running."
+msgstr "다른 작업이 아직 실행 중입니다."
+
+#: src/ui/AdvancedOpsDialog.cpp:237
+msgid ""
+"This will download and rebuild the metadata cache for all enabled "
+"repositories. Continue?"
+msgstr "활성화된 모든 저장소의 메타데이터 캐시를 다운로드하고 재구축합니다. 계속하시겠습니까?"
+
+#: src/ui/AdvancedOpsDialog.cpp:240 src/ui/FlatpakPage.cpp:254
+#: src/ui/FlatpakPage.cpp:314 src/ui/MainWindow.cpp:404
+msgid "Refresh"
+msgstr "새로고침"
+
+#: src/ui/AdvancedOpsDialog.cpp:257
+msgid ""
+"This will synchronise all installed packages to the latest version available"
+" in the repositories. Continue?"
+msgstr "설치된 모든 패키지를 저장소에서 사용 가능한 최신 버전으로 동기화합니다. 계속하시겠습니까?"
+
+#: src/ui/AdvancedOpsDialog.cpp:260
+msgid "Sync"
+msgstr "동기화"
+
+#: src/ui/AdvancedOpsDialog.cpp:278
+msgid "Please enter a target Fedora version."
+msgstr "대상 Fedora 버전을 입력하세요."
+
+#: src/ui/AdvancedOpsDialog.cpp:286
+msgid ""
+"The target version (%1) is lower than the currently running version (%2). Downgrading the system is risky and may leave the system in an inconsistent state.\n"
+"\n"
+"Do you really want to continue?"
+msgstr ""
+"대상 버전 (%1)이 현재 실행 중인 버전 (%2)보다 낮습니다. 시스템 다운그레이드는 위험하며 시스템이 불일치 상태가 될 수 있습니다.\n"
+"\n"
+"정말 계속하시겠습니까?"
+
+#: src/ui/AdvancedOpsDialog.cpp:291
+msgid "Version Downgrade Warning"
+msgstr "버전 다운그레이드 경고"
+
+#: src/ui/AdvancedOpsDialog.cpp:297
+msgid ""
+"This will download all packages needed to upgrade the system to Fedora %1. After the download completes you will need to reboot to apply the upgrade.\n"
+"\n"
+"Continue?"
+msgstr ""
+"시스템을 Fedora %1로 업그레이드하는 데 필요한 모든 패키지를 다운로드합니다. 다운로드 완료 후 업그레이드를 적용하려면 재부팅해야 합니다.\n"
+"\n"
+"계속하시겠습니까?"
+
+#: src/ui/AdvancedOpsDialog.cpp:302
+msgid "Download"
+msgstr "다운로드"
+
+#: src/ui/AdvancedOpsDialog.cpp:311
+msgid "System Upgrade (releasever=%1)"
+msgstr "시스템 업그레이드 (releasever=%1)"
+
+#: src/ui/AdvancedOpsDialog.cpp:326
+msgid ""
+"Warning: Target version %1 is lower than current version %2. This is a "
+"version downgrade and carries risks."
+msgstr "경고: 대상 버전 %1이 현재 버전 %2보다 낮습니다. 이는 버전 다운그레이드이며 위험이 따릅니다."
+
+#: src/ui/AdvancedOpsDialog.cpp:373
+msgid "Executing: %1 ..."
+msgstr "실행 중: %1 ..."
+
+#: src/ui/AdvancedOpsDialog.cpp:380
+msgid "[started]"
+msgstr "[시작됨]"
+
+#: src/ui/AdvancedOpsDialog.cpp:401 src/ui/AdvancedOpsDialog.cpp:403
+#: src/ui/FlatpakPage.cpp:814
+msgid "Operation completed successfully."
+msgstr "작업이 성공적으로 완료되었습니다."
+
+#: src/ui/AdvancedOpsDialog.cpp:402
+msgid "[completed successfully]"
+msgstr "[성공적으로 완료됨]"
+
+#: src/ui/AdvancedOpsDialog.cpp:407
+msgid "Operation cancelled or authentication failed."
+msgstr "작업이 취소되었거나 인증에 실패했습니다."
+
+#: src/ui/AdvancedOpsDialog.cpp:408
+msgid "[cancelled or authentication failed (exit %1)]"
+msgstr "[취소됨 또는 인증 실패 (종료 %1)]"
+
+#: src/ui/AdvancedOpsDialog.cpp:410
+msgid "Operation failed (exit code %1)."
+msgstr "작업이 실패했습니다 (종료 코드 %1)."
+
+#: src/ui/AdvancedOpsDialog.cpp:411
+msgid "[failed with exit code %1]"
+msgstr "[실패, 종료 코드 %1]"
+
+#: src/ui/AdvancedOpsDialog.cpp:413
+msgid ""
+"Operation failed with exit code %1. Check the output below for details."
+msgstr "작업이 종료 코드 %1로 실패했습니다. 아래 출력을 확인하세요."
+
+#: src/ui/AdvancedOpsDialog.cpp:414
+msgid "Operation Failed"
+msgstr "작업 실패"
+
+#: src/ui/AdvancedOpsDialog.cpp:422
+msgid "Failed to start command: %1"
+msgstr "명령 시작 실패: %1"
+
+#: src/ui/AdvancedOpsDialog.cpp:423
+msgid "[error: %1]"
+msgstr "[오류: %1]"
+
+#: src/ui/AdvancedOpsDialog.cpp:425
+msgid ""
+"Failed to start command.\n"
+"%1\n"
+"\n"
+"Make sure pkexec (polkit) is installed and available."
+msgstr ""
+"명령 시작에 실패했습니다.\n"
+"%1\n"
+"\n"
+"pkexec (polkit)이 설치되어 사용 가능한지 확인하세요."
+
+#: src/ui/AdvancedOpsDialog.cpp:427
+msgid "Command Start Failed"
+msgstr "명령 시작 실패"
+
+#: src/ui/FlatpakPage.cpp:96 src/ui/FlatpakPage.cpp:400
+#: src/ui/FlatpakPage.cpp:516 src/ui/FlatpakPage.cpp:834
+#: src/ui/FlatpakPage.cpp:849
+msgid "Update"
+msgstr "업데이트"
+
+#: src/ui/FlatpakPage.cpp:99 src/ui/MainWindow.cpp:151
+#: src/ui/PackageInfoWidget.cpp:112
+msgid "Installed"
+msgstr "설치됨"
+
+#: src/ui/FlatpakPage.cpp:102 src/ui/FlatpakPage.cpp:391
+#: src/ui/FlatpakPage.cpp:828 src/ui/FlatpakPage.cpp:845
+#: src/ui/TransactionResultDialog.cpp:65
+msgid "Install"
+msgstr "설치"
+
+#: src/ui/FlatpakPage.cpp:167
+msgid "Flatpak Apps"
+msgstr "Flatpak 앱"
+
+#: src/ui/FlatpakPage.cpp:171
+msgid "Flatpak Store"
+msgstr "Flatpak 스토어"
+
+#: src/ui/FlatpakPage.cpp:206 src/ui/MainWindow.cpp:666
+msgid "Loading..."
+msgstr "불러오는 중..."
+
+#: src/ui/FlatpakPage.cpp:232
+msgid "Filter installed Flatpak apps..."
+msgstr "설치된 Flatpak 앱 필터링..."
+
+#: src/ui/FlatpakPage.cpp:239 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:738
+msgid "Update All"
+msgstr "전체 업데이트"
+
+#: src/ui/FlatpakPage.cpp:244 src/ui/FlatpakPage.cpp:919
+msgid "Uninstall Selected"
+msgstr "선택 항목 제거"
+
+#: src/ui/FlatpakPage.cpp:249 src/ui/FlatpakPage.cpp:949
+msgid "Update Selected"
+msgstr "선택 항목 업데이트"
+
+#: src/ui/FlatpakPage.cpp:298
+msgid "Search Flatpak store..."
+msgstr "Flatpak 스토어 검색..."
+
+#: src/ui/FlatpakPage.cpp:304 src/ui/FlatpakPage.cpp:756
+msgid "All Remotes"
+msgstr "모든 원격 소스"
+
+#: src/ui/FlatpakPage.cpp:309 src/ui/FlatpakPage.cpp:897
+msgid "Install Selected"
+msgstr "선택 항목 설치"
+
+#: src/ui/FlatpakPage.cpp:396 src/ui/FlatpakPage.cpp:525
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:672
+#: src/ui/FlatpakPage.cpp:831 src/ui/FlatpakPage.cpp:847
+msgid "Uninstall"
+msgstr "제거"
+
+#: src/ui/FlatpakPage.cpp:404 src/ui/FlatpakPage.cpp:508
+msgid "Run"
+msgstr "실행"
+
+#: src/ui/FlatpakPage.cpp:434 src/ui/MainWindow.cpp:161
+#: src/ui/PackageInfoWidget.cpp:83
+msgid "Description"
+msgstr "설명"
+
+#: src/ui/FlatpakPage.cpp:446
+msgid "Back to List"
+msgstr "목록으로 돌아가기"
+
+#: src/ui/FlatpakPage.cpp:462 src/ui/FlatpakPage.cpp:715
+msgid "Loading installed Flatpak apps..."
+msgstr "설치된 Flatpak 앱 불러오는 중..."
+
+#: src/ui/FlatpakPage.cpp:464
+msgid "Search the Flatpak store"
+msgstr "Flatpak 스토어 검색"
+
+#: src/ui/FlatpakPage.cpp:488 src/ui/FlatpakPage.cpp:784
+#: src/ui/MainWindow.cpp:1059
+msgid "%1 result"
+msgid_plural "%1 results"
+msgstr[0] "%1개 결과"
+
+#: src/ui/FlatpakPage.cpp:528 src/ui/FlatpakPage.cpp:671
+msgid "Uninstall '%1' (%2)?"
+msgstr "'%1' (%2)을(를) 제거하시겠습니까?"
+
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:672 src/ui/FlatpakPage.cpp:897
+#: src/ui/FlatpakPage.cpp:919 src/ui/FlatpakPage.cpp:949
+#: src/ui/MainWindow.cpp:936 src/ui/MainWindow.cpp:944
+#: src/ui/MainWindow.cpp:1135 src/ui/RepoView.cpp:116 src/ui/RepoView.cpp:140
+msgid "Yes"
+msgstr "예"
+
+#: src/ui/FlatpakPage.cpp:529 src/ui/FlatpakPage.cpp:552
+#: src/ui/FlatpakPage.cpp:672 src/ui/FlatpakPage.cpp:897
+#: src/ui/FlatpakPage.cpp:919 src/ui/FlatpakPage.cpp:949
+#: src/ui/MainWindow.cpp:936 src/ui/MainWindow.cpp:944
+#: src/ui/MainWindow.cpp:1135 src/ui/RepoView.cpp:116 src/ui/RepoView.cpp:140
+msgid "No"
+msgstr "아니오"
+
+#: src/ui/FlatpakPage.cpp:546
+msgid "No updates available."
+msgstr "사용 가능한 업데이트가 없습니다."
+
+#: src/ui/FlatpakPage.cpp:551
+msgid "Update %1 Flatpak application?"
+msgid_plural "Update %1 Flatpak applications?"
+msgstr[0] "%1개의 Flatpak 앱을 업데이트하시겠습니까?"
+
+#: src/ui/FlatpakPage.cpp:570
+msgid "Searching for '%1'..."
+msgstr "'%1' 검색 중..."
+
+#: src/ui/FlatpakPage.cpp:612
+msgid "Application ID: %1"
+msgstr "앱 ID: %1"
+
+#: src/ui/FlatpakPage.cpp:613
+msgid "Version: %1"
+msgstr "버전: %1"
+
+#: src/ui/FlatpakPage.cpp:614
+msgid "Branch: %1"
+msgstr "브랜치: %1"
+
+#: src/ui/FlatpakPage.cpp:615
+msgid "Remote: %1"
+msgstr "원격 소스: %1"
+
+#: src/ui/FlatpakPage.cpp:616
+msgid "Installation: %1"
+msgstr "설치: %1"
+
+#: src/ui/FlatpakPage.cpp:618
+msgid "Size: %1"
+msgstr "크기: %1"
+
+#: src/ui/FlatpakPage.cpp:623 src/ui/PackageInfoWidget.cpp:127
+msgid "<i>No description available.</i>"
+msgstr "<i>설명이 없습니다.</i>"
+
+#: src/ui/FlatpakPage.cpp:658
+msgid "Installing..."
+msgstr "설치 중..."
+
+#: src/ui/FlatpakPage.cpp:677
+msgid "Uninstalling..."
+msgstr "제거 중..."
+
+#: src/ui/FlatpakPage.cpp:690
+msgid "Updating..."
+msgstr "업데이트 중..."
+
+#: src/ui/FlatpakPage.cpp:736
+msgid "Update All (%1)"
+msgstr "전체 업데이트 (%1)"
+
+#: src/ui/FlatpakPage.cpp:741
+msgid "%1 app installed, %2 update available"
+msgid_plural "%1 apps installed, %2 updates available"
+msgstr[0] "%1개 앱 설치됨, %2개 업데이트 사용 가능"
+
+#: src/ui/FlatpakPage.cpp:745
+msgid "%1 app installed"
+msgid_plural "%1 apps installed"
+msgstr[0] "%1개 앱 설치됨"
+
+#: src/ui/FlatpakPage.cpp:790
+msgid "Operation: %1"
+msgstr "작업: %1"
+
+#: src/ui/FlatpakPage.cpp:842
+msgid "Operation failed."
+msgstr "작업이 실패했습니다."
+
+#: src/ui/FlatpakPage.cpp:852
+msgid "Flatpak Operation Error"
+msgstr "Flatpak 작업 오류"
+
+#: src/ui/FlatpakPage.cpp:859 src/ui/MainWindow.cpp:1102
+#: src/ui/MainWindow.cpp:1103 src/ui/RepoView.cpp:130 src/ui/RepoView.cpp:154
+msgid "Error"
+msgstr "오류"
+
+#: src/ui/FlatpakPage.cpp:860
+msgid "Flatpak Error"
+msgstr "Flatpak 오류"
+
+#: src/ui/FlatpakPage.cpp:896
+msgid "Install %1 selected Flatpak application?"
+msgid_plural "Install %1 selected Flatpak applications?"
+msgstr[0] "선택한 %1개의 Flatpak 앱을 설치하시겠습니까?"
+
+#: src/ui/FlatpakPage.cpp:903
+msgid "Installing %1 application..."
+msgid_plural "Installing %1 applications..."
+msgstr[0] "%1개 앱 설치 중..."
+
+#: src/ui/FlatpakPage.cpp:918
+msgid "Uninstall %1 selected Flatpak application?"
+msgid_plural "Uninstall %1 selected Flatpak applications?"
+msgstr[0] "선택한 %1개의 Flatpak 앱을 제거하시겠습니까?"
+
+#: src/ui/FlatpakPage.cpp:925
+msgid "Uninstalling %1 application..."
+msgid_plural "Uninstalling %1 applications..."
+msgstr[0] "%1개 앱 제거 중..."
+
+#: src/ui/FlatpakPage.cpp:943
+msgid "No upgradable applications selected."
+msgstr "업그레이드 가능한 앱이 선택되지 않았습니다."
+
+#: src/ui/FlatpakPage.cpp:948
+msgid "Update %1 selected Flatpak application?"
+msgid_plural "Update %1 selected Flatpak applications?"
+msgstr[0] "선택한 %1개의 Flatpak 앱을 업데이트하시겠습니까?"
+
+#: src/ui/FlatpakPage.cpp:955
+msgid "Updating %1 application..."
+msgid_plural "Updating %1 applications..."
+msgstr[0] "%1개 앱 업데이트 중..."
+
+#: src/ui/PackageInfoWidget.cpp:118
+msgid "Update Available"
+msgstr "업데이트 가능"
+
+#: src/ui/TransactionResultDialog.cpp:66
+msgid "Upgrade"
+msgstr "업그레이드"
+
+#: src/ui/MainWindow.cpp:150
+msgid "All"
+msgstr "전체"
+
+#: src/ui/MainWindow.cpp:144
+msgid "Search packages..."
+msgstr "패키지 검색..."
+
+#: src/ui/MainWindow.cpp:152 src/ui/PackageInfoWidget.cpp:115
+msgid "Available"
+msgstr "사용 가능"
+
+#: src/ui/MainWindow.cpp:153 src/ui/MainWindow.cpp:370
+#: src/ui/MainWindow.cpp:477
+msgid "Updates"
+msgstr "업데이트"
+
+#: src/ui/MainWindow.cpp:154
+msgid "Upgradable"
+msgstr "업그레이드 가능"
+
+#: src/ui/MainWindow.cpp:158
+msgid "All Fields"
+msgstr "모든 필드"
+
+#: src/ui/MainWindow.cpp:159
+msgid "Name"
+msgstr "이름"
+
+#: src/ui/MainWindow.cpp:160
+msgid "Summary"
+msgstr "요약"
+
+#: src/ui/MainWindow.cpp:195
+msgid "Available Updates"
+msgstr "사용 가능한 업데이트"
+
+#: src/ui/MainWindow.cpp:223 src/ui/TransactionResultDialog.cpp:126
+msgid "Apply"
+msgstr "적용"
+
+#: src/ui/MainWindow.cpp:224
+msgid "Clear"
+msgstr "지우기"
+
+#: src/ui/MainWindow.cpp:225
+msgid "Resolve Dependencies"
+msgstr "의존성 해결"
+
+#: src/ui/MainWindow.cpp:228
+msgid "Offline update"
+msgstr "오프라인 업데이트"
+
+#: src/ui/MainWindow.cpp:229
+msgid "Download packages now, install on next reboot"
+msgstr "지금 패키지를 다운로드하고 다음 재부팅 시 설치"
+
+#: src/ui/MainWindow.cpp:283 src/ui/MainWindow.cpp:372
+#: src/ui/MainWindow.cpp:484 src/ui/SettingsDialog.cpp:93
+msgid "Repositories"
+msgstr "저장소"
+
+#: src/ui/MainWindow.cpp:328 src/ui/MainWindow.cpp:568
+#: src/ui/MainWindow.cpp:581 src/ui/MainWindow.cpp:619
+#: src/ui/MainWindow.cpp:734 src/ui/MainWindow.cpp:762
+#: src/ui/MainWindow.cpp:845 src/ui/MainWindow.cpp:881
+#: src/ui/MainWindow.cpp:972 src/ui/MainWindow.cpp:988
+#: src/ui/MainWindow.cpp:1066
+msgid "Ready"
+msgstr "준비됨"
+
+#: src/ui/MainWindow.cpp:358
+msgid "Miryu"
+msgstr "Miryu"
+
+#: src/ui/MainWindow.cpp:369
+msgid "Packages"
+msgstr "패키지"
+
+#: src/ui/MainWindow.cpp:371
+msgid "Queue"
+msgstr "대기열"
+
+#: src/ui/MainWindow.cpp:399 src/ui/MainWindow.cpp:1137
+msgid "Linglong Store"
+msgstr "Linglong 스토어"
+
+#: src/ui/MainWindow.cpp:375 src/ui/MainWindow.cpp:498
+msgid "Flatpak"
+msgstr "Flatpak"
+
+#: src/ui/MainWindow.cpp:417 src/ui/MainWindow.cpp:873
+#: src/ui/MainWindow.cpp:879 src/ui/RepoView.cpp:162
+msgid "Refresh Metadata"
+msgstr "메타데이터 새로고침"
+
+#: src/ui/MainWindow.cpp:425
+msgid "Install RPM File..."
+msgstr "RPM 파일 설치..."
+
+#: src/ui/MainWindow.cpp:429
+msgid "Configure Miryu..."
+msgstr "Miryu 설정..."
+
+#: src/ui/MainWindow.cpp:436
+msgid "Find"
+msgstr "찾기"
+
+#: src/ui/MainWindow.cpp:442
+msgid "Select All"
+msgstr "모두 선택"
+
+#: src/ui/MainWindow.cpp:453
+msgid "Deselect All"
+msgstr "모두 선택 해제"
+
+#: src/ui/MainWindow.cpp:472
+msgid "Package Browser"
+msgstr "패키지 브라우저"
+
+#: src/ui/MainWindow.cpp:481
+msgid "Transaction Queue"
+msgstr "트랜잭션 대기열"
+
+#: src/ui/MainWindow.cpp:502
+msgid "Flatpak is not installed on this system."
+msgstr "이 시스템에 Flatpak이 설치되어 있지 않습니다."
+
+#: src/ui/MainWindow.cpp:535
+msgid "The package backend is not initialized. Cannot install RPM files."
+msgstr "패키지 백엔드가 초기화되지 않았습니다. RPM 파일을 설치할 수 없습니다."
+
+#: src/ui/MainWindow.cpp:536 src/ui/MainWindow.cpp:612
+msgid "RPM Installation"
+msgstr "RPM 설치"
+
+#: src/ui/MainWindow.cpp:556
+msgid "Preparing RPM installation..."
+msgstr "RPM 설치 준비 중..."
+
+#: src/ui/MainWindow.cpp:567 src/ui/MainWindow.cpp:733
+msgid "Transaction Error"
+msgstr "트랜잭션 오류"
+
+#: src/ui/MainWindow.cpp:600
+msgid "RPM installation completed successfully."
+msgstr "RPM 설치가 성공적으로 완료되었습니다."
+
+#: src/ui/MainWindow.cpp:611
+msgid "Operation cancelled by user."
+msgstr "사용자가 작업을 취소했습니다."
+
+#: src/ui/MainWindow.cpp:615
+msgid "RPM installation failed."
+msgstr "RPM 설치에 실패했습니다."
+
+#: src/ui/MainWindow.cpp:616 src/ui/MainWindow.cpp:760
+msgid "Transaction Failed"
+msgstr "트랜잭션 실패"
+
+#: src/ui/MainWindow.cpp:622 src/ui/MainWindow.cpp:767
+msgid "Applying transaction..."
+msgstr "트랜잭션 적용 중..."
+
+#: src/ui/MainWindow.cpp:648
+msgid "Searching..."
+msgstr "검색 중..."
+
+#: src/ui/MainWindow.cpp:700
+msgid "%1 package queued"
+msgid_plural "%1 packages queued"
+msgstr[0] "%1개 패키지가 대기열에 추가됨"
+
+#: src/ui/MainWindow.cpp:715
+msgid "Queue is empty. Add packages to the queue first."
+msgstr "대기열이 비어 있습니다. 먼저 패키지를 대기열에 추가하세요."
+
+#: src/ui/MainWindow.cpp:720
+msgid "Resolving transaction..."
+msgstr "트랜잭션 해결 중..."
+
+#: src/ui/MainWindow.cpp:754
+msgid "Transaction completed successfully."
+msgstr "트랜잭션이 성공적으로 완료되었습니다."
+
+#: src/ui/MainWindow.cpp:781
+msgid "Building transaction..."
+msgstr "트랜잭션 빌드 중..."
+
+#: src/ui/MainWindow.cpp:820
+msgid ""
+"Distribution sync will synchronize all installed packages to the versions "
+"available in the repositories. This may downgrade or upgrade packages. "
+"Continue?"
+msgstr ""
+"배포판 동기화는 설치된 모든 패키지를 저장소에서 사용 가능한 버전으로 동기화합니다. 패키지가 다운그레이드되거나 업그레이드될 수 있습니다."
+" 계속하시겠습니까?"
+
+#: src/ui/MainWindow.cpp:827
+msgid "Performing distribution sync..."
+msgstr "배포판 동기화 수행 중..."
+
+#: src/ui/MainWindow.cpp:837
+msgid "Distribution sync completed successfully."
+msgstr "배포판 동기화가 성공적으로 완료되었습니다."
+
+#: src/ui/MainWindow.cpp:842
+msgid "Distribution sync failed."
+msgstr "배포판 동기화에 실패했습니다."
+
+#: src/ui/MainWindow.cpp:863
+msgid "Refreshing repository metadata..."
+msgstr "저장소 메타데이터 새로고침 중..."
+
+#: src/ui/MainWindow.cpp:873
+msgid "Metadata refreshed successfully."
+msgstr "메타데이터 새로고침이 완료되었습니다."
+
+#: src/ui/MainWindow.cpp:878
+msgid "Failed to refresh metadata."
+msgstr "메타데이터 새로고침에 실패했습니다."
+
+#: src/ui/MainWindow.cpp:918
+msgid "Enter the version you want to upgrade to:"
+msgstr "업그레이드할 버전을 입력하세요:"
+
+#: src/ui/MainWindow.cpp:933
+msgid ""
+"The target version (%1) is lower than the current version (%2). Downgrading "
+"the system may cause instability. Continue anyway?"
+msgstr ""
+"대상 버전 (%1)이 현재 버전 (%2)보다 낮습니다. 시스템을 다운그레이드하면 불안정해질 수 있습니다. 그래도 계속하시겠습니까?"
+
+#: src/ui/MainWindow.cpp:936
+msgid "Version Warning"
+msgstr "버전 경고"
+
+#: src/ui/MainWindow.cpp:943
+msgid "This will prepare a system upgrade transaction. Continue?"
+msgstr "시스템 업그레이드 트랜잭션을 준비합니다. 계속하시겠습니까?"
+
+#: src/ui/MainWindow.cpp:948
+msgid "Preparing system upgrade..."
+msgstr "시스템 업그레이드 준비 중..."
+
+#: src/ui/MainWindow.cpp:969
+msgid "System upgrade transaction completed."
+msgstr "시스템 업그레이드 트랜잭션이 완료되었습니다."
+
+#: src/ui/MainWindow.cpp:971
+msgid "System Upgrade Failed"
+msgstr "시스템 업그레이드 실패"
+
+#: src/ui/MainWindow.cpp:987
+msgid "System Upgrade Error"
+msgstr "시스템 업그레이드 오류"
+
+#: src/ui/MainWindow.cpp:1003
+msgid "Checking for updates..."
+msgstr "업데이트 확인 중..."
+
+#: src/ui/MainWindow.cpp:1031
+msgid "Select RPM Package Files"
+msgstr "RPM 패키지 파일 선택"
+
+#: src/ui/MainWindow.cpp:1033
+msgid "RPM Packages (*.rpm)"
+msgstr "RPM 패키지 (*.rpm)"
+
+#: src/ui/MainWindow.cpp:1039
+msgid "Download now and install on next reboot (offline update)?"
+msgstr "지금 다운로드하고 다음 재부팅 시 설치하시겠습니까(오프라인 업데이트)?"
+
+#: src/ui/MainWindow.cpp:1040
+msgid "Installation Mode"
+msgstr "설치 모드"
+
+#: src/ui/MainWindow.cpp:1041
+msgid "Offline Update"
+msgstr "오프라인 업데이트"
+
+#: src/ui/MainWindow.cpp:1041
+msgid "Install Now"
+msgstr "지금 설치"
+
+#: src/ui/MainWindow.cpp:1052
+msgid "%1 package"
+msgid_plural "%1 packages"
+msgstr[0] "%1개 패키지"
+
+#: src/ui/MainWindow.cpp:1075
+msgid "%1 update available"
+msgid_plural "%1 updates available"
+msgstr[0] "%1개 업데이트 사용 가능"
+
+#: src/ui/MainWindow.cpp:1109
+msgid "%1 updates"
+msgstr "%1 업데이트"
+
+#: src/ui/MainWindow.cpp:1122
+msgid "Queue: %1 items"
+msgstr "대기열: %1 항목"
+
+#: src/ui/MainWindow.cpp:1134
+msgid "There are pending operations in the queue. Close anyway?"
+msgstr "대기열에 보류 중인 작업이 있습니다. 그래도 닫으시겠습니까?"
+
+#: src/ui/MainWindow.cpp:1135
+msgid "Pending Operations"
+msgstr "보류 중인 작업"
+
+#: src/ui/MainWindow.cpp:1129
+msgid "About Miryu Software Center"
+msgstr "Miryu 소프트웨어 센터 정보"
+
+#: src/ui/MainWindow.cpp:1143
+msgid "Version %1"
+msgstr "버전 %1"
+
+#: src/ui/MainWindow.cpp:1164
+msgid "Authors"
+msgstr "작성자"
+
+#: src/ui/MainWindow.cpp:1207
+msgid "Need to Restart"
+msgstr "재시작 필요"
+
+#: src/ui/MainWindow.cpp:1208
+msgid ""
+"You have installed software packages that require a computer restart. "
+"Please restart the operating system as soon as possible to ensure the "
+"updates take full effect."
+msgstr ""
+"컴퓨터 재시작이 필요한 소프트웨어 패키지를 설치했습니다. 업데이트가 완전히 "
+"적용되도록 운영 체제를 최대한 빨리 재시작해 주세요."
+
+#: src/ui/PackageInfoWidget.cpp:67
+msgid "Version:"
+msgstr "버전:"
+
+#: src/ui/PackageInfoWidget.cpp:68
+msgid "Repository:"
+msgstr "저장소:"
+
+#: src/ui/PackageInfoWidget.cpp:69
+msgid "Size:"
+msgstr "크기:"
+
+#: src/ui/PackageInfoWidget.cpp:70
+msgid "License:"
+msgstr "라이선스:"
+
+#: src/ui/PackageInfoWidget.cpp:71
+msgid "URL:"
+msgstr "URL:"
+
+#: src/ui/PackageInfoWidget.cpp:72
+msgid "Status:"
+msgstr "상태:"
+
+#: src/ui/PackageInfoWidget.cpp:121
+msgid "Downgrade Available"
+msgstr "다운그레이드 가능"
+
+#: src/ui/PackageView.cpp:205
+msgid "Install Selected (%1)"
+msgstr "선택 항목 설치 (%1)"
+
+#: src/ui/PackageView.cpp:219
+msgid "Update Selected (%1)"
+msgstr "선택 항목 업데이트 (%1)"
+
+#: src/ui/PackageView.cpp:233
+msgid "Remove Selected (%1)"
+msgstr "선택 항목 제거 (%1)"
+
+#: src/ui/PackageView.cpp:246
+msgid "Copy Selected Package Names"
+msgstr "선택한 패키지 이름 복사"
+
+#: src/ui/PackageView.cpp:267 src/ui/QueueView.cpp:153
+msgid "Remove from Queue"
+msgstr "대기열에서 제거"
+
+#: src/ui/PackageView.cpp:271
+msgid "Queue for Removal"
+msgstr "제거 대기열에 추가"
+
+#: src/ui/PackageView.cpp:272
+msgid "Queue for Update"
+msgstr "업데이트 대기열에 추가"
+
+#: src/ui/PackageView.cpp:273
+msgid "Queue for Installation"
+msgstr "설치 대기열에 추가"
+
+#: src/ui/PackageView.cpp:279
+msgid "Copy Package Name"
+msgstr "패키지 이름 복사"
+
+#: src/ui/ProgressDialog.cpp:13
+msgid "Processing"
+msgstr "처리 중"
+
+#: src/ui/ProgressDialog.cpp:21
+msgid "Preparing..."
+msgstr "준비 중..."
+
+#: src/ui/ProgressDialog.cpp:54
+msgid "Downloading %1: %2 MB / %3 MB"
+msgstr "다운로드 %1: %2 MB / %3 MB"
+
+#: src/ui/ProgressDialog.cpp:59
+msgid "Downloading %1..."
+msgstr "다운로드 %1..."
+
+#: src/ui/QueueView.cpp:61 src/ui/PackageInfoWidget.cpp:95
+msgid "Dependencies"
+msgstr "의존성"
+
+#: src/ui/QueueView.cpp:137 src/ui/TransactionResultDialog.cpp:68
+msgid "Reinstall"
+msgstr "재설치"
+
+#: src/ui/QueueView.cpp:144 src/ui/TransactionResultDialog.cpp:67
+msgid "Downgrade"
+msgstr "다운그레이드"
+
+#: src/ui/RepoView.cpp:64
+msgid "Default"
+msgstr "기본값"
+
+#: src/ui/RepoView.cpp:64
+msgid "Priority: %1"
+msgstr "우선순위: %1"
+
+#: src/ui/RepoView.cpp:70
+msgid "Enabled"
+msgstr "활성화됨"
+
+#: src/ui/RepoView.cpp:70
+msgid "Disabled"
+msgstr "비활성화됨"
+
+#: src/ui/RepoView.cpp:112 src/ui/RepoView.cpp:116
+msgid "Disable Repository"
+msgstr "저장소 비활성화"
+
+#: src/ui/RepoView.cpp:115
+msgid "Disable repository '%1'?"
+msgstr "저장소 '%1'을(를) 비활성화하시겠습니까?"
+
+#: src/ui/RepoView.cpp:128
+msgid "Failed to disable repository '%1'."
+msgstr "저장소 '%1' 비활성화에 실패했습니다."
+
+#: src/ui/RepoView.cpp:136 src/ui/RepoView.cpp:140
+msgid "Enable Repository"
+msgstr "저장소 활성화"
+
+#: src/ui/RepoView.cpp:139
+msgid "Enable repository '%1'?"
+msgstr "저장소 '%1'을(를) 활성화하시겠습니까?"
+
+#: src/ui/RepoView.cpp:152
+msgid "Failed to enable repository '%1'."
+msgstr "저장소 '%1' 활성화에 실패했습니다."
+
+#: src/ui/SettingsDialog.cpp:84 src/ui/SettingsDialog.cpp:92
+msgid "Settings"
+msgstr "설정"
+
+#: src/ui/SettingsDialog.cpp:110
+msgid "Defaults"
+msgstr "기본값"
+
+#: src/ui/SettingsDialog.cpp:146
+msgid "Flatpak Settings"
+msgstr "Flatpak 설정"
+
+#: src/ui/SettingsDialog.cpp:153
+msgid "Default Location"
+msgstr "기본 위치"
+
+#: src/ui/SettingsDialog.cpp:154
+msgid ""
+"Whether new Flatpak installs default to the user or system installation."
+msgstr "새 Flatpak 설치 시 사용자 설치 또는 시스템 설치 중 기본값입니다."
+
+#: src/ui/SettingsDialog.cpp:158
+msgid "Default Remote Repository"
+msgstr "기본 원격 저장소"
+
+#: src/ui/SettingsDialog.cpp:159
+msgid "Remote repository name used for Flatpak operations by default."
+msgstr "Flatpak 작업에 기본적으로 사용되는 원격 저장소 이름입니다."
+
+#: src/ui/SettingsDialog.cpp:164
+msgid "Metadata Settings"
+msgstr "메타데이터 설정"
+
+#: src/ui/SettingsDialog.cpp:170 src/ui/SettingsDialog.cpp:189
+msgid " minutes"
+msgstr " 분"
+
+#: src/ui/SettingsDialog.cpp:172
+msgid "Min Refresh Interval"
+msgstr "최소 새로고침 간격"
+
+#: src/ui/SettingsDialog.cpp:173
+msgid "Minimum interval between automatic repository metadata refreshes."
+msgstr "저장소 메타데이터 자동 새로고침의 최소 간격입니다."
+
+#: src/ui/SettingsDialog.cpp:178
+msgid "Updater Settings"
+msgstr "업데이터 설정"
+
+#: src/ui/SettingsDialog.cpp:183
+msgid "e.g. /usr/bin/dnfdragora"
+msgstr "예: /usr/bin/dnfdragora"
+
+#: src/ui/SettingsDialog.cpp:184
+msgid "Custom System Updater Path"
+msgstr "사용자 지정 시스템 업데이터 경로"
+
+#: src/ui/SettingsDialog.cpp:185
+msgid ""
+"Full path to an external system updater to launch instead of the built-in "
+"one."
+msgstr "내장 업데이터 대신 실행할 외부 시스템 업데이터의 전체 경로입니다."
+
+#: src/ui/SettingsDialog.cpp:191
+msgid "Check Update Interval"
+msgstr "업데이트 확인 간격"
+
+#: src/ui/SettingsDialog.cpp:192
+msgid "How often Miryu checks for available RPM updates in the background."
+msgstr "Miryu가 백그라운드에서 사용 가능한 RPM 업데이트를 확인하는 빈도입니다."
+
+#: src/ui/SettingsDialog.cpp:195
+msgid "Show Tray Icon"
+msgstr "트레이 아이콘 표시"
+
+#: src/ui/SettingsDialog.cpp:200
+msgid "Show a system tray icon while Miryu is running."
+msgstr "Miryu 실행 중 시스템 트레이 아이콘을 표시합니다."
+
+#: src/ui/SettingsDialog.cpp:202
+msgid "Dark Tray Icon"
+msgstr "다크 트레이 아이콘"
+
+#: src/ui/SettingsDialog.cpp:205
+msgid "Use a dark tray icon for better visibility on light panels."
+msgstr "밝은 패널에서 가시성을 높이기 위해 어두운 트레이 아이콘을 사용합니다."
+
+#: src/ui/SettingsDialog.cpp:207
+msgid "Update Notifications"
+msgstr "업데이트 알림"
+
+#: src/ui/SettingsDialog.cpp:210
+msgid "Show a desktop notification when updates become available."
+msgstr "업데이트가 사용 가능할 때 데스크톱 알림을 표시합니다."
+
+#: src/ui/SettingsDialog.cpp:240
+msgid "Repository Management"
+msgstr "저장소 관리"
+
+#: src/ui/SettingsDialog.cpp:245
+msgid ""
+"Repository enable / disable management is performed from the main Repositories page in the sidebar.\n"
+"\n"
+"Use the sidebar \"Repositories\" entry to view, enable or disable individual software repositories and to refresh their metadata."
+msgstr ""
+"저장소 활성화/비활성화 관리는 사이드바의 메인 저장소 페이지에서 수행됩니다.\n"
+"\n"
+"사이드바의 \"저장소\" 항목을 사용하여 개별 소프트웨어 저장소를 보거나 활성화/비활성화하고 메타데이터를 새로고침하세요."
+
+#: src/ui/TransactionResultDialog.cpp:36
+msgid "Transaction Summary"
+msgstr "트랜잭션 요약"
+
+#: src/ui/TransactionResultDialog.cpp:42
+msgid "The following operations will be performed:"
+msgstr "다음 작업이 수행됩니다:"
+
+#: src/ui/TransactionResultDialog.cpp:48
+msgid "Warnings"
+msgstr "경고"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Package"
+msgstr "패키지"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Repository"
+msgstr "저장소"
+
+#: src/ui/TransactionResultDialog.cpp:57
+msgid "Size"
+msgstr "크기"
+
+#: src/ui/TransactionResultDialog.cpp:69
+msgid "Remove"
+msgstr "제거"
+
+#: src/ui/TransactionResultDialog.cpp:70
+msgid "Replace"
+msgstr "교체"
+
+#: src/ui/TransactionResultDialog.cpp:71
+msgid "Obsolete"
+msgstr "폐기"
+
+#: src/ui/TransactionResultDialog.cpp:117
+msgid "Total Download Size"
+msgstr "총 다운로드 크기"
+
+#: src/ui/TransactionResultDialog.cpp:121
+msgid "Apply offline (on next reboot)"
+msgstr "오프라인 적용(다음 재부팅 시)"
+
+#: src/ui/PackageInfoWidget.cpp:100
+msgid "Provides"
+msgstr "제공"
+
+#: src/ui/PackageInfoWidget.cpp:105
+msgid "Changelog"
+msgstr "변경 로그"
+
+#: src/ui/PackageInfoWidget.cpp:110
+msgid "Files"
+msgstr "파일"
+
+#: src/ui/PackageInfoWidget.cpp:177
+msgid "<i>No dependencies.</i>"
+msgstr "<i>의존성 없음.</i>"
+
+#: src/ui/PackageInfoWidget.cpp:184
+msgid "<i>No provides.</i>"
+msgstr "<i>제공 없음.</i>"
+
+#: src/ui/PackageInfoWidget.cpp:191
+msgid "<i>No changelog available.</i>"
+msgstr "<i>변경 로그가 없습니다.</i>"
+
+#: src/ui/PackageInfoWidget.cpp:198
+msgid "<i>No file list available.</i>"
+msgstr "<i>파일 목록이 없습니다.</i>"
+
+#: src/ui/MainWindow.cpp:757 src/ui/MainWindow.cpp:581
+msgid ""
+"Cannot remove protected packages or critical dependencies.\n"
+"\n"
+"Removing these packages would break the system.\n"
+"\n"
+"%1"
+msgstr ""
+"보호된 패키지나 중요한 의존성을 제거할 수 없습니다.\n"
+"\n"
+"이 패키지를 제거하면 시스템이 손상됩니다.\n"
+"\n"
+"%1"
+
+#: src/ui/MainWindow.cpp:761 src/ui/MainWindow.cpp:585
+msgid "Protected Package Error"
+msgstr "보호 패키지 오류"
+
+#: src/core/Dnf5DaemonClient.cpp:471
+msgid "Cannot load repositories."
+msgstr "저장소를 불러올 수 없습니다."
+
+#: src/ui/MainWindow.cpp:1134
+msgid ""
+"Failed to launch the Linglong Store.\n"
+"\n"
+"Please ensure that the linglong-store application is installed\n"
+"and available at %1."
+msgstr ""
+"Linglong 스토어를 시작할 수 없습니다.\n"
+"\n"
+"linglong-store 응용 프로그램이 설치되어 있고\n"
+"%1에서 사용 가능한지 확인하십시오."
+
+#: src/ui/MainWindow.cpp:404
+msgid "Launch the external Linglong Store application"
+msgstr "외부 Linglong 스토어 응용 프로그램 시작"
