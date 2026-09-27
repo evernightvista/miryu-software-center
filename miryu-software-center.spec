@@ -48,7 +48,7 @@ It uses the dnf5daemon-server D-Bus API for all RPM package operations and
 provides an external launcher for the Linglong Store.
 
 %prep
-%autosetup -n miryu-%{version}
+%autosetup -n %{name}-%{version}
 
 %build
 %cmake -DCMAKE_BUILD_TYPE=Release
