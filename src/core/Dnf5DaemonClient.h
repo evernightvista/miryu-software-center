@@ -41,6 +41,17 @@ public:
     bool openSession(const QVariantMap &options = {});
     bool closeSession();
     void resetSession();
+    // Forget the current (possibly dead) session and open a fresh one.
+    // Called after a transaction completes: a transaction that upgraded
+    // dbus, dnf5daemon-server or systemd restarts the daemon and
+    // invalidates the session path we hold, so every subsequent D-Bus
+    // query would otherwise hit "Not connected to D-Bus server" and
+    // recover one by one via callSync()'s retry loop. Re-establishing a
+    // fresh session once, here, makes that recovery silent and singular.
+    // Stays silent on transient failure (the daemon may still be starting)
+    // so it never pops a dialog; failing queries still fall back to the
+    // per-call callSync() recovery.
+    bool reopenSession();
 
     // Repository operations
     QList<Repository> repoList(const QStringList &attrs = QStringList{QStringLiteral("name"), QStringLiteral("enabled"), QStringLiteral("priority")},

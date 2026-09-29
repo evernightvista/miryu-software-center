@@ -99,7 +99,7 @@ bool TransactionManager::buildTransactions(const QList<Package> &packages, const
     // second time — a slow, redundant metadata download each time.
     //
     // Per the desired behaviour, the software source is refreshed only at
-    // application startup (UpdateChecker → `dnf5 update --refresh`) and
+    // application startup (UpdateChecker → `dnf check-update --refresh`) and
     // when the user explicitly clicks "更新"/Refresh (onRefresh), never
     // while building or running a transaction. The daemon's sack, loaded
     // at startup / last refresh, is reused as-is here.
@@ -289,11 +289,26 @@ TransactionResult TransactionManager::runTransaction(const TransactionOptions &o
 
     if (m_client->doTransaction(transOptions)) {
         result.completed = true;
+        // The transaction just ran. If it upgraded dbus, dnf5daemon-server
+        // or systemd, the daemon process is replaced and the session path
+        // we hold is now invalid — every subsequent D-Bus query
+        // (onRefresh -> readAllRepos / packageList / repoList) would hit
+        // "Not connected to D-Bus server" and recover one by one via
+        // callSync()'s retry loop. Reopen a fresh session here, once and
+        // silently, so the caller's post-transaction queries run against
+        // a valid session. reopenSession() is a no-op-safe best effort:
+        // on failure it stays silent and the per-call recovery still kicks
+        // in as a fallback.
+        m_client->reopenSession();
     } else {
         result.completed = false;
         result.error = QStringLiteral("Transaction execution failed");
     }
 
+    // resetGoal() clears the goal on the (possibly new) session; on a
+    // freshly reopened session the goal is empty so this is a harmless
+    // no-op. On a session that survived the transaction it clears the
+    // consumed goal as before.
     m_client->resetGoal();
     return result;
 }

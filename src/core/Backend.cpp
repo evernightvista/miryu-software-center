@@ -37,80 +37,39 @@ static void splitEvr(const QString &evr, QString &epoch, QString &version, QStri
         epoch = QStringLiteral("0");
 }
 
-// Parse a humanized size token ("25 k", "1.5 M", "0 B") into bytes. Handles a
-// glued "25k" form as well; returns 0 when the token is not a size.
-static qint64 parseHumanSize(const QString &numToken, const QString &unitToken)
-{
-    QString num = numToken.trimmed();
-    QString unit = unitToken.trimmed();
-    if (unit.isEmpty()) {
-        // Glued form like "25k": split off the trailing unit letters.
-        int i = num.size();
-        while (i > 0 && num.at(i - 1).isLetter())
-            --i;
-        if (i < num.size()) {
-            unit = num.mid(i);
-            num = num.left(i);
-        }
-    }
-    bool ok = false;
-    const double value = num.toDouble(&ok);
-    if (!ok || value < 0)
-        return 0;
-
-    qint64 factor = 1;
-    if (unit == QStringLiteral("k") || unit == QStringLiteral("K") ||
-        unit == QStringLiteral("KB") || unit == QStringLiteral("KiB")) {
-        factor = 1024;
-    } else if (unit == QStringLiteral("M") || unit == QStringLiteral("MB") ||
-               unit == QStringLiteral("MiB")) {
-        factor = 1024LL * 1024;
-    } else if (unit == QStringLiteral("G") || unit == QStringLiteral("GB") ||
-               unit == QStringLiteral("GiB")) {
-        factor = 1024LL * 1024 * 1024;
-    }
-    return static_cast<qint64>(value * factor);
-}
-
-// Update listing: run `dnf5 update --refresh` in dry-run mode (--assumeno) and
-// parse the planned transaction. Running the exact command the user runs makes
-// the GUI list precisely what dnf5 would update: metadata is refreshed on every
-// check, and obsoletes / replacements / new dependencies are included, which a
-// bare `dnf5 repoquery --upgrades` (without --refresh) misses. --assumeno
-// answers "no" to the confirmation prompt, so nothing is downloaded or applied.
+// Update listing: run `dnf check-update --refresh` and parse its output.
+// This refreshes repository metadata on every check (--refresh) and lists
+// every installed package that has a newer version available in a repo, with
+// exit code semantics (0 = no updates, 100 = updates available, 1 = error).
 // The D-Bus path (dnf5daemon rpm.list scope=upgrades + goal resolve) is not
 // used here: it can come back empty when the daemon's in-memory sack is stale
-// or the session is unresponsive, even though `dnf5 update --refresh` clearly
-// lists updates.
+// or the session is unresponsive, even though `dnf check-update --refresh`
+// clearly lists updates.
 static QList<Package> fetchUpdatesViaCli()
 {
     QProcess proc;
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     env.insert(QStringLiteral("LANG"), QStringLiteral("C"));
     env.insert(QStringLiteral("LC_ALL"), QStringLiteral("C"));
-    // Keep the transaction table on single lines when stdout is a pipe.
-    env.insert(QStringLiteral("DNF5_FORCE_COLUMNS"), QStringLiteral("200"));
     proc.setProcessEnvironment(env);
 
-    proc.start(QStringLiteral("dnf5"),
-               {QStringLiteral("update"),
-                QStringLiteral("--refresh"),
-                QStringLiteral("--assumeno")},
+    proc.start(QStringLiteral("dnf"),
+               {QStringLiteral("check-update"),
+                QStringLiteral("--refresh")},
                QIODevice::ReadOnly);
     // Metadata refresh on a cold cache can take a while; allow up to 5 minutes.
     if (!proc.waitForFinished(300000)) {
         proc.kill();
         proc.waitForFinished(5000);
-        qWarning() << "dnf5 update --refresh timed out";
+        qWarning() << "dnf check-update --refresh timed out";
         return {};
     }
 
-    // The exit code is not authoritative: 0 = nothing to do, 1 = the dry-run
-    // transaction was aborted (updates exist), other non-zero = real error.
-    // Errors leave stdout without package rows, so parsing stdout is enough.
+    // The exit code is not authoritative: 0 = nothing to do, 100 = updates
+    // available, 1 = real error. Errors leave stdout without package rows,
+    // so parsing stdout is enough.
     QList<Package> updates;
     QSet<QString> seen; // de-duplicate by NEVRA
-    QString section;    // current transaction section ("Installing:", ...)
 
     const QString out = QString::fromUtf8(proc.readAllStandardOutput());
     for (const QString &rawLine : out.split(QStringLiteral("\n"))) {
@@ -118,49 +77,29 @@ static QList<Package> fetchUpdatesViaCli()
         if (line.isEmpty())
             continue;
 
-        // Section headers ("Installing:", "Upgrading:", "Obsoleting:", ...)
-        // end with ':' and are short; every following row belongs to that
-        // section until the next header.
-        if (line.endsWith(QLatin1Char(':')) && line.size() < 40) {
-            section = line;
-            continue;
-        }
-
-        // A package row: name  arch  evr  repo  [size unit]. The EVR column
-        // always contains '-', which filters out the column header
-        // ("Package Arch Version Repository Size") and summary lines. RPM
-        // names/archs never contain ':', so a leading "Word:" token (e.g. a
-        // warning line that reached stdout) is rejected as well.
+        // A package row: name.arch  evr  repo [advisory...]. The evr column
+        // always contains '-' ("version-release"), which filters out the
+        // "Last metadata expiration check:" line and summary lines.
         const QStringList f = line.split(QLatin1Char(' '), Qt::SkipEmptyParts);
-        if (f.size() < 4 || !f[2].contains(QLatin1Char('-')))
+        if (f.size() < 3 || !f[1].contains(QLatin1Char('-')))
             continue;
-        if (f[0].endsWith(QLatin1Char(':')) || f[1].endsWith(QLatin1Char(':')))
-            continue;
-        // Removals are consequences of the update, not updates the user can
-        // queue; dnf5 prints them in the "Removing:" section.
-        if (section.startsWith(QStringLiteral("Removing"), Qt::CaseInsensitive))
+
+        // name and arch are joined by '.' in dnf check-update output; split
+        // on the LAST dot so package names containing dots (e.g. python3.11)
+        // are preserved.
+        const int dot = f[0].lastIndexOf(QLatin1Char('.'));
+        if (dot < 1 || dot >= f[0].size() - 1)
             continue;
 
         Package p;
-        p.name = f[0];
-        p.arch = f[1];
-        splitEvr(f[2], p.epoch, p.version, p.release);
-        p.repo = f[3];
-        if (f.size() >= 6)
-            p.size = parseHumanSize(f[4], f[5]);
-        else if (f.size() >= 5)
-            p.size = parseHumanSize(f[4], QString());
+        p.name = f[0].left(dot);
+        p.arch = f[0].mid(dot + 1);
+        splitEvr(f[1], p.epoch, p.version, p.release);
+        p.repo = f[2];
 
-        // Map dnf5's own section to the queue action: "Installing:" rows are
-        // packages that are not installed yet, "Downgrading:" rows are
-        // downgrades, and everything else (Upgrading / Obsoleting / Replacing)
-        // is a regular update.
-        if (section.startsWith(QStringLiteral("Installing"), Qt::CaseInsensitive))
-            p.state = PackageState::Available;
-        else if (section.startsWith(QStringLiteral("Downgrading"), Qt::CaseInsensitive))
-            p.state = PackageState::Downgrade;
-        else
-            p.state = PackageState::Update;
+        // Every row dnf check-update prints is an available update to an
+        // installed package, so they are all queued as regular updates.
+        p.state = PackageState::Update;
         p.calcTodo();
 
         if (p.name.isEmpty() || p.repo.isEmpty())
@@ -212,14 +151,24 @@ Backend::~Backend()
 
 void Backend::connectClientSignals()
 {
-    connect(m_client, &Dnf5DaemonClient::downloadAddNew, this, [this](const QString &, const QString &desc, qint64 total) {
+    connect(m_client, &Dnf5DaemonClient::downloadAddNew, this, [this](const QString &id, const QString &desc, qint64 total) {
+        // Record the package description (desc) keyed by download id so the
+        // subsequent downloadProgress(id, ...) signals can surface which
+        // package is currently being downloaded, not just "Downloading".
+        m_downloadDescs.insert(id, desc);
         Q_EMIT downloadProgress(desc, total, 0);
     });
-    connect(m_client, &Dnf5DaemonClient::downloadProgress, this, [this](const QString &, qint64 total, qint64 downloaded) {
+    connect(m_client, &Dnf5DaemonClient::downloadProgress, this, [this](const QString &id, qint64 total, qint64 downloaded) {
+        // Resolve the download id back to the package description captured in
+        // downloadAddNew; if it is missing (e.g. a progress signal arrived
+        // before add_new), fall back to the id itself.
+        const QString desc = m_downloadDescs.value(id, id);
+        Q_EMIT downloadProgress(desc, total, downloaded);
         int percent = total > 0 ? static_cast<int>(downloaded * 100 / total) : 0;
-        Q_EMIT transactionProgress(i18n("Downloading"), percent);
+        Q_EMIT transactionProgress(i18n("Downloading %1", desc), percent);
     });
-    connect(m_client, &Dnf5DaemonClient::downloadEnd, this, [this](const QString &, uint status, const QString &) {
+    connect(m_client, &Dnf5DaemonClient::downloadEnd, this, [this](const QString &id, uint status, const QString &) {
+        m_downloadDescs.remove(id);
         if (status == 0)
             Q_EMIT transactionProgress(i18n("Download complete"), 100);
     });
@@ -375,12 +324,12 @@ QList<Package> Backend::fetchUpdates()
     // updatesLoaded() (an empty list on failure) instead.
     const bool wasBlocked = m_client->blockSignals(true);
 
-    // The authoritative update list is whatever `dnf5 update --refresh` itself
-    // reports: run it as a subprocess (dry-run, see fetchUpdatesViaCli()) and
-    // parse its planned transaction. The command refreshes repository metadata
-    // on every check — exactly like `dnf5 update --refresh` in a terminal — so
-    // no separate makecache pass is needed, and it is immune to the
-    // dnf5daemon D-Bus race, so the GUI lists exactly the updates dnf5 detects.
+    // The authoritative update list is whatever `dnf check-update --refresh`
+    // reports: run it as a subprocess (see fetchUpdatesViaCli()) and parse its
+    // output. The command refreshes repository metadata on every check —
+    // exactly like `dnf check-update --refresh` in a terminal — so no separate
+    // makecache pass is needed, and it is immune to the dnf5daemon D-Bus race,
+    // so the GUI lists exactly the updates dnf detects.
     QList<Package> result = fetchUpdatesViaCli();
 
     // Restore signal delivery — real transactions and user-initiated

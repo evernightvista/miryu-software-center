@@ -976,7 +976,7 @@ void MainWindow::doRefreshMetadataWithLog()
         if (exitCode == 0) {
             m_logView->append(QStringLiteral("\n[SUCCESS] ") + i18n("Metadata refreshed."));
             // Reload the update list; the check itself refreshes metadata
-            // (`dnf5 update --refresh`), so no extra flag needs to be set here.
+            // (`dnf check-update --refresh`), so no extra flag needs to be set here.
             onRefresh();
         } else {
             m_logView->append(QStringLiteral("\n[ERROR] ") + i18n("Failed to refresh metadata (exit code %1).").arg(exitCode));

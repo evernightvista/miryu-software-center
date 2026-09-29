@@ -2,6 +2,8 @@
 
 #include <QObject>
 #include <QFutureWatcher>
+#include <QHash>
+#include <QString>
 #include "Dnf5DaemonClient.h"
 #include "TransactionManager.h"
 #include "PackageCache.h"
@@ -62,6 +64,10 @@ private:
     PackageCache *m_cache;
     bool m_initialized = false;
     QString m_lastError;
+    // Maps dnf5daemon download ids to the package description captured in
+    // downloadAddNew, so downloadProgress(id, ...) can show which package is
+    // currently being downloaded (the progress signal carries only the id).
+    QHash<QString, QString> m_downloadDescs;
 
     void connectClientSignals();
 };

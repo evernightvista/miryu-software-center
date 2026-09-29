@@ -427,6 +427,35 @@ void Dnf5DaemonClient::resetSession()
         qWarning() << "reset failed (ignored):" << msg.errorMessage();
 }
 
+bool Dnf5DaemonClient::reopenSession()
+{
+    // Hold the call mutex for the whole dance so no concurrent QtConcurrent
+    // worker can race between our teardown and the new openSession().
+    QMutexLocker locker(&m_callMutex);
+
+    // Mirror reconnect()'s teardown: drop signal subscriptions wired on the
+    // old session path and forget that path. We deliberately do NOT call
+    // close_session on the (possibly dead) path: after a transaction that
+    // restarted dnf5daemon-server that path is invalid, and calling it via
+    // callMethod() would force ensureConnected() -> reconnect() to open a
+    // new session that close_session would then immediately destroy. The
+    // daemon garbage-collects orphaned sessions on client disconnect, so
+    // simply forgetting the path is safe.
+    disconnectSignals();
+    m_sessionPath.clear();
+
+    // openSession() re-acquires the bus (ensureConnected() -> reconnect()
+    // when the system bus itself dropped, which is rarer) and opens a fresh
+    // session on it. Block signals so a failure here (the daemon may still
+    // be restarting) cannot pop a scary errorOccurred dialog — the caller's
+    // subsequent callSync()-based queries will still recover per-call as a
+    // fallback.
+    const bool wasBlocked = blockSignals(true);
+    const bool ok = openSession();
+    blockSignals(wasBlocked);
+    return ok;
+}
+
 // === Signal Connection ===
 
 void Dnf5DaemonClient::connectSignals()

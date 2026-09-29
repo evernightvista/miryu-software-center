@@ -8,11 +8,21 @@
 namespace Miryu {
 
 ProgressDialog::ProgressDialog(QWidget *parent)
-    : QDialog(parent)
+    // Pass the window flags to the QDialog constructor so they are set at
+    // window-creation time. Explicitly enumerate only Minimize + Close button
+    // hints and omit Qt::WindowMaximizeButtonHint; Qt::CustomizeWindowHint
+    // tells Qt to honor this exact button set instead of the WM defaults.
+    : QDialog(parent, Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint
+                     | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint
+                     | Qt::CustomizeWindowHint)
 {
     setWindowTitle(i18n("Processing"));
     setModal(true);
-    setMinimumWidth(400);
+    // Fixed width so the window manager (notably KWin, which shows a
+    // maximize button only for resizable windows) does not display a
+    // maximize button for this small, transient modal dialog. The height
+    // stays automatic so the detail label can wrap when needed.
+    setFixedWidth(480);
 
     auto *layout = new QVBoxLayout(this);
     layout->setSpacing(12);
