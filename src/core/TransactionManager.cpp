@@ -87,13 +87,22 @@ QList<Package> TransactionManager::filterUpdates(const QList<Package> &updates,
 
 bool TransactionManager::buildTransactions(const QList<Package> &packages, const TransactionOptions &opts)
 {
-    // Drop the daemon's in-memory repo sack before building the goal. The
-    // session may have been opened (and cached its sack) before the on-disk
-    // metadata was refreshed (`dnf5 makecache --refresh` / `--refresh`);
-    // without this, upgrade("steam") resolves against the old sack, decides
-    // the package is already up-to-date, and resolve() returns an empty
-    // transaction — which shows up as the "0 B / empty summary" dialog.
-    m_client->resetSession();
+    // Clear any goal left over from a previous buildTransaction() /
+    // runTransaction() call so the new package specs do not accumulate on
+    // top of the old ones.
+    //
+    // Repository metadata is intentionally NOT refreshed here. The software
+    // source (cleanCache + resetSession + readAllRepos) used to be
+    // force-refreshed before building the goal, which meant every click on
+    // "Apply" (buildTransaction) refreshed the software source, and every
+    // click on "OK" to accept the changes (runTransaction) refreshed it a
+    // second time — a slow, redundant metadata download each time.
+    //
+    // Per the desired behaviour, the software source is refreshed only at
+    // application startup (UpdateChecker → `dnf5 update --refresh`) and
+    // when the user explicitly clicks "更新"/Refresh (onRefresh), never
+    // while building or running a transaction. The daemon's sack, loaded
+    // at startup / last refresh, is reused as-is here.
     m_client->resetGoal();
 
     QStringList toInstall, toUpdate, toRemove, toDowngrade, toReinstall, toDistroSync;

@@ -35,16 +35,6 @@ public:
     void loadRepositories();
     void loadUpdates();
 
-    // Refresh package metadata (equivalent to `dnf5 makecache --refresh`)
-    // before loading updates so stale cache does not hide available
-    // upgrades. Runs synchronously on the calling thread.
-    bool refreshMetadata();
-
-    // Records that repository metadata has been refreshed (manually via the
-    // "Refresh Metadata" action or automatically at startup). After this the
-    // first fetchUpdates() call no longer re-runs makecache on its own.
-    void markMetadataRefreshed() { m_metadataRefreshed = true; }
-
     // Sync operations (call from worker threads)
     QList<Package> fetchPackages(PackageFilter filter);
     QList<Package> fetchSearchResults(const QString &query, SearchField field, PackageFilter scope);
@@ -71,7 +61,6 @@ private:
     TransactionManager *m_transactionManager;
     PackageCache *m_cache;
     bool m_initialized = false;
-    bool m_metadataRefreshed = false;
     QString m_lastError;
 
     void connectClientSignals();
