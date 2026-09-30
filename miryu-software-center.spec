@@ -4,12 +4,12 @@
 
 Name:           miryu-software-center
 Version:        45.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A modern RPM and Linglong software center powered by dnf5daemon
 
 License:        GPL-3.0-or-later
 URL:            https://github.com/evernightvista/miryu-software-center
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/evernightvista/miryu-software-center/archive/refs/heads/main.zip
 
 BuildRequires:  cmake >= 3.20
 BuildRequires:  gcc-c++
@@ -48,7 +48,7 @@ It uses the dnf5daemon-server D-Bus API for all RPM package operations and
 provides an external launcher for the Linglong Store.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n %{name}-main
 
 %build
 %cmake -DCMAKE_BUILD_TYPE=Release
@@ -72,6 +72,10 @@ install -Dm 644 data/evernight-vista.conf %{buildroot}/%{_datadir}/dnf5/suggest-
 %{_datadir}/polkit-1/actions/org.miryugaming.PackageManager.polkit
 
 %changelog
+* Wed Sep 30 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-4
+- Update RPM Spec file
+- Update DNF5 needs restarting list
+
 * Tue Sep 29 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-3
 - Fix Update List BUG
 
