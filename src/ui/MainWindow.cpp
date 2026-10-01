@@ -32,6 +32,9 @@
 #include <KSharedConfig>
 
 #include <QApplication>
+#include <QMenu>
+#include <QMenuBar>
+#include <QAction>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QStackedWidget>
@@ -122,6 +125,24 @@ MainWindow::MainWindow(Backend *backend, QWidget *parent)
 
     setupGUI(Default, QStringLiteral("miryuui.rc"));
 
+    // Remove the standard "Find Actions..." entry (Ctrl+Alt+I) from the
+    // Help menu — requested removal (circled entry in the screenshot).
+    // Walk all top-level menus (the entry lives in the KHelpMenu-managed
+    // Help menu) and drop the action whose shortcut is Ctrl+Alt+I.
+    const QKeySequence findActionsShortcut(Qt::CTRL | Qt::ALT | Qt::Key_I);
+    for (QAction *menuAction : menuBar()->actions()) {
+        QMenu *m = menuAction->menu();
+        if (!m)
+            continue;
+        const auto actions = m->actions();
+        for (QAction *action : actions) {
+            if (action->shortcut() == findActionsShortcut) {
+                m->removeAction(action);
+                action->deleteLater();
+            }
+        }
+    }
+
     setWindowIcon(QIcon::fromTheme(QStringLiteral("miryu-package-manager")));
 
     resize(1200, 800);
@@ -181,6 +202,15 @@ void MainWindow::setupUI()
         m_searchEdit->setTrapReturnKey(true);
         connect(m_searchEdit, &KLineEdit::returnPressed, this, &MainWindow::onSearch);
 
+        // Clearing the search box immediately returns to the installed
+        // packages view — no Enter needed: the instant the text becomes
+        // empty (clear button, backspace, select-all+delete), switch the
+        // filter combo back to Installed and load that list.
+        connect(m_searchEdit, &KLineEdit::textChanged, this, [this](const QString &text) {
+            if (text.trimmed().isEmpty())
+                showInstalledPackages();
+        });
+
         m_filterCombo = new KComboBox;
         m_filterCombo->addItem(i18n("All"), static_cast<int>(PackageFilter::All));
         m_filterCombo->addItem(i18n("Installed"), static_cast<int>(PackageFilter::Installed));
@@ -204,6 +234,10 @@ void MainWindow::setupUI()
         auto *contentSplitter = new QSplitter(Qt::Horizontal);
         m_packageView = new PackageView(m_packageModel);
         m_infoWidget = new PackageInfoWidget;
+        // Keep the detail panel hidden until the user selects a package —
+        // showing it beforehand renders an empty placeholder with no name,
+        // version, or action state, which looks broken.
+        m_infoWidget->hide();
 
         contentSplitter->addWidget(m_packageView);
         contentSplitter->addWidget(m_infoWidget);
@@ -254,6 +288,22 @@ void MainWindow::setupUI()
             }));
         });
 
+        // Action buttons in the info panel (Install / Reinstall / Remove /
+        // Update / Downgrade) put the package into the transaction queue.
+        connect(m_infoWidget, &PackageInfoWidget::markForAction,
+                this, [this](const Package &pkg, PackageTodo todo) {
+            if (pkg.queued)
+                return; // already queued — do not duplicate
+            Package queuedPkg = pkg;
+            queuedPkg.todo = todo;
+            m_queueModel->addPackage(queuedPkg);
+            // Update the list model's todo as well, so the in-row marker
+            // shows the chosen action (e.g. "Reinstall") instead of the
+            // state-derived default ("Remove").
+            m_packageModel->setQueuedWithTodo(pkg.nevra(), true, todo);
+            updateStatusBar();
+        });
+
         m_pageStack->addWidget(m_packagePage);
     }
 
@@ -287,12 +337,21 @@ void MainWindow::setupUI()
         m_queueView = new QueueView(m_queueModel);
         layout->addWidget(m_queueView, 1);
 
+        // Keep the package-list markers in sync with the queue page:
+        // removing a single queue item (context menu) or changing its action
+        // (Reinstall/Downgrade) must update the package list immediately.
+        connect(m_queueView, &QueueView::packageRemoved, this, &MainWindow::onUnqueuePackage);
+        connect(m_queueView, &QueueView::todoChanged, this, [this](const QString &nevra, PackageTodo todo) {
+            m_packageModel->setQueuedWithTodo(nevra, true, todo);
+        });
+
         auto *buttonBar = new QWidget;
         auto *buttonLayout = new QHBoxLayout(buttonBar);
         buttonLayout->setContentsMargins(8, 4, 8, 8);
 
         auto *applyBtn = new QPushButton(QIcon::fromTheme(QStringLiteral("dialog-ok-apply")), i18n("Apply"));
         auto *clearBtn = new QPushButton(QIcon::fromTheme(QStringLiteral("edit-clear")), i18n("Clear"));
+        auto *removeSelBtn = new QPushButton(QIcon::fromTheme(QStringLiteral("list-remove")), i18n("Remove"));
 
         applyBtn->setObjectName(QStringLiteral("applyBtn"));
         // The offline option is presented in the TransactionResultDialog
@@ -302,7 +361,16 @@ void MainWindow::setupUI()
 
         connect(clearBtn, &QPushButton::clicked, this, &MainWindow::onClearQueue);
 
+        // Visible "Remove" button for the selected queue item — the queue
+        // page equivalent of the context-menu removal, always at hand.
+        connect(removeSelBtn, &QPushButton::clicked, this, [this]() {
+            const QString nevra = m_queueView->selectedNevra();
+            if (!nevra.isEmpty())
+                onUnqueuePackage(nevra);
+        });
+
         buttonLayout->addStretch();
+        buttonLayout->addWidget(removeSelBtn);
         buttonLayout->addWidget(clearBtn);
         buttonLayout->addWidget(applyBtn);
 
@@ -323,7 +391,12 @@ void MainWindow::setupUI()
 
         m_repoView = new RepoView(m_repoModel, m_backend);
         layout->addWidget(m_repoView, 1);
-        connect(m_repoView, &RepoView::repositoriesChanged, this, &MainWindow::onRefresh);
+        // Enabling/disabling a repository must NOT re-download repository
+        // metadata: per the desired behaviour the software source is only
+        // refreshed at startup and when the user applies an upgrade queue.
+        // Reloading the lists is enough — the daemon already applied the
+        // change and reads the affected repo's metadata on demand.
+        connect(m_repoView, &RepoView::repositoriesChanged, this, &MainWindow::onReloadData);
 
         m_pageStack->addWidget(m_repoPage);
     }
@@ -439,7 +512,13 @@ void MainWindow::setupActions()
 
     QAction *refreshAction = new QAction(QIcon::fromTheme(QStringLiteral("view-refresh")), i18n("Refresh"), this);
     refreshAction->setShortcut(QKeySequence::Refresh);
-    connect(refreshAction, &QAction::triggered, this, &MainWindow::onRefresh);
+    // The manual "Refresh" action only reloads the displayed lists from the
+    // daemon's current state. It must NOT refresh the software source
+    // (repository metadata): per the desired behaviour the source is
+    // refreshed only at application startup and when the user applies an
+    // upgrade queue. Users who explicitly want to refresh the metadata use
+    // the dedicated "Refresh Metadata" action.
+    connect(refreshAction, &QAction::triggered, this, &MainWindow::onReloadData);
     ac->addAction(QStringLiteral("refresh"), refreshAction);
 
     QAction *upgradeAction = new QAction(QIcon::fromTheme(QStringLiteral("system-software-update")), i18n("System Upgrade"), this);
@@ -469,10 +548,8 @@ void MainWindow::setupActions()
     QAction *quitAction = KStandardAction::quit(qApp, &QApplication::quit, this);
     ac->addAction(QStringLiteral("quit"), quitAction);
 
-    QAction *findAction = new QAction(QIcon::fromTheme(QStringLiteral("edit-find")), i18n("Find"), this);
-    findAction->setShortcut(QKeySequence::Find);
-    connect(findAction, &QAction::triggered, this, [this]() { m_searchEdit->setFocus(); });
-    ac->addAction(QStringLiteral("find"), findAction);
+    // Note: the "Find" action (toolbar button + Edit menu entry) was removed
+    // on request — the in-page search box is the only search entry point.
 
     // Edit menu: Select All / Deselect All for the current package view.
     QAction *selectAllAction = new QAction(QIcon::fromTheme(QStringLiteral("edit-select-all")), i18n("Select All"), this);
@@ -511,7 +588,9 @@ void MainWindow::switchToPage(int page)
         break;
     case 1:
         m_statusLabel->setText(i18n("Updates"));
-        onLoadUpdates();
+        // Opening the Updates page must not refresh the software source;
+        // it reuses the cached metadata (see onLoadUpdates(false)).
+        onLoadUpdates(false);
         break;
     case 2:
         m_statusLabel->setText(i18n("Transaction Queue"));
@@ -536,6 +615,19 @@ void MainWindow::loadInitialData()
 {
     if (!m_backend->isInitialized())
         return;
+
+    // The package browser starts on the Installed view: select the
+    // "Installed" filter by default (the combo otherwise stays on "All",
+    // which would label the list as すべて while showing installed
+    // packages). setCurrentIndex() emits currentIndexChanged, which
+    // onFilterChanged() turns into loadPackages(Installed, false) — the
+    // explicit load below then just hits the cache. If the combo is already
+    // on Installed, setCurrentIndex() emits nothing and the explicit load
+    // below is the one that populates the list.
+    const int idx = m_filterCombo->findData(static_cast<int>(PackageFilter::Installed));
+    if (idx >= 0 && m_filterCombo->currentIndex() != idx)
+        m_filterCombo->setCurrentIndex(idx);
+
     m_backend->loadPackages(PackageFilter::Installed);
     m_backend->loadRepositories();
 }
@@ -714,6 +806,19 @@ void MainWindow::onFilterChanged()
     m_backend->loadPackages(filter, false);
 }
 
+void MainWindow::showInstalledPackages()
+{
+    // Switch the filter combo back to Installed. If it already shows
+    // Installed, setCurrentIndex() emits no signal, so fall through to
+    // onFilterChanged() to (re)load — a cache hit makes this instant.
+    const int idx = m_filterCombo->findData(static_cast<int>(PackageFilter::Installed));
+    if (idx >= 0 && m_filterCombo->currentIndex() != idx) {
+        m_filterCombo->setCurrentIndex(idx); // triggers onFilterChanged()
+        return;
+    }
+    onFilterChanged();
+}
+
 void MainWindow::onPackageSelected(const QModelIndex &index)
 {
     if (!index.isValid())
@@ -724,6 +829,9 @@ void MainWindow::onPackageSelected(const QModelIndex &index)
         return;
 
     Package pkg = model->packageAt(index.row());
+    // Reveal the detail panel now that the user has selected a package and
+    // there is real content to display.
+    m_infoWidget->show();
     m_infoWidget->setPackage(pkg);
 }
 
@@ -822,7 +930,16 @@ void MainWindow::onApplyQueue()
                     onRefresh();
                     checkRestartNeeded(runResult);
                 } else {
-                    KMessageBox::error(this, runResult.error, i18n("Transaction Failed"));
+                    const QString errLower = runResult.error.toLower();
+                    if (errLower.contains(QStringLiteral("not authorized")) ||
+                        errLower.contains(QStringLiteral("cancel")) ||
+                        errLower.contains(QStringLiteral("auth"))) {
+                        KMessageBox::information(this,
+                            i18n("Operation cancelled by user."),
+                            i18n("Transaction"));
+                    } else {
+                        KMessageBox::error(this, runResult.error, i18n("Transaction Failed"));
+                    }
                 }
                 m_statusLabel->setText(i18n("Ready"));
                 runWatcher->deleteLater();
@@ -861,8 +978,18 @@ void MainWindow::onRefresh()
     if (!m_backend->isInitialized())
         return;
 
+    // Post-transaction reload: drop the daemon's in-memory sack so the next
+    // query re-reads the rpmdb and repo metadata from disk (reflecting the
+    // packages just installed/upgraded/removed).
+    //
+    // This is NOT a software-source refresh: no repository metadata is
+    // downloaded here. The only automatic refresh moment is application
+    // startup (Backend::fetchUpdates with refreshMetadata=true, which calls
+    // readAllRepos so only expired metadata is re-downloaded). Applying an
+    // update queue resolves directly from the daemon cache that produced
+    // the update list, so re-running readAllRepos() here would be a
+    // redundant, slow re-download.
     m_backend->client()->resetSession();
-    m_backend->client()->readAllRepos();
 
     // Clear cached package details so refreshed data is fetched.
     m_backend->cache()->clearDetails();
@@ -871,7 +998,29 @@ void MainWindow::onRefresh()
     m_backend->loadPackages(filter, true);
 
     if (m_currentPage == 1)
-        onLoadUpdates();
+        onLoadUpdates(false); // reuse the cache refreshed during the transaction
+    if (m_currentPage == 3)
+        m_backend->loadRepositories();
+}
+
+void MainWindow::onReloadData()
+{
+    if (!m_backend->isInitialized())
+        return;
+
+    // Light reload: refresh the displayed lists from the daemon's current
+    // in-memory state WITHOUT touching repository metadata (no
+    // resetSession / readAllRepos, no `dnf check-update --refresh`). This is
+    // what the manual "Refresh" action and repository enable/disable toggles
+    // do — per the desired behaviour every situation other than application
+    // startup must not re-refresh the software source.
+    m_backend->cache()->clearDetails();
+
+    PackageFilter filter = static_cast<PackageFilter>(m_filterCombo->currentData().toInt());
+    m_backend->loadPackages(filter, true);
+
+    if (m_currentPage == 1)
+        onLoadUpdates(false);
     if (m_currentPage == 3)
         m_backend->loadRepositories();
 }
@@ -975,8 +1124,16 @@ void MainWindow::doRefreshMetadataWithLog()
             [this](int exitCode, QProcess::ExitStatus) {
         if (exitCode == 0) {
             m_logView->append(QStringLiteral("\n[SUCCESS] ") + i18n("Metadata refreshed."));
-            // Reload the update list; the check itself refreshes metadata
-            // (`dnf check-update --refresh`), so no extra flag needs to be set here.
+            // `dnf5 makecache --refresh` refreshed the *system* cache
+            // (/var/cache/dnf). The daemon keeps its *own* cache at
+            // /var/cache/dnf5daemon-server/, which is still stale. Expire it
+            // and readAllRepos() so the daemon re-downloads into its own
+            // cache and the subsequent list queries match `dnf check-update`.
+            m_backend->client()->cleanCache(QStringLiteral("expire-cache"));
+            m_backend->client()->readAllRepos();
+            // onRefresh() drops the daemon's in-memory sack (resetSession) so
+            // the next list query reloads from the freshly synced daemon
+            // cache.
             onRefresh();
         } else {
             m_logView->append(QStringLiteral("\n[ERROR] ") + i18n("Failed to refresh metadata (exit code %1).").arg(exitCode));
@@ -1078,7 +1235,16 @@ void MainWindow::onSystemUpgrade()
                         KMessageBox::information(this, i18n("System upgrade transaction completed."));
                         checkRestartNeeded(r);
                     } else {
-                        KMessageBox::error(this, r.error, i18n("System Upgrade Failed"));
+                        const QString errLower = r.error.toLower();
+                        if (errLower.contains(QStringLiteral("not authorized")) ||
+                            errLower.contains(QStringLiteral("cancel")) ||
+                            errLower.contains(QStringLiteral("auth"))) {
+                            KMessageBox::information(this,
+                                i18n("Operation cancelled by user."),
+                                i18n("System Upgrade"));
+                        } else {
+                            KMessageBox::error(this, r.error, i18n("System Upgrade Failed"));
+                        }
                     }
                     m_statusLabel->setText(i18n("Ready"));
                     runWatcher->deleteLater();
@@ -1109,12 +1275,20 @@ void MainWindow::onSystemUpgrade()
     }));
 }
 
-void MainWindow::onLoadUpdates()
+void MainWindow::onLoadUpdates(bool refreshMetadata)
 {
     m_statusLabel->setText(i18n("Checking for updates..."));
     m_progressBar->setRange(0, 0);
     m_progressBar->setVisible(true);
-    m_backend->loadUpdates();
+    // Page switches, post-transaction reloads and the manual Refresh action
+    // all pass false here so the cached metadata is reused. The only
+    // automatic software-source refresh is application startup (handled by
+    // UpdateChecker → Backend::loadUpdates(true), which calls readAllRepos()
+    // so only expired metadata is re-downloaded). Applying an update queue
+    // does NOT refresh metadata — it resolves directly from the daemon
+    // cache that produced the update list, so the transaction always matches
+    // what was displayed.
+    m_backend->loadUpdates(refreshMetadata);
 }
 
 void MainWindow::onAdvancedOps()
@@ -1540,6 +1714,9 @@ void MainWindow::onPackagesLoaded(int filter, const QList<Package> &packages)
     m_progressBar->setVisible(false);
     m_packageModel->setPackages(packages);
     m_statusLabel->setText(i18np("%1 package", "%1 packages", packages.size()));
+    // The detail panel stays hidden until the user actually selects a package
+    // — showing it now would render an empty placeholder (no name, version,
+    // etc.) because no row is selected yet.
 }
 
 void MainWindow::onSearchCompleted(const QList<Package> &packages)
@@ -1581,8 +1758,25 @@ void MainWindow::onTransactionProgress(const QString &message, int percent)
 
 void MainWindow::onDownloadProgress(const QString &downloadId, qint64 total, qint64 downloaded)
 {
+    // Compose the whole dialog state from THIS signal (like yumex-ng, which
+    // re-asserts "Downloading : <pkg>" on every download progress signal).
+    // This guarantees the dialog always shows which package the numbers
+    // belong to — the top "Downloading <pkg>" line, the progress bar and the
+    // byte detail can never drift apart, and the package name appears the
+    // moment a download starts (downloadAddNew → downloadProgress(...,0))
+    // instead of waiting for the first progress tick.
     if (m_progressDialog) {
+        m_progressDialog->setMessage(i18n("Downloading %1", downloadId));
         m_progressDialog->setDownloadProgress(downloadId, total, downloaded);
+        int percent = total > 0 ? static_cast<int>(downloaded * 100 / total) : 0;
+        m_progressDialog->setProgress(percent);
+    }
+    m_statusLabel->setText(i18n("Downloading %1", downloadId));
+    if (total > 0) {
+        const int percent = static_cast<int>(downloaded * 100 / total);
+        m_progressBar->setRange(0, 100);
+        m_progressBar->setValue(percent);
+        m_progressBar->setVisible(true);
     }
 }
 

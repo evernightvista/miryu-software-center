@@ -13,13 +13,12 @@ class Backend;
 /**
  * Periodically checks for available RPM updates via the Backend.
  *
- * The check interval and whether notifications are shown are read from
- * KSharedConfig ("General" group) so that changes made in SettingsDialog
- * take effect after the next start() / checkNow() call.
+ * The check interval is read from KSharedConfig ("General" group) so that
+ * changes made in SettingsDialog take effect after the next start() /
+ * checkNow() call.
  *
  * On every successful check the signal updatesAvailable(int) is emitted
- * with the number of pending updates. When notifications are enabled and
- * at least one update is available, a KNotification is sent.
+ * with the number of pending updates.
  */
 class UpdateChecker : public QObject
 {
@@ -44,8 +43,13 @@ public:
     /**
      * Performs an immediate update check regardless of the timer state.
      * Safe to call while a check is already in progress (no-op then).
+     *
+     * refreshMetadata controls whether this check refreshes the software
+     * source (repository metadata): the application startup check passes
+     * true, every periodic timer check passes false, so periodic checks
+     * reuse the cached metadata instead of re-downloading it.
      */
-    void checkNow();
+    void checkNow(bool refreshMetadata = false);
 
     /**
      * Returns the currently configured check interval in minutes.
@@ -58,17 +62,6 @@ public:
      * back to KConfig. Use SettingsDialog to persist a change.
      */
     void setCheckIntervalMinutes(int minutes);
-
-    /**
-     * Returns whether desktop notifications for available updates are enabled.
-     */
-    bool notificationsEnabled() const { return m_notificationsEnabled; }
-
-    /**
-     * Enables or disables desktop notifications at runtime. The new value
-     * is NOT written back to KConfig; use SettingsDialog to persist it.
-     */
-    void setNotificationsEnabled(bool enabled);
 
     /**
      * Returns the update count from the last completed check.
@@ -87,12 +80,10 @@ private Q_SLOTS:
 
 private:
     void loadSettings();
-    void showNotification(int count);
 
     Backend *m_backend;
     QTimer *m_timer;
     int m_intervalMinutes = 60;
-    bool m_notificationsEnabled = true;
     bool m_checking = false;
     int m_lastCount = -1;
 };

@@ -7,8 +7,6 @@
 
 #include <KSharedConfig>
 #include <KConfigGroup>
-#include <KNotification>
-#include <KLocalizedString>
 
 Q_LOGGING_CATEGORY(MIRYU_UPDATE_CHECKER, "miryu.updatechecker")
 
@@ -31,15 +29,22 @@ UpdateChecker::UpdateChecker(Backend *backend, QObject *parent)
 
     loadSettings();
 
-    // Trigger a check whenever the timer fires.
-    connect(m_timer, &QTimer::timeout, this, &UpdateChecker::checkNow);
+    // Trigger a check whenever the timer fires. Periodic checks MUST NOT
+    // refresh the software source: per the desired behaviour the repository
+    // metadata is refreshed only at application startup (see start()), so
+    // every periodic tick reuses the metadata cache instead of
+    // re-downloading it. Applying an upgrade queue also reuses the cache
+    // (the displayed update list already came from it).
+    connect(m_timer, &QTimer::timeout, this, [this]() {
+        checkNow(false);
+    });
 
     // Receive the result of the async loadUpdates() call.
     connect(m_backend, &Backend::updatesLoaded,
             this, &UpdateChecker::onUpdatesLoaded);
 
     qCDebug(MIRYU_UPDATE_CHECKER) << "UpdateChecker created, interval =" << m_intervalMinutes
-                                  << "minutes, notifications =" << m_notificationsEnabled;
+                                  << "minutes";
 }
 
 UpdateChecker::~UpdateChecker()
@@ -58,9 +63,6 @@ void UpdateChecker::loadSettings()
     // otherwise cause the QTimer to fire continuously and peg the CPU.
     if (m_intervalMinutes < 1)
         m_intervalMinutes = kDefaultCheckInterval;
-
-    m_notificationsEnabled = group.readEntry(
-        QStringLiteral("updateNotificationsEnabled"), true);
 }
 
 void UpdateChecker::start()
@@ -78,8 +80,15 @@ void UpdateChecker::start()
     qCDebug(MIRYU_UPDATE_CHECKER) << "Timer started, firing every" << m_intervalMinutes << "min";
 
     // Perform an immediate first check so the user doesn't have to wait
-    // for the full interval to pass before seeing results.
-    QMetaObject::invokeMethod(this, &UpdateChecker::checkNow, Qt::QueuedConnection);
+    // for the full interval to pass before seeing results. This startup
+    // check is the only automatic moment the software source is refreshed
+    // (repository metadata) — Backend::fetchUpdates() calls readAllRepos()
+    // which only re-downloads metadata for repos whose cache has expired.
+    // Applying an update queue does NOT refresh metadata: it resolves from
+    // the same daemon cache that produced the update list.
+    QMetaObject::invokeMethod(this, [this]() {
+        checkNow(true);
+    }, Qt::QueuedConnection);
 }
 
 void UpdateChecker::stop()
@@ -90,7 +99,7 @@ void UpdateChecker::stop()
     }
 }
 
-void UpdateChecker::checkNow()
+void UpdateChecker::checkNow(bool refreshMetadata)
 {
     if (!m_backend || !m_backend->isInitialized()) {
         qCDebug(MIRYU_UPDATE_CHECKER) << "Backend not initialized, skipping check";
@@ -105,8 +114,9 @@ void UpdateChecker::checkNow()
     }
 
     m_checking = true;
-    qCDebug(MIRYU_UPDATE_CHECKER) << "Starting update check";
-    m_backend->loadUpdates();
+    qCDebug(MIRYU_UPDATE_CHECKER) << "Starting update check"
+                                  << (refreshMetadata ? "(refreshing metadata)" : "(using cached metadata)");
+    m_backend->loadUpdates(refreshMetadata);
 }
 
 void UpdateChecker::onUpdatesLoaded(const QList<Miryu::Package> &updates)
@@ -122,9 +132,6 @@ void UpdateChecker::onUpdatesLoaded(const QList<Miryu::Package> &updates)
 
     m_lastCount = count;
     Q_EMIT updatesAvailable(count);
-
-    if (m_notificationsEnabled && count > 0)
-        showNotification(count);
 }
 
 void UpdateChecker::setCheckIntervalMinutes(int minutes)
@@ -139,36 +146,6 @@ void UpdateChecker::setCheckIntervalMinutes(int minutes)
         // Restart so the new interval takes effect from now.
         m_timer->start();
     }
-}
-
-void UpdateChecker::setNotificationsEnabled(bool enabled)
-{
-    m_notificationsEnabled = enabled;
-}
-
-void UpdateChecker::showNotification(int count)
-{
-    // Using the instance-based API rather than the deprecated static
-    // KNotification::event() so that the NotificationFlags can be set
-    // explicitly and the object lifetime is controlled by "this".
-    auto *notification = new KNotification(
-        QStringLiteral("updatesAvailable"),
-        KNotification::CloseOnTimeout,
-        this);
-
-    notification->setTitle(i18n("Updates Available"));
-    notification->setText(i18np("%1 update is available for your system.",
-                                "%1 updates are available for your system.",
-                                count));
-    notification->setIconName(QStringLiteral("system-software-update"));
-
-    // Allow the notification to appear in the system tray / notification
-    // daemon even when the main window is hidden.
-    notification->setFlags(KNotification::CloseOnTimeout);
-
-    notification->sendEvent();
-
-    qCDebug(MIRYU_UPDATE_CHECKER) << "Notification sent for" << count << "updates";
 }
 
 }

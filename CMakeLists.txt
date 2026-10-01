@@ -42,7 +42,6 @@ find_package(KF6 REQUIRED COMPONENTS
     KIO
     Crash
     DBusAddons
-    Notifications
     WindowSystem
 )
 
@@ -90,7 +89,6 @@ target_link_libraries(miryu-software-center PRIVATE
     KF6::KIOWidgets
     KF6::Crash
     KF6::DBusAddons
-    KF6::Notifications
     KF6::WindowSystem
 )
 
@@ -115,6 +113,13 @@ install(FILES
 install(FILES
     data/org.miryugaming.PackageManager.polkit
     DESTINATION ${CMAKE_INSTALL_DATADIR}/polkit-1/actions
+)
+
+# Polkit rule granting passwordless restart of dnf5daemon-server.service
+# (used after every DNF5 transaction to restart the daemon without prompting).
+install(FILES
+    data/50-miryu-dnf5daemon.rules
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/polkit-1/rules.d
 )
 
 ki18n_install(po)

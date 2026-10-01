@@ -1,0 +1,25 @@
+// Polkit rule for Miryu Software Center.
+//
+// Allows ACTIVE LOCAL users to restart the dnf5daemon-server.service unit
+// WITHOUT an authentication prompt, so Miryu Software Center can
+// automatically restart the D-Bus package-management daemon after every DNF5
+// transaction (install / upgrade / downgrade / reinstall / remove).
+//
+// The grant is scoped as narrowly as possible:
+//   - action: only org.freedesktop.systemd1.manage-units
+//   - unit:   only dnf5daemon-server.service (never any other unit)
+//   - user:   only active, locally logged-in sessions
+//
+// Restarting this single unit is harmless: it only drops the daemon's
+// in-memory rpmdb / repository sack / goal caches; the daemon is re-activated
+// on demand afterwards.
+//
+// © 2027 KairikiFedora and © 2027 MiryuGaming
+
+polkit.addRule(function (action, subject) {
+    if (action.id == "org.freedesktop.systemd1.manage-units" &&
+        action.lookup("unit") == "dnf5daemon-server.service" &&
+        subject.local && subject.active) {
+        return polkit.Result.YES;
+    }
+});

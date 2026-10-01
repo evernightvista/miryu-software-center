@@ -1,5 +1,7 @@
 #include "QueueModel.h"
 
+#include <KLocalizedString>
+
 namespace Miryu {
 
 QueueModel::QueueModel(QObject *parent)
@@ -157,14 +159,16 @@ QString QueueModel::formatSize(qint64 bytes) const
 
 QString QueueModel::todoText(PackageTodo todo) const
 {
+    // Localized marker text (covered by the same .po entries as the action
+    // buttons and the context menu).
     switch (todo) {
-    case PackageTodo::Install:    return QStringLiteral("Install");
-    case PackageTodo::Update:     return QStringLiteral("Update");
-    case PackageTodo::Remove:     return QStringLiteral("Remove");
-    case PackageTodo::Downgrade:  return QStringLiteral("Downgrade");
-    case PackageTodo::Reinstall:  return QStringLiteral("Reinstall");
-    case PackageTodo::DistroSync: return QStringLiteral("Sync");
-    case PackageTodo::None:       return QStringLiteral("");
+    case PackageTodo::Install:    return i18n("Install");
+    case PackageTodo::Update:     return i18n("Update");
+    case PackageTodo::Remove:     return i18n("Remove");
+    case PackageTodo::Downgrade:  return i18n("Downgrade");
+    case PackageTodo::Reinstall:  return i18n("Reinstall");
+    case PackageTodo::DistroSync: return i18n("Sync");
+    case PackageTodo::None:       return QString();
     }
     return {};
 }

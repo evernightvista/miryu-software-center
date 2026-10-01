@@ -7,6 +7,7 @@
 class QLabel;
 class QTextBrowser;
 class QTabWidget;
+class QPushButton;
 
 namespace Miryu {
 
@@ -29,6 +30,11 @@ Q_SIGNALS:
     // and the nevra is used to verify the correct package was selected.
     void packageDetailsRequested(const QString &pkgName, const QString &nevra);
 
+    // Emitted when one of the action buttons (Install / Reinstall / Remove /
+    // Update / Downgrade) is pressed. The MainWindow adds the package to the
+    // transaction queue with the requested todo.
+    void markForAction(const Miryu::Package &pkg, Miryu::PackageTodo todo);
+
 private:
     Miryu::Package m_current;
 
@@ -41,6 +47,12 @@ private:
     QLabel *m_licenseLabel;
     QLabel *m_urlLabel;
     QLabel *m_stateLabel;
+
+    QPushButton *m_installButton;
+    QPushButton *m_reinstallButton;
+    QPushButton *m_removeButton;
+    QPushButton *m_updateButton;
+    QPushButton *m_downgradeButton;
 
     QTabWidget *m_tabWidget;
     QTextBrowser *m_descBrowser;

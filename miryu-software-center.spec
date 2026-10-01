@@ -4,7 +4,7 @@
 
 Name:           miryu-software-center
 Version:        45.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A modern RPM and Linglong software center powered by dnf5daemon
 
 License:        GPL-3.0-or-later
@@ -70,8 +70,13 @@ install -Dm 644 data/evernight-vista.conf %{buildroot}/%{_datadir}/dnf5/suggest-
 %{_datadir}/metainfo/org.miryugaming.PackageManager.metainfo.xml
 %{_datadir}/kxmlgui5/miryu/miryuui.rc
 %{_datadir}/polkit-1/actions/org.miryugaming.PackageManager.polkit
+%{_datadir}/polkit-1/rules.d/50-miryu-dnf5daemon.rules
 
 %changelog
+* Thu Oct 01 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-5
+- Fix Flatpak Not show icons
+- Fix other bugs
+ 
 * Wed Sep 30 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-4
 - Update RPM Spec file
 - Update DNF5 needs restarting list

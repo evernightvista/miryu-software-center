@@ -952,6 +952,13 @@ msgstr "从队列中移除"
 #: src/ui/PackageView.cpp:271
 msgid "Queue for Removal"
 msgstr "加入移除队列"
+#: src/ui/PackageView.cpp:286
+msgid "Queue for Reinstall"
+msgstr "加入重新安装队列"
+
+#: src/ui/PackageView.cpp:292
+msgid "Queue for Downgrade"
+msgstr "加入降级队列"
 
 #: src/ui/PackageView.cpp:272
 msgid "Queue for Update"
@@ -1251,3 +1258,61 @@ msgstr ""
 #: src/ui/MainWindow.cpp:404
 msgid "Launch the external Linglong Store application"
 msgstr "启动外部玲珑商店应用程序"
+
+msgid "<i>Loading...</i>"
+msgstr "<i>加载中...</i>"
+
+msgid "Cannot connect to the D-Bus system bus.\n\n"
+msgstr "无法连接到 D-Bus 系统总线。\n\n"
+
+msgid "Cannot remove protected packages or critical dependencies.\n\n"
+msgstr "无法移除受保护的软件包或关键依赖项。\n\n"
+
+msgid "Distribution sync will synchronize all installed packages to the versions available in the repositories. "
+msgstr "发行版同步会将所有已安装软件包同步到仓库中可用的版本。 "
+
+msgid "Downloading %1"
+msgstr "正在下载 %1"
+
+msgid "Failed to connect to dnf5daemon-server.\n\n"
+msgstr "无法连接到 dnf5daemon-server。\n\n"
+
+msgid "Failed to launch the Linglong Store.\n\n"
+msgstr "无法启动 Linglong 商店。\n\n"
+
+msgid "Failed to refresh metadata (exit code %1)."
+msgstr "刷新元数据失败（退出代码 %1）。"
+
+msgid "Failed to start command.\n%1\n\n"
+msgstr "启动命令失败。\n%1\n\n"
+
+msgid "Metadata refreshed."
+msgstr "元数据已刷新。"
+
+msgid "Refresh Metadata Log"
+msgstr "刷新元数据日志"
+
+msgid "Repository enable / disable management is performed from the main "
+msgstr "仓库的启用/禁用管理在主界面 中进行 "
+
+msgid "The connection to the system D-Bus / dnf5daemon-server was lost"
+msgstr "与系统 D-Bus / dnf5daemon-server 的连接已断开"
+
+msgid "The target version (%1) is lower than the current version (%2). "
+msgstr "目标版本（%1）低于当前版本（%2）。 "
+
+msgid "The target version (%1) is lower than the currently running "
+msgstr "目标版本（%1）低于当前运行的 "
+
+msgid "This will download all packages needed to upgrade the system to "
+msgstr "这将下载将系统升级到 所需的全部软件包 "
+
+msgid "This will download and rebuild the metadata cache for all enabled "
+msgstr "这将下载并重建所有已启用 的元数据缓存 "
+
+msgid "This will synchronise all installed packages to the latest version "
+msgstr "这将把所有已安装软件包同步到最新版本 "
+
+msgid "You have installed software packages that require a computer restart. "
+msgstr "您已安装了需要重新启动计算机的软件包。 "
+

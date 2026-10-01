@@ -49,6 +49,11 @@ public:
     Package packageAt(int row) const;
 
     void setQueued(const QString &nevra, bool queued);
+    // Like setQueued(), but also sets the package's todo to @p todo when
+    // queuing (so the list marker shows e.g. "Reinstall"/"Downgrade" instead
+    // of the state-derived default "Remove"). When unqueuing the todo is
+    // reset to calcTodo(state).
+    void setQueuedWithTodo(const QString &nevra, bool queued, PackageTodo todo);
     void clearQueued();
     QList<Package> queuedPackages() const;
 

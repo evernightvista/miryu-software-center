@@ -9,6 +9,8 @@
 #include <QAction>
 #include <QStyledItemDelegate>
 #include <QPainter>
+#include <QFutureWatcher>
+#include <QtConcurrent>
 #include <KLocalizedString>
 #include <KMessageBox>
 #include <KGuiItem>
@@ -102,6 +104,58 @@ RepoView::RepoView(RepoModel *model, Backend *backend, QWidget *parent)
     header()->setSectionResizeMode(0, QHeaderView::Stretch);
 }
 
+// Run the polkit-gated repoEnable() call on a worker thread so the UI stays
+// responsive while the user authenticates. On completion the UI thread
+// applies the result and shows at most one dialog.
+static void runRepoEnableAsync(RepoView *view, Backend *backend,
+                               const QString &repoId, bool enable)
+{
+    auto *watcher = new QFutureWatcher<bool>(view);
+    QObject::connect(watcher, &QFutureWatcher<bool>::finished, view, [view, backend, repoId, enable, watcher]() {
+        const bool ok = watcher->result();
+        watcher->deleteLater();
+        if (ok) {
+            // Do NOT refresh the software source here: per the desired
+            // behaviour repository metadata is refreshed only at
+            // application startup and when the user applies an upgrade
+            // queue. repoEnable() already wrote the new enabled state
+            // to the repo config; resetSession() drops the daemon's
+            // stale in-memory sack so the subsequent repoList()
+            // re-reads the updated configuration. The next package
+            // query reloads metadata from disk on demand instead of
+            // forcing an immediate (and possibly slow) re-download.
+            backend->client()->resetSession();
+            backend->loadRepositories();
+            Q_EMIT view->repositoriesChanged();
+        } else {
+            const QString err = backend->client()->lastError();
+            const QString errLower = err.toLower();
+            // Polkit auth cancellation: show a friendly message instead
+            // of the raw daemon error. errorOccurred() is already
+            // suppressed for auth errors in Dnf5DaemonClient, so this
+            // is the only dialog the user sees.
+            if (errLower.contains(QStringLiteral("not authorized")) ||
+                errLower.contains(QStringLiteral("cancel")) ||
+                errLower.contains(QStringLiteral("auth"))) {
+                KMessageBox::information(view,
+                    i18n("Operation cancelled by user."),
+                    i18n("Repository"));
+            } else {
+                KMessageBox::error(view,
+                    err.isEmpty()
+                        ? (enable
+                            ? i18n("Failed to enable repository '%1'.", repoId)
+                            : i18n("Failed to disable repository '%1'.", repoId))
+                        : err,
+                    i18n("Error"));
+            }
+        }
+    });
+    watcher->setFuture(QtConcurrent::run([backend, repoId, enable]() {
+        return backend->client()->repoEnable(repoId, enable);
+    }));
+}
+
 void RepoView::contextMenuEvent(QContextMenuEvent *event)
 {
     QModelIndex index = indexAt(event->pos());
@@ -124,17 +178,9 @@ void RepoView::contextMenuEvent(QContextMenuEvent *event)
                 // Disable the repository through dnf5daemon. The D-Bus call
                 // triggers the daemon's own polkit policy
                 // (org.rpm.dnf.v0.rpm.Repo.conf_write) automatically.
-                if (m_backend->client()->repoEnable(repoId, false)) {
-                    m_backend->client()->readAllRepos();
-                    m_backend->loadRepositories();
-                    Q_EMIT repositoriesChanged();
-                } else {
-                    KMessageBox::error(this,
-                        m_backend->client()->lastError().isEmpty()
-                            ? i18n("Failed to disable repository '%1'.", repoId)
-                            : m_backend->client()->lastError(),
-                        i18n("Error"));
-                }
+                // Runs off the UI thread so the window stays responsive
+                // during polkit authentication.
+                runRepoEnableAsync(this, m_backend, repoId, false);
             }
         });
     } else {
@@ -148,17 +194,9 @@ void RepoView::contextMenuEvent(QContextMenuEvent *event)
                 // Enable the repository through dnf5daemon. The D-Bus call
                 // triggers the daemon's own polkit policy
                 // (org.rpm.dnf.v0.rpm.Repo.conf_write) automatically.
-                if (m_backend->client()->repoEnable(repoId, true)) {
-                    m_backend->client()->readAllRepos();
-                    m_backend->loadRepositories();
-                    Q_EMIT repositoriesChanged();
-                } else {
-                    KMessageBox::error(this,
-                        m_backend->client()->lastError().isEmpty()
-                            ? i18n("Failed to enable repository '%1'.", repoId)
-                            : m_backend->client()->lastError(),
-                        i18n("Error"));
-                }
+                // Runs off the UI thread so the window stays responsive
+                // during polkit authentication.
+                runRepoEnableAsync(this, m_backend, repoId, true);
             }
         });
     }

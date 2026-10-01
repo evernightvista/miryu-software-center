@@ -1,6 +1,7 @@
 #include "PackageView.h"
 #include "../models/PackageModel.h"
 #include "../core/Enums.h"
+#include "../core/TodoColors.h"
 
 #include <QHeaderView>
 #include <QContextMenuEvent>
@@ -74,18 +75,26 @@ public:
                           QStringLiteral("  (") + index.data(PackageModel::ArchRole).toString() + QStringLiteral(")");
         painter->drawText(verRect, Qt::AlignLeft | Qt::AlignTop, verText);
 
-        // Draw summary
-        QRect summaryRect = opt.rect.adjusted(opt.rect.width() * 2 / 3, 4, -8, -4);
+        // Draw summary. Reserve the right edge for the queued todo marker
+        // ("Install"/"Reinstall"/"Remove"/"Update"/"Downgrade") or the
+        // "(dep)" tag: those markers are drawn afterwards (on top), so
+        // without this reservation their text would visually overlap the
+        // package description — the exact overlap reported in the bug.
+        const int rightReserve = queued ? 100 : (isDep ? 48 : 8);
+        QRect summaryRect = opt.rect.adjusted(opt.rect.width() * 2 / 3, 4, -rightReserve, -4);
         painter->setFont(opt.font);
         painter->setPen(opt.palette.color(QPalette::WindowText));
         QString summary = index.data(PackageModel::SummaryRole).toString();
         painter->drawText(summaryRect, Qt::AlignRight | Qt::AlignVCenter, summary);
 
-        // Draw queued indicator
+        // Draw queued indicator. The marker text is colored by action type:
+        // Reinstall = blue, Downgrade = yellow, Remove = red (Install =
+        // green, Update = orange) — matching the queue page.
         if (queued) {
-            QRect queueRect(opt.rect.right() - 80, opt.rect.y(), 80, opt.rect.height());
+            QRect queueRect(opt.rect.right() - 100, opt.rect.y(), 100, opt.rect.height());
             QString todoText = index.data(PackageModel::TodoTextRole).toString();
-            painter->setPen(QColor(46, 160, 67));
+            int todo = index.data(PackageModel::TodoRole).toInt();
+            painter->setPen(todoColor(static_cast<PackageTodo>(todo)));
             QFont qFont = opt.font;
             qFont.setBold(true);
             qFont.setPointSize(qFont.pointSize() - 1);
@@ -93,7 +102,7 @@ public:
             painter->drawText(queueRect, Qt::AlignRight | Qt::AlignVCenter, todoText);
         }
 
-        if (isDep) {
+        if (isDep && !queued) {
             QRect depRect(opt.rect.right() - 80, opt.rect.y(), 80, opt.rect.height());
             painter->setPen(secondaryText);
             QFont dFont = opt.font;
@@ -265,11 +274,50 @@ void PackageView::contextMenuEvent(QContextMenuEvent *event)
                                              i18n("Remove from Queue"));
         connect(unqueueAction, &QAction::triggered, this, [this, index]() { toggleQueue(index); });
     } else {
-        auto *queueAction = menu.addAction(QIcon::fromTheme(QStringLiteral("list-add")),
-                                           pkg.todo == PackageTodo::Remove ? i18n("Queue for Removal") :
-                                           pkg.todo == PackageTodo::Update ? i18n("Queue for Update") :
-                                           i18n("Queue for Installation"));
-        connect(queueAction, &QAction::triggered, this, [this, index]() { toggleQueue(index); });
+        // Action set per package state. Installed packages get Reinstall and
+        // Downgrade in addition to Removal, so the common maintenance
+        // operations are reachable from the context menu (mirrors the
+        // reference yumex-ng client). The menu pops up at the click position
+        // inside the list column area, so the entries never overlap the
+        // description column on the right.
+        switch (pkg.state) {
+        case PackageState::Installed: {
+            auto *reinstallAction = menu.addAction(
+                QIcon::fromTheme(QStringLiteral("view-refresh")), i18n("Queue for Reinstall"));
+            connect(reinstallAction, &QAction::triggered, this, [this, index]() {
+                queueWithTodo(index, PackageTodo::Reinstall);
+            });
+
+            auto *downgradeAction = menu.addAction(
+                QIcon::fromTheme(QStringLiteral("arrow-down")), i18n("Queue for Downgrade"));
+            connect(downgradeAction, &QAction::triggered, this, [this, index]() {
+                queueWithTodo(index, PackageTodo::Downgrade);
+            });
+
+            auto *removeAction = menu.addAction(
+                QIcon::fromTheme(QStringLiteral("edit-delete")), i18n("Queue for Removal"));
+            connect(removeAction, &QAction::triggered, this, [this, index]() { toggleQueue(index); });
+            break;
+        }
+        case PackageState::Available: {
+            auto *queueAction = menu.addAction(QIcon::fromTheme(QStringLiteral("list-add")),
+                                               i18n("Queue for Installation"));
+            connect(queueAction, &QAction::triggered, this, [this, index]() { toggleQueue(index); });
+            break;
+        }
+        case PackageState::Update: {
+            auto *queueAction = menu.addAction(QIcon::fromTheme(QStringLiteral("system-software-update")),
+                                               i18n("Queue for Update"));
+            connect(queueAction, &QAction::triggered, this, [this, index]() { toggleQueue(index); });
+            break;
+        }
+        case PackageState::Downgrade: {
+            auto *queueAction = menu.addAction(QIcon::fromTheme(QStringLiteral("arrow-down")),
+                                               i18n("Queue for Downgrade"));
+            connect(queueAction, &QAction::triggered, this, [this, index]() { toggleQueue(index); });
+            break;
+        }
+        }
     }
 
     menu.addSeparator();
@@ -318,6 +366,21 @@ void PackageView::onUnqueueSelected()
             Q_EMIT unqueuePackage(pkg.nevra());
         }
     }
+}
+
+void PackageView::queueWithTodo(const QModelIndex &index, PackageTodo todo)
+{
+    Package pkg = m_model->packageAt(index.row());
+    if (pkg.queued)
+        return; // already queued — do not duplicate
+
+    Package queuedPkg = pkg;
+    queuedPkg.todo = todo;
+    queuedPkg.queued = true;
+    // Also update the model's todo so the in-row marker shows the real
+    // action ("Reinstall"/"Downgrade"), not the state-derived default.
+    m_model->setQueuedWithTodo(pkg.nevra(), true, todo);
+    Q_EMIT queuePackage(queuedPkg);
 }
 
 void PackageView::toggleQueue(const QModelIndex &index)

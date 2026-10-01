@@ -957,6 +957,13 @@ msgstr "キューから削除"
 #: src/ui/PackageView.cpp:271
 msgid "Queue for Removal"
 msgstr "削除キューに追加"
+#: src/ui/PackageView.cpp:286
+msgid "Queue for Reinstall"
+msgstr "再インストールをキューに追加"
+
+#: src/ui/PackageView.cpp:292
+msgid "Queue for Downgrade"
+msgstr "ダウングレードをキューに追加"
 
 #: src/ui/PackageView.cpp:272
 msgid "Queue for Update"
@@ -1256,3 +1263,61 @@ msgstr ""
 #: src/ui/MainWindow.cpp:404
 msgid "Launch the external Linglong Store application"
 msgstr "外部Linglongストアアプリケーションを起動"
+
+msgid "<i>Loading...</i>"
+msgstr "<i>読み込み中...</i>"
+
+msgid "Cannot connect to the D-Bus system bus.\n\n"
+msgstr "D-Bus システムバスに接続できません。\n\n"
+
+msgid "Cannot remove protected packages or critical dependencies.\n\n"
+msgstr "保護されたパッケージや重要な依存関係は削除できません。\n\n"
+
+msgid "Distribution sync will synchronize all installed packages to the versions available in the repositories. "
+msgstr "ディストリビューション同期は、インストール済みの全パッケージをリポジトリで利用可能なバージョンに同期します。 "
+
+msgid "Downloading %1"
+msgstr "%1 をダウンロード中"
+
+msgid "Failed to connect to dnf5daemon-server.\n\n"
+msgstr "dnf5daemon-server に接続できませんでした。\n\n"
+
+msgid "Failed to launch the Linglong Store.\n\n"
+msgstr "Linglong ストアを起動できませんでした。\n\n"
+
+msgid "Failed to refresh metadata (exit code %1)."
+msgstr "メタデータの更新に失敗しました（終了コード %1）。"
+
+msgid "Failed to start command.\n%1\n\n"
+msgstr "コマンドの起動に失敗しました。\n%1\n\n"
+
+msgid "Metadata refreshed."
+msgstr "メタデータを更新しました。"
+
+msgid "Refresh Metadata Log"
+msgstr "メタデータログを更新"
+
+msgid "Repository enable / disable management is performed from the main "
+msgstr "リポジトリの有効化/無効化はメイン から行います "
+
+msgid "The connection to the system D-Bus / dnf5daemon-server was lost"
+msgstr "システム D-Bus / dnf5daemon-server への接続が失われました"
+
+msgid "The target version (%1) is lower than the current version (%2). "
+msgstr "対象バージョン（%1）は現在のバージョン（%2）より低いです。 "
+
+msgid "The target version (%1) is lower than the currently running "
+msgstr "対象バージョン（%1）は実行中の より低いです "
+
+msgid "This will download all packages needed to upgrade the system to "
+msgstr "システムを にアップグレードするために必要な全パッケージをダウンロードします "
+
+msgid "This will download and rebuild the metadata cache for all enabled "
+msgstr "有効な全 のメタデータキャッシュをダウンロードして再構築します "
+
+msgid "This will synchronise all installed packages to the latest version "
+msgstr "インストール済みの全パッケージを最新バージョン に同期します "
+
+msgid "You have installed software packages that require a computer restart. "
+msgstr "コンピューターの再起動が必要なソフトウェアパッケージをインストールしました。 "
+

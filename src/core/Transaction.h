@@ -56,6 +56,14 @@ struct TransactionResult
     {
         qint64 total = 0;
         for (const auto &key : data.keys()) {
+            // Only packages that actually need to be downloaded contribute to
+            // the download total. Actions that operate on already-installed
+            // packages (remove / replaced / obsoleted) fetch nothing and must
+            // be excluded, matching the semantics of "Total Download Size".
+            if (key == QStringLiteral("replaced") ||
+                key == QStringLiteral("remove") ||
+                key == QStringLiteral("obsoleted"))
+                continue;
             QVariantList list = data.value(key).toList();
             for (const auto &item : list) {
                 QVariantList pair = item.toList();

@@ -17,12 +17,212 @@
 #include <QAction>
 #include <QStyledItemDelegate>
 #include <QPainter>
+#include <QPixmapCache>
+#include <QIcon>
+#include <QDir>
+#include <QSet>
+#include <QStandardPaths>
+#include <QFileInfo>
 #include <KLineEdit>
 #include <KLocalizedString>
 #include <KMessageBox>
 #include <KGuiItem>
 
 namespace Miryu {
+
+// ---------------------------------------------------------------------------
+// Flatpak icon loading
+// ---------------------------------------------------------------------------
+
+/*!
+ * Scan the Flatpak appstream cache and return every icon root it contains.
+ *
+ * For each configured remote Flatpak keeps an appstream metadata tree at
+ *   <install>/appstream/<remote>/<arch>/active/icons/
+ * which holds the (downloaded) icons for *remote* applications — i.e. the
+ * apps shown in the Flatpak store that are not installed locally. Without
+ * probing these roots only installed apps (whose icons live under
+ * exports/share/icons) would ever display a real icon.
+ *
+ * The remote / arch subdirectory names are not known ahead of time, so we
+ * enumerate them with QDir.
+ */
+static QStringList flatpakAppstreamIconRoots()
+{
+    QStringList roots;
+    const QStringList appstreamBases = {
+        QStringLiteral("/var/lib/flatpak/appstream"),
+        QDir::homePath() + QStringLiteral("/.local/share/flatpak/appstream"),
+    };
+
+    for (const QString &base : appstreamBases) {
+        QDir baseDir(base);
+        if (!baseDir.exists())
+            continue;
+        const QStringList remotes = baseDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        for (const QString &remote : remotes) {
+            QDir remoteDir(base + QLatin1Char('/') + remote);
+            const QStringList archs = remoteDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+            for (const QString &arch : archs) {
+                const QString iconRoot =
+                    base + QLatin1Char('/') + remote + QLatin1Char('/') + arch +
+                    QStringLiteral("/active/icons");
+                if (QDir(iconRoot).exists())
+                    roots << iconRoot;
+            }
+        }
+    }
+    return roots;
+}
+
+/*!
+ * Return the list of directories Flatpak stores application icons in.
+ *
+ * Combines two sources:
+ *   - The *export* trees (installed apps):
+ *       /var/lib/flatpak/exports/share/icons
+ *       ~/.local/share/flatpak/exports/share/icons
+ *       plus the standard XDG data dirs.
+ *   - The *appstream* cache trees (remote / store apps, see
+ *     flatpakAppstreamIconRoots()).
+ *
+ * We probe them directly so we do not depend on XDG_DATA_DIRS having been
+ * updated for the current process.
+ */
+static QStringList flatpakIconRoots()
+{
+    QStringList roots;
+    // Installed-app export trees
+    roots << QStringLiteral("/var/lib/flatpak/exports/share/icons");
+    const QString home = QDir::homePath();
+    roots << home + QStringLiteral("/.local/share/flatpak/exports/share/icons");
+    const QStringList dataDirs = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
+    for (const QString &d : dataDirs)
+        roots << d + QStringLiteral("/icons");
+    // Remote / store app icons from the appstream cache
+    roots << flatpakAppstreamIconRoots();
+    return roots;
+}
+
+/*!
+ * Resolve a Flatpak application's icon to a local file path.
+ *
+ * Searches the Flatpak export icon trees for a file named \a iconName
+ * (typically the application ID) with a raster (.png) or vector (.svg)
+ * extension. The largest available size is preferred. Returns an empty
+ * string when no icon file is found.
+ */
+static QString findFlatpakIconFile(const QString &iconName)
+{
+    if (iconName.isEmpty())
+        return {};
+
+    static const QStringList extensions = {
+        QStringLiteral(".png"), QStringLiteral(".svg"), QStringLiteral(".svgz")
+    };
+
+    // Prefer the largest common icon sizes; hicolor/apps folders are named
+    // after the pixel size (e.g. "128x128") or "scalable" for SVG.
+    static const QStringList sizeDirs = {
+        QStringLiteral("scalable"),
+        QStringLiteral("256x256"),
+        QStringLiteral("128x128"),
+        QStringLiteral("96x96"),
+        QStringLiteral("64x64"),
+        QStringLiteral("48x48"),
+        QStringLiteral("32x32"),
+    };
+
+    for (const QString &root : flatpakIconRoots()) {
+        for (const QString &sizeDir : sizeDirs) {
+            const QString appsDir = root + QStringLiteral("/hicolor/") + sizeDir + QStringLiteral("/apps");
+            for (const QString &ext : extensions) {
+                const QString candidate = appsDir + QLatin1Char('/') + iconName + ext;
+                if (QFileInfo::exists(candidate))
+                    return candidate;
+            }
+        }
+    }
+    return {};
+}
+
+/*!
+ * Load a Flatpak application icon at the requested \a size.
+ *
+ * The result is cached in QPixmapCache under a key derived from the app id
+ * and size, so repeated lookups (e.g. while painting a list) are cheap.
+ *
+ * Several icon names are tried in order, because the icon file name is not
+ * always identical to the application ID:
+ *   1. The full application ID (e.g. org.gnome.Weather).
+ *   2. The last segment of the application ID (e.g. Weather) — common for
+ *      apps that name their icon after the product rather than the full ID.
+ *   3. The human-readable application name.
+ *
+ * For each candidate name we first try QIcon::fromTheme() and then a direct
+ * file lookup across the Flatpak export + appstream icon trees.
+ *
+ * Returns a null QPixmap when no icon can be found; callers should fall
+ * back to a generic placeholder (first-letter tile) in that case.
+ */
+static QPixmap loadFlatpakIcon(const QString &appId, const QString &appName, int size)
+{
+    if (appId.isEmpty() || size <= 0)
+        return {};
+
+    const QString cacheKey =
+        QStringLiteral("flatpak-icon:") + appId + QLatin1Char(':') + QString::number(size);
+
+    QPixmap cached;
+    if (QPixmapCache::find(cacheKey, &cached))
+        return cached;
+
+    // Negative cache: app IDs we already failed to resolve an icon for.
+    // Store apps (not installed locally) hit this path every paint, so
+    // remembering the miss avoids a directory scan per row per repaint.
+    static QSet<QString> s_noIcon;
+    if (s_noIcon.contains(appId))
+        return {};
+
+    // Build the ordered list of icon names to try.
+    QStringList candidates;
+    candidates << appId;
+    const int dot = appId.lastIndexOf(QLatin1Char('.'));
+    if (dot >= 0 && dot < appId.size() - 1)
+        candidates << appId.mid(dot + 1);
+    if (!appName.isEmpty() && appName != appId)
+        candidates << appName;
+
+    QPixmap pixmap;
+    for (const QString &name : candidates) {
+        // a) Icon theme lookup (covers the case where Flatpak exports are
+        //    visible to the running desktop / Qt).
+        QIcon themed = QIcon::fromTheme(name);
+        if (!themed.isNull()) {
+            pixmap = themed.pixmap(size);
+            if (!pixmap.isNull())
+                break;
+        }
+        // b) Direct file lookup in the Flatpak export + appstream trees.
+        const QString path = findFlatpakIconFile(name);
+        if (!path.isEmpty()) {
+            pixmap = QPixmap(path);
+            if (!pixmap.isNull())
+                break;
+        }
+    }
+
+    if (!pixmap.isNull()) {
+        if (pixmap.width() != size || pixmap.height() != size)
+            pixmap = pixmap.scaled(size, size, Qt::KeepAspectRatio,
+                                   Qt::SmoothTransformation);
+        QPixmapCache::insert(cacheKey, pixmap);
+    } else {
+        s_noIcon.insert(appId);
+    }
+
+    return pixmap;
+}
 
 // ---------------------------------------------------------------------------
 // Custom list delegate
@@ -54,22 +254,32 @@ public:
 
         bool installed = index.data(FlatpakAppModel::InstalledRole).toBool();
         bool upgradable = index.data(FlatpakAppModel::UpgradableRole).toBool();
+        const QString name = index.data(FlatpakAppModel::NameRole).toString();
+        const QString appId = index.data(FlatpakAppModel::AppIdRole).toString();
 
-        // Icon placeholder
+        // Icon: try the real Flatpak app icon first, fall back to a coloured
+        // first-letter tile when no icon file / theme entry is available.
         QRect iconRect(opt.rect.x() + 8, opt.rect.y() + 8, 40, 40);
-        QColor iconColor = upgradable ? QColor(255, 200, 100)
-                         : installed   ? QColor(100, 180, 255)
-                                       : QColor(200, 200, 200);
-        painter->setBrush(iconColor);
-        painter->setPen(Qt::NoPen);
-        painter->drawRoundedRect(iconRect, 6, 6);
-        painter->setPen(Qt::white);
-        QFont iconFont = opt.font;
-        iconFont.setBold(true);
-        iconFont.setPointSize(14);
-        painter->setFont(iconFont);
-        QString name = index.data(FlatpakAppModel::NameRole).toString();
-        painter->drawText(iconRect, Qt::AlignCenter, name.left(1).toUpper());
+        const QPixmap icon = loadFlatpakIcon(appId, name, iconRect.width());
+        if (!icon.isNull()) {
+            // Centre the (possibly transparent) icon inside the tile.
+            QRect target = icon.rect();
+            target.moveCenter(iconRect.center());
+            painter->drawPixmap(target, icon);
+        } else {
+            QColor iconColor = upgradable ? QColor(255, 200, 100)
+                             : installed   ? QColor(100, 180, 255)
+                                           : QColor(200, 200, 200);
+            painter->setBrush(iconColor);
+            painter->setPen(Qt::NoPen);
+            painter->drawRoundedRect(iconRect, 6, 6);
+            painter->setPen(Qt::white);
+            QFont iconFont = opt.font;
+            iconFont.setBold(true);
+            iconFont.setPointSize(14);
+            painter->setFont(iconFont);
+            painter->drawText(iconRect, Qt::AlignCenter, name.left(1).toUpper());
+        }
 
         // Name
         QRect nameRect = opt.rect.adjusted(56, 6, -120, -opt.rect.height() / 2);
@@ -616,8 +826,20 @@ void FlatpakPage::showStoreDetailView(const FlatpakApp &app)
 {
     m_currentDetailApp = app;
 
-    // Icon placeholder with first letter
-    m_detailIcon->setText(app.name.left(1).toUpper());
+    // Icon: show the real Flatpak app icon when available, otherwise fall
+    // back to a coloured first-letter tile (the label's stylesheet gives
+    // the placeholder its background).
+    const QPixmap icon = loadFlatpakIcon(app.appId, app.name, m_detailIcon->width());
+    if (!icon.isNull()) {
+        m_detailIcon->clear();
+        m_detailIcon->setPixmap(icon);
+        m_detailIcon->setStyleSheet(QString());
+    } else {
+        m_detailIcon->clear();
+        m_detailIcon->setText(app.name.left(1).toUpper());
+        m_detailIcon->setStyleSheet(QStringLiteral(
+            "background: #ddd; border-radius: 8px; font-size: 24pt; font-weight: bold;"));
+    }
 
     m_detailName->setText(app.name.isEmpty() ? app.appId : app.name);
     m_detailAppId->setText(i18n("Application ID: %1", app.appId));

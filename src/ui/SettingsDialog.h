@@ -31,7 +31,6 @@ namespace Miryu {
  *   updateCheckInterval           (int,     default 60)
  *   showTrayIcon                  (bool,    default true)
  *   darkTrayIcon                  (bool,    default false)
- *   updateNotificationsEnabled    (bool,    default true)
  */
 class SettingsDialog : public QDialog
 {
@@ -80,7 +79,6 @@ private:
     QSpinBox *m_updateCheckSpin = nullptr;
     QCheckBox *m_showTrayIconCheck = nullptr;
     QCheckBox *m_darkTrayIconCheck = nullptr;
-    QCheckBox *m_updateNotificationsCheck = nullptr;
 };
 
 }

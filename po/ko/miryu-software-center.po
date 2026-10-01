@@ -957,6 +957,13 @@ msgstr "대기열에서 제거"
 #: src/ui/PackageView.cpp:271
 msgid "Queue for Removal"
 msgstr "제거 대기열에 추가"
+#: src/ui/PackageView.cpp:286
+msgid "Queue for Reinstall"
+msgstr "재설치 대기열에 추가"
+
+#: src/ui/PackageView.cpp:292
+msgid "Queue for Downgrade"
+msgstr "다운그레이드 대기열에 추가"
 
 #: src/ui/PackageView.cpp:272
 msgid "Queue for Update"
@@ -1256,3 +1263,61 @@ msgstr ""
 #: src/ui/MainWindow.cpp:404
 msgid "Launch the external Linglong Store application"
 msgstr "외부 Linglong 스토어 응용 프로그램 시작"
+
+msgid "<i>Loading...</i>"
+msgstr "<i>불러오는 중...</i>"
+
+msgid "Cannot connect to the D-Bus system bus.\n\n"
+msgstr "D-Bus 시스템 버스에 연결할 수 없습니다.\n\n"
+
+msgid "Cannot remove protected packages or critical dependencies.\n\n"
+msgstr "보호된 패키지나 중요 종속성은 제거할 수 없습니다.\n\n"
+
+msgid "Distribution sync will synchronize all installed packages to the versions available in the repositories. "
+msgstr "배포판 동기화는 설치된 모든 패키지를 저장소에서 사용 가능한 버전으로 동기화합니다. "
+
+msgid "Downloading %1"
+msgstr "%1 다운로드 중"
+
+msgid "Failed to connect to dnf5daemon-server.\n\n"
+msgstr "dnf5daemon-server에 연결하지 못했습니다.\n\n"
+
+msgid "Failed to launch the Linglong Store.\n\n"
+msgstr "Linglong 스토어를 시작하지 못했습니다.\n\n"
+
+msgid "Failed to refresh metadata (exit code %1)."
+msgstr "메타데이터 새로고침 실패(종료 코드 %1)."
+
+msgid "Failed to start command.\n%1\n\n"
+msgstr "명령 시작 실패.\n%1\n\n"
+
+msgid "Metadata refreshed."
+msgstr "메타데이터가 새로고침되었습니다."
+
+msgid "Refresh Metadata Log"
+msgstr "메타데이터 로그 새로고침"
+
+msgid "Repository enable / disable management is performed from the main "
+msgstr "저장소 활성화/비활성화 관리는 메인 에서 수행됩니다 "
+
+msgid "The connection to the system D-Bus / dnf5daemon-server was lost"
+msgstr "시스템 D-Bus / dnf5daemon-server 연결이 끊어졌습니다"
+
+msgid "The target version (%1) is lower than the current version (%2). "
+msgstr "대상 버전(%1)이 현재 버전(%2)보다 낮습니다. "
+
+msgid "The target version (%1) is lower than the currently running "
+msgstr "대상 버전(%1)이 현재 실행 중인 보다 낮습니다 "
+
+msgid "This will download all packages needed to upgrade the system to "
+msgstr "시스템을 으로 업그레이드하는 데 필요한 모든 패키지를 다운로드합니다 "
+
+msgid "This will download and rebuild the metadata cache for all enabled "
+msgstr "활성화된 모든 의 메타데이터 캐시를 다운로드하고 다시 빌드합니다 "
+
+msgid "This will synchronise all installed packages to the latest version "
+msgstr "설치된 모든 패키지를 최신 버전 으로 동기화합니다 "
+
+msgid "You have installed software packages that require a computer restart. "
+msgstr "컴퓨터를 다시 시작해야 하는 소프트웨어 패키지를 설치했습니다. "
+

@@ -35,13 +35,21 @@ public:
     void searchPackages(const QString &query, SearchField field = SearchField::All,
                         PackageFilter scope = PackageFilter::All);
     void loadRepositories();
-    void loadUpdates();
+    // Load the update list. When refreshMetadata is true the daemon is asked
+    // to sync the system cache (readAllRepos) before `dnf check-update`
+    // reads it, so the CLI and the daemon see the same metadata. Per the
+    // desired behaviour the software source is refreshed ONLY at application
+    // startup (UpdateChecker calls loadUpdates(true)) and when the user
+    // applies a queue containing upgrades (TransactionManager::buildTransaction
+    // calls readAllRepos itself). Periodic checks, page switches and
+    // post-transaction reloads pass false so they reuse the cached metadata.
+    void loadUpdates(bool refreshMetadata = false);
 
     // Sync operations (call from worker threads)
     QList<Package> fetchPackages(PackageFilter filter);
     QList<Package> fetchSearchResults(const QString &query, SearchField field, PackageFilter scope);
     QList<Repository> fetchRepositories();
-    QList<Package> fetchUpdates();
+    QList<Package> fetchUpdates(bool refreshMetadata = false);
 
     // Transaction operations
     TransactionResult buildTransaction(const QList<Package> &packages, const TransactionOptions &opts = {});

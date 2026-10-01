@@ -113,7 +113,7 @@ Miryu communicates with `dnf5daemon-server` via the system D-Bus. The service na
 - CMake 3.20+
 - Extra CMake Modules (ECM) 6.0+
 - Qt6 (6.5+): Core, Gui, Widgets, DBus, Concurrent
-- KDE Frameworks 6: CoreAddons, I18n, XmlGui, Config, WidgetsAddons, ItemViews, IconThemes, KIO, Crash, DBusAddons, Notifications, WindowSystem
+- KDE Frameworks 6: CoreAddons, I18n, XmlGui, Config, WidgetsAddons, ItemViews, IconThemes, KIO, Crash, DBusAddons, WindowSystem
 
 ### Runtime dependencies
 
@@ -132,7 +132,7 @@ sudo dnf install cmake extra-cmake-modules gcc-c++ \
     kf6-coreaddons-devel kf6-i18n-devel kf6-xmlgui-devel \
     kf6-config-devel kf6-widgetsaddons-devel kf6-itemviews-devel \
     kf6-iconthemes-devel kf6-kio-devel kf6-crash-devel \
-    kf6-dbusaddons-devel kf6-notifications-devel kf6-windowing-devel \
+    kf6-dbusaddons-devel kf6-windowing-devel \
     dnf5daemon-server
 
 # Build and install

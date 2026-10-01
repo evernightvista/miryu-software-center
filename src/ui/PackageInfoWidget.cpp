@@ -8,6 +8,7 @@
 #include <QTextBrowser>
 #include <QFrame>
 #include <QIcon>
+#include <QPushButton>
 #include <QTabWidget>
 #include <KLocalizedString>
 
@@ -80,6 +81,44 @@ PackageInfoWidget::PackageInfoWidget(QWidget *parent)
 
     layout->addLayout(form);
 
+    // Action buttons row: its own horizontal layout row between the details
+    // form and the tab widget, so the buttons are spatially separated from
+    // the description / tab content and can never overlap it. Each button
+    // emits markForAction() with the corresponding PackageTodo; MainWindow
+    // adds the package to the transaction queue.
+    auto *actionsLayout = new QHBoxLayout;
+    actionsLayout->setSpacing(6);
+
+    m_installButton = new QPushButton(QIcon::fromTheme(QStringLiteral("list-add")), i18n("Install"));
+    m_reinstallButton = new QPushButton(QIcon::fromTheme(QStringLiteral("view-refresh")), i18n("Reinstall"));
+    m_removeButton = new QPushButton(QIcon::fromTheme(QStringLiteral("edit-delete")), i18n("Remove"));
+    m_updateButton = new QPushButton(QIcon::fromTheme(QStringLiteral("system-software-update")), i18n("Update"));
+    m_downgradeButton = new QPushButton(QIcon::fromTheme(QStringLiteral("arrow-down")), i18n("Downgrade"));
+
+    connect(m_installButton, &QPushButton::clicked, this, [this]() {
+        Q_EMIT markForAction(m_current, PackageTodo::Install);
+    });
+    connect(m_reinstallButton, &QPushButton::clicked, this, [this]() {
+        Q_EMIT markForAction(m_current, PackageTodo::Reinstall);
+    });
+    connect(m_removeButton, &QPushButton::clicked, this, [this]() {
+        Q_EMIT markForAction(m_current, PackageTodo::Remove);
+    });
+    connect(m_updateButton, &QPushButton::clicked, this, [this]() {
+        Q_EMIT markForAction(m_current, PackageTodo::Update);
+    });
+    connect(m_downgradeButton, &QPushButton::clicked, this, [this]() {
+        Q_EMIT markForAction(m_current, PackageTodo::Downgrade);
+    });
+
+    actionsLayout->addWidget(m_installButton);
+    actionsLayout->addWidget(m_reinstallButton);
+    actionsLayout->addWidget(m_removeButton);
+    actionsLayout->addWidget(m_updateButton);
+    actionsLayout->addWidget(m_downgradeButton);
+    actionsLayout->addStretch(1);
+    layout->addLayout(actionsLayout);
+
     // Separator
     auto *sep2 = new QFrame;
     sep2->setFrameShape(QFrame::HLine);
@@ -150,6 +189,17 @@ void PackageInfoWidget::setPackage(const Package &pkg)
         m_stateLabel->setText(i18n("Downgrade Available"));
         break;
     }
+
+    // Action buttons: show only the operations that apply to this state.
+    // The row lives between the details form and the tab widget (its own
+    // layout row), so the buttons never overlap the description / tab
+    // content — this is the "no overlap with package description" fix.
+    m_installButton->setVisible(pkg.state == PackageState::Available);
+    m_reinstallButton->setVisible(pkg.state == PackageState::Installed);
+    m_removeButton->setVisible(pkg.state == PackageState::Installed);
+    m_updateButton->setVisible(pkg.state == PackageState::Update);
+    m_downgradeButton->setVisible(pkg.state == PackageState::Installed
+                                  || pkg.state == PackageState::Downgrade);
 
     // Description tab: show what we already have from the package list
     QString desc = pkg.description;

@@ -22,6 +22,17 @@ public:
     static constexpr const char *BUS_NAME = "org.rpm.dnf.v0";
     static constexpr const char *OBJECT_PATH = "/org/rpm/dnf/v0";
 
+    // Timeout for ordinary, fast D-Bus queries (package / repo listings,
+    // status probes). Some dnf5daemon operations (repo loading, metadata
+    // refresh) can take longer than the D-Bus default of 25s.
+    static constexpr int kDefaultCallTimeoutMs = 60000;
+    // Timeout for operations that may block on polkit user interaction
+    // (hardcoded 2-minute auth window in the daemon) or on long-running work
+    // (goal resolution of a large transaction, package download inside
+    // do_transaction, metadata download inside read_all_repos, Rpm.list_fd
+    // streaming). Mirrors yumex-ng's 20-minute async D-Bus timeout.
+    static constexpr int kLongCallTimeoutMs = 20 * 60 * 1000;
+
     explicit Dnf5DaemonClient(QObject *parent = nullptr);
     ~Dnf5DaemonClient();
 
@@ -53,6 +64,25 @@ public:
     // per-call callSync() recovery.
     bool reopenSession();
 
+    // Restart the dnf5daemon-server systemd unit after a transaction has
+    // finished (install / upgrade / downgrade / reinstall / remove) and
+    // promptly re-acquire the D-Bus connection + session afterwards.
+    //
+    // Restarting the daemon gives it a clean in-memory state (rpmdb, repo
+    // sack, goal) after packages were changed on disk. The restart is done
+    // via `systemctl restart dnf5daemon-server` WITHOUT a polkit
+    // authentication dialog: the shipped polkit rules file
+    // (data/50-miryu-dnf5daemon.rules) grants active local users the right
+    // to restart only this unit.
+    //
+    // After the service is back up, the client promptly reconnects to D-Bus
+    // (fresh system-bus connection + fresh session + re-wired signals). The
+    // old session path died with the restarted daemon process, so every
+    // subsequent D-Bus query would otherwise fail — or crash the app — on the
+    // stale handle. Best-effort: on failure it stays silent and the per-call
+    // callSync() recovery still kicks in as a fallback.
+    bool restartDaemonServer();
+
     // Repository operations
     QList<Repository> repoList(const QStringList &attrs = QStringList{QStringLiteral("name"), QStringLiteral("enabled"), QStringLiteral("priority")},
                                const QString &enableDisable = QStringLiteral("all"));
@@ -62,7 +92,11 @@ public:
     // with a proper localized authentication message.
     bool repoEnable(const QString &repoId, bool enabled);
 
-    // Package queries
+    // Package queries. Large result sets are streamed from the daemon via the
+    // org.rpm.dnf.v0.rpm.Rpm.list_fd D-Bus method (JSON over a pipe we pass
+    // as a unix fd — the same transport the reference yumex-ng client uses),
+    // with an automatic fallback to the classic list() method for daemons
+    // that predate list_fd.
     QList<Package> packageList(const QStringList &patterns,
                                const QStringList &packageAttrs = QStringList{QStringLiteral("name"), QStringLiteral("evr"), QStringLiteral("arch"), QStringLiteral("repo_id"), QStringLiteral("summary"), QStringLiteral("install_size"), QStringLiteral("is_installed")},
                                PackageFilter scope = PackageFilter::All,
@@ -172,10 +206,17 @@ private:
 
     // Low-level D-Bus call using QDBusMessage directly (no introspection)
     QDBusMessage callMethod(const QString &path, const QString &interface,
-                           const QString &method, const QList<QVariant> &args = {});
+                           const QString &method, const QList<QVariant> &args = {},
+                           int timeoutMs = kDefaultCallTimeoutMs,
+                           QDBus::CallMode mode = QDBus::Block);
     bool callSync(const QString &path, const QString &interface,
                   const QString &method, const QList<QVariant> &args,
-                  QVariant &result, QString &error);
+                  QVariant &result, QString &error,
+                  int timeoutMs = kDefaultCallTimeoutMs);
+
+    // Classic D-Bus Rpm.list() call — the primary package-list transport
+    // (synchronous; same path the upstream miryu-software-center uses).
+    QList<QVariantMap> rpmListViaDbus(const QVariantMap &options);
 
     // Re-acquire the system bus connection if it was lost (e.g. the bus or
     // dnf5daemon-server restarted after a system upgrade). Returns true when

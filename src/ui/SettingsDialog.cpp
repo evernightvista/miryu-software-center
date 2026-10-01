@@ -119,7 +119,6 @@ void SettingsDialog::setupUI()
             m_updateCheckSpin->setValue(kDefaultUpdateCheckInterval);
             m_showTrayIconCheck->setChecked(true);
             m_darkTrayIconCheck->setChecked(false);
-            m_updateNotificationsCheck->setChecked(true);
         });
     }
 
@@ -203,11 +202,6 @@ QWidget *SettingsDialog::createSettingsTab()
     applyToggleStyle(m_darkTrayIconCheck);
     addRow(updaterForm, QString(), m_darkTrayIconCheck,
            i18n("Use a dark tray icon for better visibility on light panels."));
-
-    m_updateNotificationsCheck = new QCheckBox(i18n("Update Notifications"));
-    applyToggleStyle(m_updateNotificationsCheck);
-    addRow(updaterForm, QString(), m_updateNotificationsCheck,
-           i18n("Show a desktop notification when updates become available."));
 
     outerLayout->addWidget(updaterSection);
     outerLayout->addStretch();
@@ -349,9 +343,6 @@ void SettingsDialog::loadSettings()
     m_darkTrayIconCheck->setChecked(group.readEntry(
         QStringLiteral("darkTrayIcon"), false));
 
-    m_updateNotificationsCheck->setChecked(group.readEntry(
-        QStringLiteral("updateNotificationsEnabled"), true));
-
     // The dark-tray-icon toggle is only meaningful when the tray icon
     // itself is enabled.
     onTrayIconToggled(m_showTrayIconCheck->isChecked());
@@ -384,9 +375,6 @@ void SettingsDialog::saveSettings()
 
     group.writeEntry(QStringLiteral("darkTrayIcon"),
                      m_darkTrayIconCheck->isChecked());
-
-    group.writeEntry(QStringLiteral("updateNotificationsEnabled"),
-                     m_updateNotificationsCheck->isChecked());
 
     group.sync();
     KSharedConfig::openConfig()->sync();

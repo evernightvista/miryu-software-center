@@ -1,6 +1,7 @@
 #include "QueueView.h"
 #include "../models/QueueModel.h"
 #include "../core/Package.h"
+#include "../core/TodoColors.h"
 
 #include <QHeaderView>
 #include <QContextMenuEvent>
@@ -38,16 +39,12 @@ public:
         bool isDep = index.data(QueueModel::IsDepRole).toBool();
         QString todoText = index.data(QueueModel::TodoTextRole).toString();
 
-        // Color indicator for action type
-        QColor actionColor;
-        if (todoText == QStringLiteral("Install"))
-            actionColor = QColor(46, 160, 67);   // green
-        else if (todoText == QStringLiteral("Remove"))
-            actionColor = QColor(192, 28, 40);    // red
-        else if (todoText == QStringLiteral("Update"))
-            actionColor = QColor(255, 140, 0);    // orange
-        else
-            actionColor = QColor(0, 114, 178);    // blue
+        // Color indicator and badge by action type (Reinstall = blue,
+        // Downgrade = yellow, Remove = red, Install = green, Update =
+        // orange). Uses the typed TodoRole, not the localized text, so the
+        // colors keep working in every language.
+        int todo = index.data(QueueModel::TodoRole).toInt();
+        QColor actionColor = todoColor(static_cast<PackageTodo>(todo));
 
         QRect indicatorRect(opt.rect.x() + 4, opt.rect.y() + 4, 4, opt.rect.height() - 8);
         painter->fillRect(indicatorRect, actionColor);
@@ -130,6 +127,14 @@ void QueueView::refresh()
     viewport()->update();
 }
 
+QString QueueView::selectedNevra() const
+{
+    const QModelIndex idx = currentIndex();
+    if (!idx.isValid())
+        return {};
+    return idx.data(QueueModel::NevraRole).toString();
+}
+
 void QueueView::contextMenuEvent(QContextMenuEvent *event)
 {
     QModelIndex index = indexAt(event->pos());
@@ -144,6 +149,7 @@ void QueueView::contextMenuEvent(QContextMenuEvent *event)
                                            i18n("Reinstall"));
     connect(reinstallAction, &QAction::triggered, this, [this, nevra]() {
         m_model->updateTodo(nevra, PackageTodo::Reinstall);
+        Q_EMIT todoChanged(nevra, PackageTodo::Reinstall);
         refresh();
     });
 
@@ -151,6 +157,19 @@ void QueueView::contextMenuEvent(QContextMenuEvent *event)
                                            i18n("Downgrade"));
     connect(downgradeAction, &QAction::triggered, this, [this, nevra]() {
         m_model->updateTodo(nevra, PackageTodo::Downgrade);
+        Q_EMIT todoChanged(nevra, PackageTodo::Downgrade);
+        refresh();
+    });
+
+    // "Remove" (uninstall) — change this queue entry's action to Remove, so
+    // the package gets uninstalled when the transaction is applied. Distinct
+    // from "Remove from Queue" below, which only drops the entry from the
+    // queue without applying anything.
+    auto *removePkgAction = menu.addAction(QIcon::fromTheme(QStringLiteral("edit-delete")),
+                                           i18n("Remove"));
+    connect(removePkgAction, &QAction::triggered, this, [this, nevra]() {
+        m_model->updateTodo(nevra, PackageTodo::Remove);
+        Q_EMIT todoChanged(nevra, PackageTodo::Remove);
         refresh();
     });
 

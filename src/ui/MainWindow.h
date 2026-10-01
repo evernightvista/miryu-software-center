@@ -68,8 +68,9 @@ private Q_SLOTS:
     void onApplyQueue();
     void onClearQueue();
     void onRefresh();
+    void onReloadData();
     void onSystemUpgrade();
-    void onLoadUpdates();
+    void onLoadUpdates(bool refreshMetadata = false);
     void onDistroSync();
     void onRefreshMetadata();
     void onAdvancedOps();
@@ -96,6 +97,7 @@ private:
     void doDistroSyncWithLog();
     void runRpmInstallWithPolkit(const QStringList &files, bool offline);
     void createRestartBanner();
+    void showInstalledPackages();
     void updateRestartBannerHeight();
     void checkRestartNeededOnStartup();
     void checkRestartNeeded(const Miryu::TransactionResult &result);

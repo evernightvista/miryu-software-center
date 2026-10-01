@@ -948,6 +948,13 @@ msgstr ""
 #: src/ui/PackageView.cpp:271
 msgid "Queue for Removal"
 msgstr ""
+#: src/ui/PackageView.cpp:286
+msgid "Queue for Reinstall"
+msgstr ""
+
+#: src/ui/PackageView.cpp:292
+msgid "Queue for Downgrade"
+msgstr ""
 
 #: src/ui/PackageView.cpp:272
 msgid "Queue for Update"
@@ -1235,3 +1242,61 @@ msgstr ""
 #: src/ui/MainWindow.cpp:404
 msgid "Launch the external Linglong Store application"
 msgstr ""
+
+msgid "<i>Loading...</i>"
+msgstr ""
+
+msgid "Cannot connect to the D-Bus system bus.\n\n"
+msgstr ""
+
+msgid "Cannot remove protected packages or critical dependencies.\n\n"
+msgstr ""
+
+msgid "Distribution sync will synchronize all installed packages to the versions available in the repositories. "
+msgstr ""
+
+msgid "Downloading %1"
+msgstr ""
+
+msgid "Failed to connect to dnf5daemon-server.\n\n"
+msgstr ""
+
+msgid "Failed to launch the Linglong Store.\n\n"
+msgstr ""
+
+msgid "Failed to refresh metadata (exit code %1)."
+msgstr ""
+
+msgid "Failed to start command.\n%1\n\n"
+msgstr ""
+
+msgid "Metadata refreshed."
+msgstr ""
+
+msgid "Refresh Metadata Log"
+msgstr ""
+
+msgid "Repository enable / disable management is performed from the main "
+msgstr ""
+
+msgid "The connection to the system D-Bus / dnf5daemon-server was lost"
+msgstr ""
+
+msgid "The target version (%1) is lower than the current version (%2). "
+msgstr ""
+
+msgid "The target version (%1) is lower than the currently running "
+msgstr ""
+
+msgid "This will download all packages needed to upgrade the system to "
+msgstr ""
+
+msgid "This will download and rebuild the metadata cache for all enabled "
+msgstr ""
+
+msgid "This will synchronise all installed packages to the latest version "
+msgstr ""
+
+msgid "You have installed software packages that require a computer restart. "
+msgstr ""
+

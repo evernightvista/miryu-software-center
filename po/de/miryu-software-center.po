@@ -994,6 +994,13 @@ msgstr "Aus Warteschlange entfernen"
 #: src/ui/PackageView.cpp:271
 msgid "Queue for Removal"
 msgstr "Zur Entfernungs-Warteschlange hinzufügen"
+#: src/ui/PackageView.cpp:286
+msgid "Queue for Reinstall"
+msgstr "Wiedereinrichtung in Warteschlange stellen"
+
+#: src/ui/PackageView.cpp:292
+msgid "Queue for Downgrade"
+msgstr "Downgrade in Warteschlange stellen"
 
 #: src/ui/PackageView.cpp:272
 msgid "Queue for Update"
@@ -1306,3 +1313,61 @@ msgstr ""
 #: src/ui/MainWindow.cpp:404
 msgid "Launch the external Linglong Store application"
 msgstr "Externe Linglong Store-Anwendung starten"
+
+msgid "<i>Loading...</i>"
+msgstr "<i>Wird geladen...</i>"
+
+msgid "Cannot connect to the D-Bus system bus.\n\n"
+msgstr "Verbindung zum D-Bus-Systembus nicht möglich.\n\n"
+
+msgid "Cannot remove protected packages or critical dependencies.\n\n"
+msgstr "Geschützte Pakete oder kritische Abhängigkeiten können nicht entfernt werden.\n\n"
+
+msgid "Distribution sync will synchronize all installed packages to the versions available in the repositories. "
+msgstr "Die Distributionssynchronisierung synchronisiert alle installierten Pakete auf die in den Repositorien verfügbaren Versionen. "
+
+msgid "Downloading %1"
+msgstr "%1 wird heruntergeladen"
+
+msgid "Failed to connect to dnf5daemon-server.\n\n"
+msgstr "Verbindung zu dnf5daemon-server fehlgeschlagen.\n\n"
+
+msgid "Failed to launch the Linglong Store.\n\n"
+msgstr "Linglong Store konnte nicht gestartet werden.\n\n"
+
+msgid "Failed to refresh metadata (exit code %1)."
+msgstr "Aktualisieren der Metadaten fehlgeschlagen (Exit-Code %1)."
+
+msgid "Failed to start command.\n%1\n\n"
+msgstr "Befehl konnte nicht gestartet werden.\n%1\n\n"
+
+msgid "Metadata refreshed."
+msgstr "Metadaten aktualisiert."
+
+msgid "Refresh Metadata Log"
+msgstr "Metadatenprotokoll aktualisieren"
+
+msgid "Repository enable / disable management is performed from the main "
+msgstr "Das Aktivieren/Deaktivieren von Repositorien erfolgt über die Haupt "
+
+msgid "The connection to the system D-Bus / dnf5daemon-server was lost"
+msgstr "Die Verbindung zum System-D-Bus / dnf5daemon-server wurde unterbrochen"
+
+msgid "The target version (%1) is lower than the current version (%2). "
+msgstr "Die Zielversion (%1) ist niedriger als die aktuelle Version (%2). "
+
+msgid "The target version (%1) is lower than the currently running "
+msgstr "Die Zielversion (%1) ist niedriger als die aktuell ausgeführte "
+
+msgid "This will download all packages needed to upgrade the system to "
+msgstr "Dies lädt alle Pakete herunter, die zum Upgrade des Systems auf  erforderlich sind "
+
+msgid "This will download and rebuild the metadata cache for all enabled "
+msgstr "Dies lädt den Metadaten-Cache für alle aktivierten  herunter und erstellt ihn neu "
+
+msgid "This will synchronise all installed packages to the latest version "
+msgstr "Dies synchronisiert alle installierten Pakete auf die neueste Version "
+
+msgid "You have installed software packages that require a computer restart. "
+msgstr "Sie haben Softwarepakete installiert, die einen Neustart des Computers erfordern. "
+

@@ -74,6 +74,12 @@ void TransactionResultDialog::setupUI(const TransactionResult &result)
     qint64 totalSize = 0;
 
     for (const auto &action : result.actionKeys()) {
+        // yumex-ng hides "replaced" entries: they are the already-installed
+        // old versions being removed by an upgrade and need no download, so
+        // they must not be shown nor counted in the transaction total.
+        if (action == QStringLiteral("replaced"))
+            continue;
+
         auto items = result.itemsByAction(action);
         if (items.isEmpty())
             continue;
@@ -108,7 +114,11 @@ void TransactionResultDialog::setupUI(const TransactionResult &result)
         groupItem->setTextAlignment(2, Qt::AlignRight);
         groupItem->setExpanded(true);
 
-        totalSize += groupSize;
+        // Only actions that require downloading packages contribute to the
+        // "Total Download Size". remove / obsoleted operate on already
+        // installed packages and fetch nothing.
+        if (action != QStringLiteral("remove") && action != QStringLiteral("obsoleted"))
+            totalSize += groupSize;
     }
 
     layout->addWidget(m_treeWidget, 1);

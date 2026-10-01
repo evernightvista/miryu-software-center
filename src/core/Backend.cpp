@@ -37,14 +37,20 @@ static void splitEvr(const QString &evr, QString &epoch, QString &version, QStri
         epoch = QStringLiteral("0");
 }
 
-// Update listing: run `dnf check-update --refresh` and parse its output.
-// This refreshes repository metadata on every check (--refresh) and lists
-// every installed package that has a newer version available in a repo, with
-// exit code semantics (0 = no updates, 100 = updates available, 1 = error).
-// The D-Bus path (dnf5daemon rpm.list scope=upgrades + goal resolve) is not
-// used here: it can come back empty when the daemon's in-memory sack is stale
-// or the session is unresponsive, even though `dnf check-update --refresh`
-// clearly lists updates.
+// Update listing (fallback only): run `dnf check-update` and parse its output.
+//
+// The command lists every installed package that has a newer version
+// available in a repo, with exit code semantics (0 = no updates, 100 =
+// updates available, 1 = error). It is used ONLY as a fallback when the
+// daemon's own packageList(PackageFilter::Updates) returns an empty list
+// (transient D-Bus failure, unresponsive session, etc.).
+//
+// NOTE: `dnf check-update` reads the *system* cache at /var/cache/dnf/,
+// which is separate from the daemon's cache at /var/cache/dnf5daemon-server/.
+// Because of this the CLI result can diverge from what the daemon's
+// transaction resolve() will see, so it must NOT be the authoritative source.
+// Backend::fetchUpdates uses the daemon's packageList() first so the
+// displayed updates and the resolved transaction always share the same sack.
 static QList<Package> fetchUpdatesViaCli()
 {
     QProcess proc;
@@ -53,15 +59,16 @@ static QList<Package> fetchUpdatesViaCli()
     env.insert(QStringLiteral("LC_ALL"), QStringLiteral("C"));
     proc.setProcessEnvironment(env);
 
-    proc.start(QStringLiteral("dnf"),
-               {QStringLiteral("check-update"),
-                QStringLiteral("--refresh")},
-               QIODevice::ReadOnly);
-    // Metadata refresh on a cold cache can take a while; allow up to 5 minutes.
+    // No --refresh: the daemon's readAllRepos() (called by fetchUpdates) has
+    // already synced the system cache, so this command reuses it.
+    QStringList args = {QStringLiteral("check-update")};
+    proc.start(QStringLiteral("dnf"), args, QIODevice::ReadOnly);
+    // Reusing the cached metadata is fast; allow up to 5 minutes anyway in
+    // case the cache is cold and dnf decides to download anyway.
     if (!proc.waitForFinished(300000)) {
         proc.kill();
         proc.waitForFinished(5000);
-        qWarning() << "dnf check-update --refresh timed out";
+        qWarning() << "dnf check-update timed out";
         return {};
     }
 
@@ -163,9 +170,12 @@ void Backend::connectClientSignals()
         // downloadAddNew; if it is missing (e.g. a progress signal arrived
         // before add_new), fall back to the id itself.
         const QString desc = m_downloadDescs.value(id, id);
+        // The dialog / status bar compose the full "Downloading <pkg> +
+        // percent" display from this signal themselves (MainWindow::
+        // onDownloadProgress), so there is a single source of truth for which
+        // package is currently being downloaded — see yumex-ng, which
+        // re-asserts the package name on every download_progress signal.
         Q_EMIT downloadProgress(desc, total, downloaded);
-        int percent = total > 0 ? static_cast<int>(downloaded * 100 / total) : 0;
-        Q_EMIT transactionProgress(i18n("Downloading %1", desc), percent);
     });
     connect(m_client, &Dnf5DaemonClient::downloadEnd, this, [this](const QString &id, uint status, const QString &) {
         m_downloadDescs.remove(id);
@@ -229,6 +239,22 @@ bool Backend::initialize()
 
     m_transactionManager->loadRepositories();
 
+    // Deliberately NO background sack warm-up here. dnf5daemon-server runs
+    // every metadata-requiring call (read_all_repos, list_fd, ...) while
+    // holding a single global libdnf5 mutex; a background read_all_repos
+    // whose metadata download stalls (unreachable mirror, hanging DNS) then
+    // blocks EVERY subsequent list_fd on that same mutex, and the client
+    // only learns about it after its full fd timeout (observed in the field
+    // as "timed out waiting for package stream (1200000 ms without data)"
+    // repeated for every query). It is better to let the first real query
+    // trigger fill_sack() itself: if the metadata download is merely slow,
+    // the client-side per-poll timeout below tolerates it as long as chunks
+    // keep flowing, and if the query times out, the download typically
+    // completes in the daemon anyway — the user's retry then finds the sack
+    // READY and streams immediately. ERROR-locked sacks are healed by the
+    // resetSession() self-heal in fetchPackages().
+
+
     m_initialized = true;
     Q_EMIT initialized();
     return true;
@@ -245,6 +271,25 @@ QList<Package> Backend::fetchPackages(PackageFilter filter)
     };
 
     QList<Package> packages = m_client->packageList({QStringLiteral("*")}, attrs, filter);
+
+    // Self-heal: an empty result for a full package scope is never
+    // legitimate (the system always has packages). The daemon returns an
+    // empty stream WITHOUT any error when its fill_sack() throws inside
+    // list_fd — most commonly because the session sack is in a permanent
+    // ERROR state (a previous metadata load failed, e.g. an untrusted repo
+    // key in non-interactive mode). Reset the session and retry once so the
+    // browser heals instead of silently showing an empty list. Updates /
+    // Upgradable scopes are excluded: zero updates is a normal outcome there.
+    // resetSession() is harmless while a transaction runs (it fails and the
+    // next query retries), and retrying is cheap — the second call typically
+    // finds the sack freshly READY and streams the list immediately.
+    if (packages.isEmpty() && filter != PackageFilter::Updates
+        && filter != PackageFilter::Upgradable) {
+        qWarning() << "fetchPackages: empty list for filter" << int(filter)
+                   << "- resetting daemon session and retrying once";
+        m_client->resetSession();
+        packages = m_client->packageList({QStringLiteral("*")}, attrs, filter);
+    }
     return packages;
 }
 
@@ -259,7 +304,10 @@ QList<Package> Backend::fetchSearchResults(const QString &query, SearchField fie
     };
 
     QVariantMap extra;
-    extra[QStringLiteral("latest_limit")] = 0;
+    // No latest-limit override: the default is 1 (newest EVR per name.arch,
+    // like the reference yumex-ng client). Search results stay small — every
+    // version of every match (latest-limit=0) would balloon the daemon's
+    // reply and memory footprint for no GUI benefit.
 
     // Use fuzzy glob patterns so that searching e.g. "firefox" matches
     // "*firefox*" instead of requiring an exact package name match.
@@ -309,7 +357,7 @@ QList<Repository> Backend::fetchRepositories()
     return m_client->repoList();
 }
 
-QList<Package> Backend::fetchUpdates()
+QList<Package> Backend::fetchUpdates(bool refreshMetadata)
 {
     // fetchUpdates() runs on a QtConcurrent worker thread, typically right
     // after a transaction completes (onRefresh → loadUpdates). At that point
@@ -324,13 +372,55 @@ QList<Package> Backend::fetchUpdates()
     // updatesLoaded() (an empty list on failure) instead.
     const bool wasBlocked = m_client->blockSignals(true);
 
-    // The authoritative update list is whatever `dnf check-update --refresh`
-    // reports: run it as a subprocess (see fetchUpdatesViaCli()) and parse its
-    // output. The command refreshes repository metadata on every check —
-    // exactly like `dnf check-update --refresh` in a terminal — so no separate
-    // makecache pass is needed, and it is immune to the dnf5daemon D-Bus race,
-    // so the GUI lists exactly the updates dnf detects.
-    QList<Package> result = fetchUpdatesViaCli();
+    // The authoritative update list comes from the *daemon* itself
+    // (packageList with PackageFilter::Updates), exactly as yumex-ng does
+    // (package_list_fd(scope="upgrades")). This is critical: the daemon
+    // maintains its own metadata cache at /var/cache/dnf5daemon-server/,
+    // which is *separate* from the system dnf cache at /var/cache/dnf/ that
+    // `dnf check-update` reads. Reading the update list from the daemon
+    // guarantees the displayed list and the resolved transaction always
+    // share the same sack.
+    //
+    // refreshMetadata is true only at application startup — the single
+    // automatic moment the software source is refreshed. (The other is the
+    // explicit "Refresh Metadata" action in the menu.) When true we call
+    // readAllRepos(), which only re-downloads metadata for repos whose
+    // cache has actually expired (per the repo's metadata_expire). This is
+    // much faster than the previous cleanCache("expire-cache") + readAllRepos
+    // combo, which forced every repo to re-download on every startup.
+    // resetSession() drops any stale in-memory sack so the subsequent
+    // packageList() query rebuilds the sack from the on-disk cache.
+    if (refreshMetadata) {
+        m_client->readAllRepos();
+        m_client->resetSession();
+    }
+
+    static const QStringList detailAttrs = {
+        QStringLiteral("name"), QStringLiteral("evr"), QStringLiteral("arch"),
+        QStringLiteral("repo_id"), QStringLiteral("summary"), QStringLiteral("install_size"),
+        QStringLiteral("is_installed"), QStringLiteral("description"), QStringLiteral("url"),
+        QStringLiteral("license"), QStringLiteral("version"), QStringLiteral("release"),
+        QStringLiteral("epoch")
+    };
+
+    QList<Package> result =
+        m_client->packageList({QStringLiteral("*")}, detailAttrs, PackageFilter::Updates);
+
+    // Fallback: if the daemon returned an empty list (transient D-Bus
+    // failure, unresponsive session, etc.), fall back to `dnf check-update`.
+    // The CLI list may come from the system cache and therefore diverge from
+    // the daemon's sack, but it is better than showing nothing at all.
+    if (result.isEmpty())
+        result = fetchUpdatesViaCli();
+    else {
+        // Daemon rows come back with state == Installed (rpm.list reports the
+        // installed package that has an upgrade available); mark them as
+        // updates so they render in the update list and can be queued.
+        for (Package &p : result) {
+            p.state = PackageState::Update;
+            p.calcTodo();
+        }
+    }
 
     // Restore signal delivery — real transactions and user-initiated
     // operations after this point must still be able to surface errors.
@@ -349,7 +439,15 @@ void Backend::loadPackages(PackageFilter filter, bool reset)
     auto *watcher = new QFutureWatcher<QList<Package>>(this);
     connect(watcher, &QFutureWatcher<QList<Package>>::finished, this, [this, watcher, filter]() {
         QList<Package> packages = watcher->result();
-        m_cache->setPackages(filter, packages);
+        // Do not cache an empty listing: an empty result here is almost always
+        // the symptom of a failed/interrupted transfer (stale daemon sack,
+        // truncated list_fd pipe), and caching it would lock the browser into
+        // an empty list until the next forced reset. Re-querying on the next
+        // page switch costs a few seconds and lets a transient failure heal.
+        // (Only the update checker legitimately reports "no packages", and it
+        // does not go through this cache.)
+        if (!packages.isEmpty())
+            m_cache->setPackages(filter, packages);
         Q_EMIT packagesLoaded(filter, packages);
         watcher->deleteLater();
     });
@@ -387,7 +485,7 @@ void Backend::loadRepositories()
     }));
 }
 
-void Backend::loadUpdates()
+void Backend::loadUpdates(bool refreshMetadata)
 {
     auto *watcher = new QFutureWatcher<QList<Package>>(this);
     connect(watcher, &QFutureWatcher<QList<Package>>::finished, this, [this, watcher]() {
@@ -396,8 +494,8 @@ void Backend::loadUpdates()
         watcher->deleteLater();
     });
 
-    watcher->setFuture(QtConcurrent::run([this]() {
-        return fetchUpdates();
+    watcher->setFuture(QtConcurrent::run([this, refreshMetadata]() {
+        return fetchUpdates(refreshMetadata);
     }));
 }
 

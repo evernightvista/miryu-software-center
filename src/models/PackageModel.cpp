@@ -1,5 +1,7 @@
 #include "PackageModel.h"
 
+#include <KLocalizedString>
+
 namespace Miryu {
 
 PackageModel::PackageModel(QObject *parent)
@@ -95,8 +97,25 @@ void PackageModel::setQueued(const QString &nevra, bool queued)
     for (int i = 0; i < m_packages.size(); ++i) {
         if (m_packages[i].nevra() == nevra) {
             m_packages[i].queued = queued;
+            if (!queued)
+                m_packages[i].todo = calcTodo(m_packages[i].state); // restore default marker
             QModelIndex idx = index(i);
-            Q_EMIT dataChanged(idx, idx, {QueuedRole});
+            Q_EMIT dataChanged(idx, idx, {QueuedRole, TodoRole, TodoTextRole});
+        }
+    }
+}
+
+void PackageModel::setQueuedWithTodo(const QString &nevra, bool queued, PackageTodo todo)
+{
+    for (int i = 0; i < m_packages.size(); ++i) {
+        if (m_packages[i].nevra() == nevra) {
+            m_packages[i].queued = queued;
+            // Explicit todo while queued (e.g. Reinstall / Downgrade chosen
+            // from the context menu or the info-panel buttons); on unqueue,
+            // fall back to the state-derived default.
+            m_packages[i].todo = queued ? todo : calcTodo(m_packages[i].state);
+            QModelIndex idx = index(i);
+            Q_EMIT dataChanged(idx, idx, {QueuedRole, TodoRole, TodoTextRole});
         }
     }
 }
@@ -106,8 +125,11 @@ void PackageModel::clearQueued()
     for (int i = 0; i < m_packages.size(); ++i) {
         if (m_packages[i].queued) {
             m_packages[i].queued = false;
+            // Also reset any explicit todo (Reinstall / Downgrade / …) back
+            // to the state-derived default, so the marker never lingers.
+            m_packages[i].todo = calcTodo(m_packages[i].state);
             QModelIndex idx = index(i);
-            Q_EMIT dataChanged(idx, idx, {QueuedRole});
+            Q_EMIT dataChanged(idx, idx, {QueuedRole, TodoRole, TodoTextRole});
         }
     }
 }
@@ -146,14 +168,16 @@ QString PackageModel::stateText(PackageState state) const
 
 QString PackageModel::todoText(PackageTodo todo) const
 {
+    // Localized marker text (the strings are also used by the action buttons
+    // and the context menu, so they are already covered by the .po files).
     switch (todo) {
-    case PackageTodo::Install:    return QStringLiteral("Install");
-    case PackageTodo::Update:     return QStringLiteral("Update");
-    case PackageTodo::Remove:     return QStringLiteral("Remove");
-    case PackageTodo::Downgrade:  return QStringLiteral("Downgrade");
-    case PackageTodo::Reinstall:  return QStringLiteral("Reinstall");
-    case PackageTodo::DistroSync: return QStringLiteral("Sync");
-    case PackageTodo::None:       return QStringLiteral("");
+    case PackageTodo::Install:    return i18n("Install");
+    case PackageTodo::Update:     return i18n("Update");
+    case PackageTodo::Remove:     return i18n("Remove");
+    case PackageTodo::Downgrade:  return i18n("Downgrade");
+    case PackageTodo::Reinstall:  return i18n("Reinstall");
+    case PackageTodo::DistroSync: return i18n("Sync");
+    case PackageTodo::None:       return QString();
     }
     return {};
 }
