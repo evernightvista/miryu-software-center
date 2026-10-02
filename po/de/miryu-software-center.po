@@ -1371,3 +1371,13 @@ msgstr "Dies synchronisiert alle installierten Pakete auf die neueste Version "
 msgid "You have installed software packages that require a computer restart. "
 msgstr "Sie haben Softwarepakete installiert, die einen Neustart des Computers erfordern. "
 
+#: src/core/Dnf5DaemonClient.cpp:1389
+msgid "Failed to send transaction request to dnf5daemon."
+msgstr "Senden der Transaktionsanfrage an dnf5daemon fehlgeschlagen."
+
+#: src/ui/MainWindow.cpp:696 src/ui/MainWindow.cpp:910
+msgid "Dependency resolution failed. The reasons are as follows:\n"
+"\n"
+msgstr "Abhängigkeitsauflösung fehlgeschlagen. Die Gründe sind wie folgt:\n"
+"\n"
+

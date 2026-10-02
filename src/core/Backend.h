@@ -36,13 +36,19 @@ public:
                         PackageFilter scope = PackageFilter::All);
     void loadRepositories();
     // Load the update list. When refreshMetadata is true the daemon is asked
-    // to sync the system cache (readAllRepos) before `dnf check-update`
-    // reads it, so the CLI and the daemon see the same metadata. Per the
-    // desired behaviour the software source is refreshed ONLY at application
-    // startup (UpdateChecker calls loadUpdates(true)) and when the user
-    // applies a queue containing upgrades (TransactionManager::buildTransaction
-    // calls readAllRepos itself). Periodic checks, page switches and
-    // post-transaction reloads pass false so they reuse the cached metadata.
+    // to reload its on-disk cache (readAllRepos) before querying, and the CLI
+    // cross-check runs `dnf5 check-upgrade --refresh` to force a fresh
+    // metadata download into the system cache — this reliably detects every
+    // published update (e.g. third-party-repo packages like microsoft-edge-
+    // stable) and drives a daemon-cache refresh when the daemon's list is
+    // incomplete. When refreshMetadata is false the CLI omits --refresh and
+    // reuses the cached system metadata, avoiding the rpmdb/metadata lock
+    // conflict that would otherwise stall an in-progress transaction at
+    // "Preparing...". Per the desired behaviour the software source is
+    // refreshed ONLY at application startup (UpdateChecker calls
+    // loadUpdates(true)) and the explicit Refresh action. Periodic checks,
+    // page switches and post-transaction reloads pass false so they reuse the
+    // cached metadata.
     void loadUpdates(bool refreshMetadata = false);
 
     // Sync operations (call from worker threads)

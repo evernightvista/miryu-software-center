@@ -512,12 +512,14 @@ void MainWindow::setupActions()
 
     QAction *refreshAction = new QAction(QIcon::fromTheme(QStringLiteral("view-refresh")), i18n("Refresh"), this);
     refreshAction->setShortcut(QKeySequence::Refresh);
-    // The manual "Refresh" action only reloads the displayed lists from the
-    // daemon's current state. It must NOT refresh the software source
-    // (repository metadata): per the desired behaviour the source is
-    // refreshed only at application startup and when the user applies an
-    // upgrade queue. Users who explicitly want to refresh the metadata use
-    // the dedicated "Refresh Metadata" action.
+    // The manual "Refresh" action force-refreshes the software source, just
+    // like the automatic refresh at application startup: it reloads the
+    // update list with refreshMetadata=true, which calls
+    // cleanCache("expire-cache") + readAllRepos() + resetSession() so the
+    // daemon expires and re-downloads every repo's metadata. The CLI
+    // cross-check inside fetchUpdates additionally runs
+    // `dnf5 check-upgrade --refresh` so third-party-repo updates
+    // (e.g. microsoft-edge-stable) are always detected.
     connect(refreshAction, &QAction::triggered, this, &MainWindow::onReloadData);
     ac->addAction(QStringLiteral("refresh"), refreshAction);
 
@@ -683,9 +685,22 @@ void MainWindow::runRpmInstallWithPolkit(const QStringList &files, bool offline)
         watcher->deleteLater();
 
         if (!result.completed) {
-            QString error = result.error;
-            if (!result.problems.isEmpty())
-                error += QStringLiteral("\n\n") + result.problems.join(QStringLiteral("\n"));
+            QString error;
+            if (!result.problems.isEmpty()) {
+                // dnf5 could not resolve the transaction (conflicting
+                // requests, missing dependencies, …). The human-readable
+                // reasons come from get_transaction_problems_string().
+                // Prepend a clear header so the dialog reads "Dependency
+                // resolution failed. The reasons are as follows:" followed
+                // by the raw dnf5 problem text (e.g. "Problem: conflicting
+                // requests - nothing provides ...").
+                error = i18n("Dependency resolution failed. The reasons are as follows:\n\n")
+                        + result.problems.join(QStringLiteral("\n"));
+                if (!result.error.isEmpty())
+                    error += QStringLiteral("\n\n") + result.error;
+            } else {
+                error = result.error;
+            }
 
             if (error.contains(QStringLiteral("protected"), Qt::CaseInsensitive) ||
                 error.contains(QStringLiteral("essential"), Qt::CaseInsensitive)) {
@@ -884,9 +899,22 @@ void MainWindow::onApplyQueue()
         TransactionResult result = watcher->result();
 
         if (!result.completed) {
-            QString error = result.error;
-            if (!result.problems.isEmpty())
-                error += QStringLiteral("\n\n") + result.problems.join(QStringLiteral("\n"));
+            QString error;
+            if (!result.problems.isEmpty()) {
+                // dnf5 could not resolve the transaction (conflicting
+                // requests, missing dependencies, …). The human-readable
+                // reasons come from get_transaction_problems_string().
+                // Prepend a clear header so the dialog reads "Dependency
+                // resolution failed. The reasons are as follows:" followed
+                // by the raw dnf5 problem text (e.g. "Problem: conflicting
+                // requests - nothing provides ...").
+                error = i18n("Dependency resolution failed. The reasons are as follows:\n\n")
+                        + result.problems.join(QStringLiteral("\n"));
+                if (!result.error.isEmpty())
+                    error += QStringLiteral("\n\n") + result.error;
+            } else {
+                error = result.error;
+            }
 
             // Detect attempts to remove protected packages or critical
             // dependencies. dnf5 reports these in the problems string.
@@ -1008,19 +1036,22 @@ void MainWindow::onReloadData()
     if (!m_backend->isInitialized())
         return;
 
-    // Light reload: refresh the displayed lists from the daemon's current
-    // in-memory state WITHOUT touching repository metadata (no
-    // resetSession / readAllRepos, no `dnf check-update --refresh`). This is
-    // what the manual "Refresh" action and repository enable/disable toggles
-    // do — per the desired behaviour every situation other than application
-    // startup must not re-refresh the software source.
+    // Force-refresh: reload the displayed lists from the daemon while
+    // force-refreshing the software source (repository metadata), exactly
+    // as application startup does. Passing refreshMetadata=true to
+    // onLoadUpdates makes fetchUpdates call
+    // cleanCache("expire-cache") + readAllRepos() + resetSession()
+    // (on a worker thread, so the UI stays responsive), which expires and
+    // re-downloads every repo's metadata. The CLI cross-check runs
+    // `dnf5 check-upgrade --refresh`, guaranteeing that newly published
+    // updates (e.g. microsoft-edge-stable) are detected.
     m_backend->cache()->clearDetails();
 
     PackageFilter filter = static_cast<PackageFilter>(m_filterCombo->currentData().toInt());
     m_backend->loadPackages(filter, true);
 
     if (m_currentPage == 1)
-        onLoadUpdates(false);
+        onLoadUpdates(true);
     if (m_currentPage == 3)
         m_backend->loadRepositories();
 }
@@ -1280,14 +1311,13 @@ void MainWindow::onLoadUpdates(bool refreshMetadata)
     m_statusLabel->setText(i18n("Checking for updates..."));
     m_progressBar->setRange(0, 0);
     m_progressBar->setVisible(true);
-    // Page switches, post-transaction reloads and the manual Refresh action
-    // all pass false here so the cached metadata is reused. The only
-    // automatic software-source refresh is application startup (handled by
-    // UpdateChecker → Backend::loadUpdates(true), which calls readAllRepos()
-    // so only expired metadata is re-downloaded). Applying an update queue
-    // does NOT refresh metadata — it resolves directly from the daemon
-    // cache that produced the update list, so the transaction always matches
-    // what was displayed.
+    // Page switches and post-transaction reloads pass false so the cached
+    // metadata is reused. The manual Refresh action and application startup
+    // pass true, which calls readAllRepos() so expired metadata is
+    // re-downloaded and resetSession() drops the stale in-memory sack.
+    // Applying an update queue does NOT refresh metadata — it resolves
+    // directly from the daemon cache that produced the update list, so the
+    // transaction always matches what was displayed.
     m_backend->loadUpdates(refreshMetadata);
 }
 

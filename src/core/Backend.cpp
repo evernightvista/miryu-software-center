@@ -5,7 +5,12 @@
 #include <QMetaType>
 #include <QProcess>
 #include <QProcessEnvironment>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
 #include <QSet>
+#include <QStandardPaths>
 #include <QStringList>
 
 #include <KLocalizedString>
@@ -37,48 +42,57 @@ static void splitEvr(const QString &evr, QString &epoch, QString &version, QStri
         epoch = QStringLiteral("0");
 }
 
-// Update listing (fallback only): run `dnf check-update` and parse its output.
-//
-// The command lists every installed package that has a newer version
-// available in a repo, with exit code semantics (0 = no updates, 100 =
-// updates available, 1 = error). It is used ONLY as a fallback when the
-// daemon's own packageList(PackageFilter::Updates) returns an empty list
-// (transient D-Bus failure, unresponsive session, etc.).
-//
-// NOTE: `dnf check-update` reads the *system* cache at /var/cache/dnf/,
-// which is separate from the daemon's cache at /var/cache/dnf5daemon-server/.
-// Because of this the CLI result can diverge from what the daemon's
-// transaction resolve() will see, so it must NOT be the authoritative source.
-// Backend::fetchUpdates uses the daemon's packageList() first so the
-// displayed updates and the resolved transaction always share the same sack.
-static QList<Package> fetchUpdatesViaCli()
+// Parse the JSON output of `dnf5 check-upgrade --json`. The document is an
+// object whose keys are output sections ("Upgrading packages", "Obsoleting
+// packages", …) and whose values are arrays of package objects with name,
+// arch, evr, repository (and optionally obsoletes). This is far more robust
+// than parsing the text columns, whose layout changes across dnf5 versions.
+static QList<Package> parseCheckUpgradeJson(const QString &json)
 {
-    QProcess proc;
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.insert(QStringLiteral("LANG"), QStringLiteral("C"));
-    env.insert(QStringLiteral("LC_ALL"), QStringLiteral("C"));
-    proc.setProcessEnvironment(env);
-
-    // No --refresh: the daemon's readAllRepos() (called by fetchUpdates) has
-    // already synced the system cache, so this command reuses it.
-    QStringList args = {QStringLiteral("check-update")};
-    proc.start(QStringLiteral("dnf"), args, QIODevice::ReadOnly);
-    // Reusing the cached metadata is fast; allow up to 5 minutes anyway in
-    // case the cache is cold and dnf decides to download anyway.
-    if (!proc.waitForFinished(300000)) {
-        proc.kill();
-        proc.waitForFinished(5000);
-        qWarning() << "dnf check-update timed out";
-        return {};
-    }
-
-    // The exit code is not authoritative: 0 = nothing to do, 100 = updates
-    // available, 1 = real error. Errors leave stdout without package rows,
-    // so parsing stdout is enough.
     QList<Package> updates;
-    QSet<QString> seen; // de-duplicate by NEVRA
+    QJsonParseError err;
+    const QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &err);
+    if (err.error != QJsonParseError::NoError || !doc.isObject())
+        return updates;
 
-    const QString out = QString::fromUtf8(proc.readAllStandardOutput());
+    QSet<QString> seen;
+    const QJsonObject root = doc.object();
+    for (auto it = root.constBegin(); it != root.constEnd(); ++it) {
+        if (!it.value().isArray())
+            continue;
+        const QJsonArray pkgs = it.value().toArray();
+        for (const QJsonValue &v : pkgs) {
+            if (!v.isObject())
+                continue;
+            const QJsonObject obj = v.toObject();
+
+            Package p;
+            p.name = obj.value(QStringLiteral("name")).toString();
+            p.arch = obj.value(QStringLiteral("arch")).toString();
+            splitEvr(obj.value(QStringLiteral("evr")).toString(),
+                     p.epoch, p.version, p.release);
+            p.repo = obj.value(QStringLiteral("repository")).toString();
+            p.state = PackageState::Update;
+            p.calcTodo();
+
+            if (p.name.isEmpty() || p.repo.isEmpty())
+                continue;
+            if (seen.contains(p.nevra()))
+                continue;
+            seen.insert(p.nevra());
+            updates.append(p);
+        }
+    }
+    return updates;
+}
+
+// Parse the classic text output of `dnf check-update` / `dnf check-upgrade`
+// (name.arch  evr  repo columns). Used as a fallback for dnf4 or older dnf5
+// builds that do not support --json.
+static QList<Package> parseCheckUpgradeText(const QString &out)
+{
+    QList<Package> updates;
+    QSet<QString> seen;
     for (const QString &rawLine : out.split(QStringLiteral("\n"))) {
         const QString line = rawLine.trimmed();
         if (line.isEmpty())
@@ -91,9 +105,9 @@ static QList<Package> fetchUpdatesViaCli()
         if (f.size() < 3 || !f[1].contains(QLatin1Char('-')))
             continue;
 
-        // name and arch are joined by '.' in dnf check-update output; split
-        // on the LAST dot so package names containing dots (e.g. python3.11)
-        // are preserved.
+        // name and arch are joined by '.' in the text output; split on the
+        // LAST dot so package names containing dots (e.g. python3.11) are
+        // preserved.
         const int dot = f[0].lastIndexOf(QLatin1Char('.'));
         if (dot < 1 || dot >= f[0].size() - 1)
             continue;
@@ -104,8 +118,7 @@ static QList<Package> fetchUpdatesViaCli()
         splitEvr(f[1], p.epoch, p.version, p.release);
         p.repo = f[2];
 
-        // Every row dnf check-update prints is an available update to an
-        // installed package, so they are all queued as regular updates.
+        // Every row printed is an available update to an installed package.
         p.state = PackageState::Update;
         p.calcTodo();
 
@@ -116,6 +129,106 @@ static QList<Package> fetchUpdatesViaCli()
         seen.insert(p.nevra());
         updates.append(p);
     }
+    return updates;
+}
+
+// Update listing (cross-check source): run `dnf5 check-upgrade` (or the dnf4
+// `check-update` shim) and parse its output.
+//
+// The command lists every installed package that has a newer version
+// available in a repo, with exit code semantics (0 = no updates, 100 =
+// updates available, 1 = error).
+//
+// When `refresh` is true (application startup or an explicit user refresh) we
+// pass --refresh, which forces every enabled repo to re-download its metadata
+// before checking. This guarantees the CLI sees the latest published updates
+// (e.g. microsoft-edge-stable) even when the local cache is "fresh but
+// stale".
+//
+// When `refresh` is false (periodic background checks) we deliberately omit
+// --refresh: the command then reuses the system cache at /var/cache/dnf/
+// (kept fresh by dnf-makecache.timer on most systems). This avoids two
+// problems: (1) a long metadata download on every periodic tick, and (2) a
+// lock conflict with an in-progress dnf5daemon transaction — `dnf5 check-upgrade
+// --refresh` holds the rpmdb/metadata read lock while downloading, and
+// do_transaction needs the exclusive lock to install, so running both
+// concurrently leaves the progress dialog stuck at "Preparing...".
+//
+// On dnf5 we request --json output, which is robust against column-layout
+// changes. dnf4 (the `dnf` shim) does not support --json, so we fall back to
+// text parsing.
+//
+// NOTE: the CLI result is used only as a cross-check / safety net. The
+// authoritative update list — the one the transaction resolves from — still
+// comes from the daemon's packageList(PackageFilter::Updates), so the
+// displayed list and the resolved transaction share the same sack.
+static QList<Package> fetchUpdatesViaCli(bool refresh)
+{
+    QProcess proc;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert(QStringLiteral("LANG"), QStringLiteral("C"));
+    env.insert(QStringLiteral("LC_ALL"), QStringLiteral("C"));
+    proc.setProcessEnvironment(env);
+
+    // Prefer dnf5 (the native package manager on the target distros); fall
+    // back to the `dnf` compatibility shim if dnf5 is not on PATH.
+    const bool hasDnf5 =
+        !QStandardPaths::findExecutable(QStringLiteral("dnf5")).isEmpty();
+    const QString dnfBin = hasDnf5 ? QStringLiteral("dnf5") : QStringLiteral("dnf");
+    // dnf5's command is `check-upgrade`; dnf4 uses `check-update`.
+    const QString checkCmd = hasDnf5 ? QStringLiteral("check-upgrade")
+                                     : QStringLiteral("check-update");
+
+    auto run = [&](const QStringList &args) -> bool {
+        proc.start(dnfBin, args, QIODevice::ReadOnly);
+        if (!proc.waitForFinished(300000)) {
+            proc.kill();
+            proc.waitForFinished(5000);
+            qWarning() << dnfBin << checkCmd << "timed out";
+            return false;
+        }
+        return true;
+    };
+
+    // Build the argument list. --refresh is only added when the caller
+    // explicitly requested a metadata refresh (startup / explicit refresh),
+    // never for periodic background checks — see the function doc comment.
+    QStringList args = {checkCmd};
+    if (refresh)
+        args << QStringLiteral("--refresh");
+    if (hasDnf5)
+        args << QStringLiteral("--json");
+
+    if (!run(args))
+        return {};
+
+    // Exit codes: 0 = no updates, 100 = updates available, 1 = real error.
+    int exitCode = proc.exitCode();
+    QString out = QString::fromUtf8(proc.readAllStandardOutput());
+
+    // Some older dnf5 builds reject --json; retry without it (text output).
+    // Keep the same --refresh choice as the first attempt.
+    if (hasDnf5 && exitCode == 1) {
+        QStringList retryArgs = {checkCmd};
+        if (refresh)
+            retryArgs << QStringLiteral("--refresh");
+        if (!run(retryArgs))
+            return {};
+        exitCode = proc.exitCode();
+        out = QString::fromUtf8(proc.readAllStandardOutput());
+    }
+
+    if (exitCode == 1) {
+        qWarning() << dnfBin << checkCmd << "failed (exit 1):"
+                   << QString::fromUtf8(proc.readAllStandardError());
+        return {};
+    }
+
+    QList<Package> updates;
+    if (hasDnf5 && out.trimmed().startsWith(QLatin1Char('{')))
+        updates = parseCheckUpgradeJson(out);
+    if (updates.isEmpty())
+        updates = parseCheckUpgradeText(out);
     return updates;
 }
 
@@ -377,20 +490,24 @@ QList<Package> Backend::fetchUpdates(bool refreshMetadata)
     // (package_list_fd(scope="upgrades")). This is critical: the daemon
     // maintains its own metadata cache at /var/cache/dnf5daemon-server/,
     // which is *separate* from the system dnf cache at /var/cache/dnf/ that
-    // `dnf check-update` reads. Reading the update list from the daemon
+    // `dnf5 check-upgrade` reads. Reading the update list from the daemon
     // guarantees the displayed list and the resolved transaction always
     // share the same sack.
     //
-    // refreshMetadata is true only at application startup — the single
-    // automatic moment the software source is refreshed. (The other is the
-    // explicit "Refresh Metadata" action in the menu.) When true we call
-    // readAllRepos(), which only re-downloads metadata for repos whose
-    // cache has actually expired (per the repo's metadata_expire). This is
-    // much faster than the previous cleanCache("expire-cache") + readAllRepos
-    // combo, which forced every repo to re-download on every startup.
-    // resetSession() drops any stale in-memory sack so the subsequent
-    // packageList() query rebuilds the sack from the on-disk cache.
+    // refreshMetadata is true at application startup and when the user
+    // clicks the explicit Refresh action — the two moments the software
+    // source is force-refreshed. To guarantee every repo re-downloads its
+    // metadata (not just the ones whose cache has expired per
+    // metadata_expire) we first call cleanCache("expire-cache"), which
+    // marks every repo's on-disk cache as expired, then readAllRepos()
+    // re-fetches them into /var/cache/dnf5daemon-server/. This mirrors
+    // `dnf5 check-upgrade --refresh` and ensures newly published updates
+    // (e.g. third-party-repo packages like microsoft-edge-stable) are
+    // always picked up. resetSession() drops any stale in-memory sack so
+    // the subsequent packageList() query rebuilds the sack from the
+    // freshly refreshed on-disk cache.
     if (refreshMetadata) {
+        m_client->cleanCache(QStringLiteral("expire-cache"));
         m_client->readAllRepos();
         m_client->resetSession();
     }
@@ -406,20 +523,76 @@ QList<Package> Backend::fetchUpdates(bool refreshMetadata)
     QList<Package> result =
         m_client->packageList({QStringLiteral("*")}, detailAttrs, PackageFilter::Updates);
 
-    // Fallback: if the daemon returned an empty list (transient D-Bus
-    // failure, unresponsive session, etc.), fall back to `dnf check-update`.
-    // The CLI list may come from the system cache and therefore diverge from
-    // the daemon's sack, but it is better than showing nothing at all.
-    if (result.isEmpty())
-        result = fetchUpdatesViaCli();
-    else {
-        // Daemon rows come back with state == Installed (rpm.list reports the
-        // installed package that has an upgrade available); mark them as
-        // updates so they render in the update list and can be queued.
-        for (Package &p : result) {
-            p.state = PackageState::Update;
-            p.calcTodo();
+    // Cross-check the daemon's list against `dnf5 check-upgrade`. When
+    // refreshMetadata is true (startup / explicit refresh) the CLI is invoked
+    // with --refresh so it re-downloads every repo's metadata into the system
+    // cache and reliably sees newly published updates (e.g. microsoft-edge-
+    // stable). On periodic checks refreshMetadata is false and the CLI reuses
+    // the cached system metadata — this avoids the rpmdb/metadata lock
+    // conflict that would otherwise stall an in-progress transaction at
+    // "Preparing...". The daemon keeps its own cache at
+    // /var/cache/dnf5daemon-server/ and readAllRepos() only re-downloads
+    // metadata for repos whose cache has *expired*, so a repo whose cache is
+    // "fresh" but stale still drops that package's update from the daemon's
+    // list; comparing it against the CLI result lets us detect and heal the
+    // divergence (refresh daemon cache + re-query, with a CLI-only safety net).
+    const QList<Package> cliUpdates = fetchUpdatesViaCli(refreshMetadata);
+
+    auto collectNa = [](const QList<Package> &pkgs) {
+        QSet<QString> na;
+        na.reserve(pkgs.size());
+        for (const auto &p : pkgs)
+            na.insert(p.na());
+        return na;
+    };
+
+    QSet<QString> daemonNa = collectNa(result);
+    int missingCount = 0;
+    for (const auto &p : cliUpdates) {
+        if (!daemonNa.contains(p.na()))
+            ++missingCount;
+    }
+    const bool daemonIncomplete = missingCount > 0;
+
+    // The daemon's update list is missing packages that `dnf5 check-upgrade`
+    // (with --refresh on explicit refreshes, cached metadata otherwise)
+    // knows about. Its on-disk metadata cache is stale, so force every repo
+    // to re-download (expire-cache marks all caches expired, readAllRepos
+    // then re-fetches them) and re-query from a freshly rebuilt sack. This
+    // guarantees the authoritative list — the one the transaction resolves
+    // from — matches what dnf5 displays.
+    if (daemonIncomplete) {
+        const QString cliCmd = refreshMetadata
+                                   ? QStringLiteral("`dnf5 check-upgrade --refresh`")
+                                   : QStringLiteral("`dnf5 check-upgrade`");
+        qWarning() << "Daemon update list is missing" << missingCount
+                   << "package(s) known to" << cliCmd << ";"
+                   << "refreshing daemon metadata cache and re-querying";
+        m_client->cleanCache(QStringLiteral("expire-cache"));
+        m_client->readAllRepos();
+        m_client->resetSession();
+        result = m_client->packageList({QStringLiteral("*")}, detailAttrs, PackageFilter::Updates);
+        daemonNa = collectNa(result);
+    }
+
+    // Final safety net: if a repo still fails to load (transient network
+    // error, unreachable mirror, …) the daemon may still omit some CLI
+    // updates. Append those entries so the user at least sees them; the
+    // transaction resolves from the daemon's sack and will simply skip any
+    // package it cannot resolve rather than erroring out.
+    for (const auto &p : cliUpdates) {
+        if (!daemonNa.contains(p.na())) {
+            result.append(p);
+            daemonNa.insert(p.na());
         }
+    }
+
+    // Daemon rows come back with state == Installed (rpm.list reports the
+    // installed package that has an upgrade available); mark every entry as
+    // an update so it renders in the update list and can be queued.
+    for (Package &p : result) {
+        p.state = PackageState::Update;
+        p.calcTodo();
     }
 
     // Restore signal delivery — real transactions and user-initiated

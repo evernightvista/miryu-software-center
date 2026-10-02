@@ -196,6 +196,18 @@ private:
     QString m_lastError;
     int m_reconnectCount = 0;
 
+    // Authoritative transaction outcome reported by the daemon via the
+    // TransactionAfterComplete D-Bus signal. do_transaction can take
+    // minutes; if the method reply is lost (transient D-Bus hiccup,
+    // heavy system load, …) the daemon still emits this signal right
+    // before it would have replied. We record it here so doTransaction()
+    // can fall back to it and avoid reporting a failure for a transaction
+    // that actually succeeded. Reset at the start of every doTransaction()
+    // call. Both doTransaction() and onTransactionAfterComplete() run on
+    // the main thread, so no locking is needed.
+    bool m_transactionCompleted = false;
+    bool m_transactionSuccess = false;
+
     // Serializes every D-Bus operation (callMethod / reconnect) so that
     // concurrent QtConcurrent workers (package list, repo list, update
     // probe, …) cannot race each other's reconnect() and corrupt m_bus /
@@ -231,7 +243,22 @@ private:
     // QDBusConnection::connectToBus() to open a fresh socket instead.
     // Recovery is always silent: reconnect() never emits errorOccurred()
     // itself — callers report the final error only after their own retries.
+    //
+    // THREADING: QDBusConnection::connectToBus() ties the new connection's
+    // socket watcher to the calling thread. If a worker thread (which runs no
+    // Qt event loop) creates the connection, incoming D-Bus signals and
+    // asynchronous replies are NEVER delivered — the ProgressDialog gets stuck
+    // at "Preparing..." and do_transaction's reply is lost until the timeout.
+    // To prevent this, reconnect() always executes the actual reconnection on
+    // the thread that owns this object (the GUI/main thread): if invoked from
+    // any other thread it marshals itself via a blocking queued invocation.
+    // Callers must therefore NOT hold m_callMutex when calling reconnect()
+    // (otherwise the main thread would deadlock trying to re-acquire it).
     bool reconnect();
+
+    // The actual reconnection body. Always runs on the owner (main) thread
+    // and acquires m_callMutex. Called from reconnect().
+    bool doReconnect();
 
     // Detect transient D-Bus failures (stale bus handle, bus or daemon
     // restarting) that are safe to retry after a silent reconnect.

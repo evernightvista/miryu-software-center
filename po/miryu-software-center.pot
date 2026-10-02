@@ -1300,3 +1300,12 @@ msgstr ""
 msgid "You have installed software packages that require a computer restart. "
 msgstr ""
 
+#: src/core/Dnf5DaemonClient.cpp:1389
+msgid "Failed to send transaction request to dnf5daemon."
+msgstr ""
+
+#: src/ui/MainWindow.cpp:696 src/ui/MainWindow.cpp:910
+msgid "Dependency resolution failed. The reasons are as follows:\n"
+"\n"
+msgstr ""
+

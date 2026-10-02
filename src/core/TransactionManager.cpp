@@ -326,17 +326,19 @@ TransactionResult TransactionManager::runTransaction(const TransactionOptions &o
     // runTransaction() runs on a worker thread (QtConcurrent::run), but the
     // D-Bus progress signals emitted during do_transaction are dispatched to
     // the thread that owns Dnf5DaemonClient — the GUI/main thread. If we
-    // called doTransaction() here on the worker thread with QDBus::Block,
-    // the connection's internal lock would be held by the worker and the
-    // main thread's signal queue could starve, leaving the progress dialog
-    // stuck at "Preparing..." with no package name.
+    // called doTransaction() here on the worker thread, QDBus::BlockWithGui
+    // would pump the worker's (non-existent) event loop and the progress
+    // signals (delivered to the main thread) could not reach the UI.
     //
-    // doTransaction() itself uses QDBus::BlockWithGui, which only helps if
-    // it runs on the SAME thread the signals are delivered to. So marshal
-    // the call onto the main thread via a blocking queued invocation: the
-    // worker waits, the main thread executes do_transaction, and while it
-    // waits for the daemon's reply BlockWithGui drains the incoming signal
-    // queue so download / install progress reaches the UI.
+    // doTransaction() uses m_bus.call(..., QDBus::BlockWithGui) (the Qt
+    // counterpart of yumex-ng's async do_transaction + GLib.MainLoop): it
+    // blocks for the reply while keeping the Qt event loop running, so every
+    // download / transaction signal the daemon emits is dispatched. This only
+    // works on the SAME thread the D-Bus connection was created on (the main
+    // thread), so marshal the call onto it via a blocking queued invocation:
+    // the worker waits, the main thread executes do_transaction, and its
+    // event loop drains the incoming D-Bus signal queue so download / install
+    // progress reaches the ProgressDialog.
     bool transactionOk = false;
     QMetaObject::invokeMethod(m_client, [this, &transOptions, &transactionOk]() {
         transactionOk = m_client->doTransaction(transOptions);

@@ -1316,3 +1316,13 @@ msgstr "這將把所有已安裝套件同步到最新版本 "
 msgid "You have installed software packages that require a computer restart. "
 msgstr "您已安裝了需要重新啟動電腦的套件。 "
 
+#: src/core/Dnf5DaemonClient.cpp:1389
+msgid "Failed to send transaction request to dnf5daemon."
+msgstr "向 dnf5daemon 發送事務請求失敗。"
+
+#: src/ui/MainWindow.cpp:696 src/ui/MainWindow.cpp:910
+msgid "Dependency resolution failed. The reasons are as follows:\n"
+"\n"
+msgstr "依賴解決失敗，原因如下：\n"
+"\n"
+

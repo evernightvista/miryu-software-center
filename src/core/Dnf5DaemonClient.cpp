@@ -161,13 +161,19 @@ QDBusMessage Dnf5DaemonClient::callMethod(const QString &path, const QString &in
                                           const QString &method, const QList<QVariant> &args,
                                           int timeoutMs, QDBus::CallMode mode)
 {
+    // Self-heal a lost bus connection BEFORE taking the call mutex.
+    // ensureConnected() may invoke reconnect(), which (for worker-thread
+    // callers) marshals itself onto the main thread and acquires m_callMutex
+    // there. If we held the mutex here, the main thread would deadlock.
+    // The short window between ensureConnected() and the mutex below is
+    // harmless: a concurrent reconnect just replaces m_bus, and callSync()'s
+    // retry loop recovers from the resulting "Not connected" failure.
+    ensureConnected();
+
     // Serialize all D-Bus traffic: the same session is shared by concurrent
     // QtConcurrent workers, and a reconnect() must never run while another
     // thread is mid-call on the (soon to be replaced) connection.
     QMutexLocker locker(&m_callMutex);
-
-    // Self-heal a lost bus connection before sending.
-    ensureConnected();
 
     QDBusMessage msg = QDBusMessage::createMethodCall(
         QString::fromLatin1(BUS_NAME),
@@ -181,14 +187,12 @@ QDBusMessage Dnf5DaemonClient::callMethod(const QString &path, const QString &in
     // large Rpm.list replies) get the long 20-minute timeout — mirroring the
     // yumex-ng client, which uses a 20-minute async D-Bus timeout.
     //
-    // QDBus::BlockWithGui keeps the GUI event loop running while waiting for
-    // the reply. This is essential for long-running calls like do_transaction:
-    // the daemon emits D-Bus progress signals (download_progress,
-    // transaction_action_*, …) while the call is in flight, and those
-    // signals must be delivered to this thread's event loop so the
-    // ProgressDialog can update. A plain QDBus::Block call from a worker
-    // thread can starve signal delivery and the dialog stays stuck at
-    // "Preparing... 0%".
+    // The default mode is QDBus::Block, which is correct for calls made from
+    // worker threads (resolve, list, …) that don't need to dispatch GUI
+    // signals. do_transaction does NOT go through callMethod: it calls
+    // m_bus.call() directly with QDBus::BlockWithGui (see doTransaction()) so
+    // the daemon's progress signals reach the ProgressDialog instead of
+    // leaving it stuck at "Preparing... 0%".
     return m_bus.call(msg, mode, timeoutMs);
 }
 
@@ -202,6 +206,28 @@ bool Dnf5DaemonClient::ensureConnected()
 }
 
 bool Dnf5DaemonClient::reconnect()
+{
+    // The actual reconnection (connectToBus + openSession) MUST run on the
+    // thread that owns this object (the GUI/main thread). QDBusConnection
+    // binds the new connection's socket watcher to the calling thread; a
+    // worker thread has no running Qt event loop, so any connection created
+    // there would never receive D-Bus signals or async replies. If we are
+    // already on the owner thread, run directly. Otherwise marshal to it via
+    // a blocking queued invocation.
+    //
+    // m_callMutex must NOT be held by the caller here: doReconnect() acquires
+    // it itself, and if a worker thread held it while waiting for the main
+    // thread, the main thread would deadlock on the same mutex.
+    if (QThread::currentThread() != thread()) {
+        bool ok = false;
+        QMetaObject::invokeMethod(this, [this, &ok]() { ok = doReconnect(); },
+                                  Qt::BlockingQueuedConnection);
+        return ok;
+    }
+    return doReconnect();
+}
+
+bool Dnf5DaemonClient::doReconnect()
 {
     // Must not run concurrently with another thread's D-Bus call or another
     // reconnect — replacing m_bus / clearing m_sessionPath mid-use would
@@ -775,6 +801,12 @@ void Dnf5DaemonClient::onTransactionBeforeBegin(const QDBusObjectPath &, quint64
 
 void Dnf5DaemonClient::onTransactionAfterComplete(const QDBusObjectPath &, bool success)
 {
+    // Record the authoritative outcome reported by the daemon. If the
+    // do_transaction method reply is subsequently lost, doTransaction()
+    // falls back to this value so a genuinely successful transaction is
+    // not reported as a failure.
+    m_transactionCompleted = true;
+    m_transactionSuccess = success;
     Q_EMIT transactionAfterComplete(success);
 }
 
@@ -1276,7 +1308,7 @@ Dnf5DaemonClient::ResolveResult Dnf5DaemonClient::resolve(bool allowErasing)
         // walked manually. Guard against a mis-demmarshalled argument (which
         // would make value<QDBusArgument>() return an empty arg and silently
         // produce zero items).
-        const QVariant &itemsVariant = msg.arguments().at(0);
+        const QVariant itemsVariant = msg.arguments().at(0);
         if (!itemsVariant.canConvert<QDBusArgument>()) {
             result.error = friendlyDisconnectError(
                 QStringLiteral("The dnf5daemon-server returned a transaction summary "
@@ -1343,28 +1375,74 @@ bool Dnf5DaemonClient::doTransaction(const QVariantMap &options)
     // do_transaction downloads and installs the resolved package set — this
     // can easily exceed the default 60s (a large kernel / desktop update
     // downloads for minutes). Use the long timeout, mirroring yumex-ng's
-    // 20-minute async call.
+    // 20-minute call.
     //
-    // QDBus::BlockWithGui is essential here: while do_transaction is in
-    // flight the daemon emits D-Bus progress signals (download_progress,
-    // transaction_action_start, transaction_action_progress, …). Those
-    // signals must be dispatched to this object's event loop so they reach
-    // the ProgressDialog. A plain QDBus::Block call holds the connection's
-    // internal lock and can starve signal delivery, leaving the dialog stuck
-    // at "Preparing...". BlockWithGui spins a local event loop that drains
-    // the incoming signal queue while waiting for the reply.
+    // HOW PROGRESS SIGNALS REACH THE UI (mirroring yumex-ng):
+    // yumex-ng calls do_transaction with reply_handler/error_handler and runs
+    // a GLib.MainLoop while waiting; that loop dispatches the daemon's
+    // download_progress / transaction_action_* signals to the UI. The Qt
+    // equivalent is QDBus::BlockWithGui: it blocks for the reply but keeps
+    // pumping the Qt event loop, so every D-Bus signal the daemon emits
+    // during the transaction is delivered to our slots and forwarded to the
+    // ProgressDialog. (QDBus::Block, by contrast, does NOT dispatch signals,
+    // which is why the dialog used to be stuck at "Preparing...".)
+    //
+    // doTransaction() is always invoked on the GUI/main thread (Transaction-
+    // Manager marshals it via Qt::BlockingQueuedConnection), so BlockWithGui
+    // is valid here.
     //
     // The resolved transaction is bound to the session that resolve() ran on.
-    // callMethod() may silently reconnect() (via ensureConnected) and open a
-    // fresh session that has no resolved transaction; without this guard the
-    // daemon returns "Transaction has to be resolved first." Detect the
-    // mid-call reconnect and report a clear, actionable error instead.
+    // A reconnect during the call would open a fresh session with no resolved
+    // transaction, so the daemon returns "Transaction has to be resolved
+    // first." Detect a reconnect and report a clear, actionable error.
     const int reconnectCountBefore = m_reconnectCount;
-    QDBusMessage msg = callMethod(m_sessionPath, QString::fromLatin1(IFACE_GOAL),
-                                  QStringLiteral("do_transaction"), {QVariant(opts)},
-                                  kLongCallTimeoutMs, QDBus::BlockWithGui);
+
+    // Reset the authoritative transaction-outcome record. The daemon emits
+    // TransactionAfterComplete(success) right before it sends the method
+    // reply; if the reply is lost in transit (transient D-Bus hiccup, heavy
+    // system I/O stalling the bus, …) we still have this signal to decide
+    // the real outcome. See onTransactionAfterComplete().
+    m_transactionCompleted = false;
+    m_transactionSuccess = false;
+
+    // Self-heal the connection BEFORE taking the call mutex (see callMethod
+    // for why: reconnect() marshals to the main thread and acquires the mutex
+    // itself, so holding it here would deadlock). doTransaction runs on the
+    // main thread, so reconnect() executes doReconnect() inline.
+    ensureConnected();
+
+    QDBusMessage reply;
+    {
+        QMutexLocker locker(&m_callMutex);
+        QDBusMessage msg = QDBusMessage::createMethodCall(
+            QString::fromLatin1(BUS_NAME),
+            m_sessionPath,
+            QString::fromLatin1(IFACE_GOAL),
+            QStringLiteral("do_transaction"));
+        msg.setArguments({QVariant(opts)});
+        reply = m_bus.call(msg, QDBus::BlockWithGui, kLongCallTimeoutMs);
+    }
+
+    // If the method reply was lost but the daemon's TransactionAfterComplete
+    // signal reported success, the transaction genuinely ran to completion —
+    // do not surface a false failure. This is the common case behind
+    // "dnf5daemon-server says success but the app says the transaction
+    // failed": a long do_transaction (minutes of downloading + installing)
+    // can lose its D-Bus reply while the daemon still emits the completion
+    // signal. Trust the signal.
+    auto daemonReportedSuccess = [this]() {
+        return m_transactionCompleted && m_transactionSuccess;
+    };
 
     if (m_reconnectCount != reconnectCountBefore) {
+        if (daemonReportedSuccess()) {
+            qWarning() << "do_transaction: session reconnected during call"
+                       << "(before=" << reconnectCountBefore
+                       << "after=" << m_reconnectCount
+                       << ") but daemon reported success via"
+                       << "TransactionAfterComplete; treating as success";
+            return true;
+        }
         QString error = friendlyDisconnectError(
             QStringLiteral("The dnf5daemon-server session was reset while running the transaction. "
                            "The resolved transaction was lost; please try again."));
@@ -1375,14 +1453,21 @@ bool Dnf5DaemonClient::doTransaction(const QVariantMap &options)
         return false;
     }
 
-    if (msg.type() == QDBusMessage::ErrorMessage) {
-        QString error = msg.errorMessage();
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        if (daemonReportedSuccess()) {
+            qWarning() << "do_transaction: D-Bus reply was an error ("
+                       << reply.errorMessage()
+                       << ") but daemon reported success via"
+                       << "TransactionAfterComplete; treating as success";
+            return true;
+        }
+        QString error = reply.errorMessage();
         qWarning() << "do_transaction failed:" << error;
         // do_transaction executes the goal that was resolved on THIS session;
         // a reconnect would open an empty session, so there is nothing to
         // auto-retry. Report the failure with an actionable message instead
         // of the raw "Not connected to D-Bus server" text.
-        if (looksLikeDisconnect(msg))
+        if (looksLikeDisconnect(reply))
             error = friendlyDisconnectError(error);
         // Store the real error so runTransaction() can surface it to the UI
         // instead of a generic "Transaction execution failed".
@@ -1396,12 +1481,21 @@ bool Dnf5DaemonClient::doTransaction(const QVariantMap &options)
     }
 
     // Same InvalidMessage / non-reply guard as resolve(): a dropped connection
-    // that yields no usable reply must not be reported as success.
-    if (msg.type() != QDBusMessage::ReplyMessage) {
+    // that yields no usable reply must not be reported as success — UNLESS the
+    // daemon's TransactionAfterComplete signal confirms the transaction
+    // succeeded (the reply was merely lost in transit).
+    if (reply.type() != QDBusMessage::ReplyMessage) {
+        if (daemonReportedSuccess()) {
+            qWarning() << "do_transaction: unexpected reply type"
+                       << static_cast<int>(reply.type())
+                       << "but daemon reported success via"
+                       << "TransactionAfterComplete; treating as success";
+            return true;
+        }
         QString error = friendlyDisconnectError(
             QStringLiteral("The dnf5daemon-server did not confirm the transaction. "
                            "Please try again."));
-        qWarning() << "do_transaction: unexpected reply type" << static_cast<int>(msg.type());
+        qWarning() << "do_transaction: unexpected reply type" << static_cast<int>(reply.type());
         Q_EMIT errorOccurred(error);
         return false;
     }

@@ -1371,3 +1371,13 @@ msgstr "Ceci synchronisera tous les paquets installés vers la dernière version
 msgid "You have installed software packages that require a computer restart. "
 msgstr "Vous avez installé des paquets logiciels qui nécessitent un redémarrage de l'ordinateur. "
 
+#: src/core/Dnf5DaemonClient.cpp:1389
+msgid "Failed to send transaction request to dnf5daemon."
+msgstr "Échec de l'envoi de la requête de transaction à dnf5daemon."
+
+#: src/ui/MainWindow.cpp:696 src/ui/MainWindow.cpp:910
+msgid "Dependency resolution failed. The reasons are as follows:\n"
+"\n"
+msgstr "Échec de la résolution des dépendances. Les raisons sont les suivantes :\n"
+"\n"
+

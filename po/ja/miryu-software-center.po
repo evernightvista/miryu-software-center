@@ -1321,3 +1321,13 @@ msgstr "インストール済みの全パッケージを最新バージョン �
 msgid "You have installed software packages that require a computer restart. "
 msgstr "コンピューターの再起動が必要なソフトウェアパッケージをインストールしました。 "
 
+#: src/core/Dnf5DaemonClient.cpp:1389
+msgid "Failed to send transaction request to dnf5daemon."
+msgstr "dnf5daemon へのトランザクション要求の送信に失敗しました。"
+
+#: src/ui/MainWindow.cpp:696 src/ui/MainWindow.cpp:910
+msgid "Dependency resolution failed. The reasons are as follows:\n"
+"\n"
+msgstr "依存関係の解決に失敗しました。理由は以下の通り：\n"
+"\n"
+
