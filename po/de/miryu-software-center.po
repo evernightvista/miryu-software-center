@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: miryu\n"
 "Report-Msgid-Bugs-To: https://github.com/EvernightFedora/miryu\n"
 "POT-Creation-Date: 2026-08-21 03:20+0000\n"
-"PO-Revision-Date: 2026-08-20 00:00+0800\n"
+"PO-Revision-Date: 2026-10-03 00:00+0800\n"
 "Last-Translator: KairikiFedora <kairiki@evernightfedora.org>\n"
 "Language-Team: German <miryu@example.com>\n"
 "Language: de\n"
@@ -702,13 +702,21 @@ msgstr "Miryu einrichten..."
 msgid "Find"
 msgstr "Suchen"
 
-#: src/ui/MainWindow.cpp:442
+#: src/ui/MainWindow.cpp:601 src/ui/MainWindow.cpp:346
 msgid "Select All"
 msgstr "Alle auswählen"
 
-#: src/ui/MainWindow.cpp:453
+#: src/ui/MainWindow.cpp:612 src/ui/MainWindow.cpp:351
 msgid "Deselect All"
 msgstr "Auswahl aufheben"
+
+#: src/ui/MainWindow.cpp:347
+msgid "Queue every update shown in the list"
+msgstr "Alle in der Liste angezeigten Updates in die Warteschlange aufnehmen"
+
+#: src/ui/MainWindow.cpp:352
+msgid "Remove every update from the queue"
+msgstr "Alle Updates aus der Warteschlange entfernen"
 
 #: src/ui/MainWindow.cpp:472
 msgid "Package Browser"
@@ -935,9 +943,9 @@ msgstr "Neustart erforderlich"
 
 #: src/ui/MainWindow.cpp:1208
 msgid ""
-"You have installed software packages that require a computer restart. "
-"Please restart the operating system as soon as possible to ensure the "
-"updates take full effect."
+"You have installed software packages that require a computer restart. Please"
+" restart the operating system as soon as possible to ensure the updates take"
+" full effect."
 msgstr ""
 "Sie haben Softwarepakete installiert, die einen Computerneustart erfordern. "
 "Bitte starten Sie das Betriebssystem so bald wie möglich neu, um "
@@ -994,6 +1002,7 @@ msgstr "Aus Warteschlange entfernen"
 #: src/ui/PackageView.cpp:271
 msgid "Queue for Removal"
 msgstr "Zur Entfernungs-Warteschlange hinzufügen"
+
 #: src/ui/PackageView.cpp:286
 msgid "Queue for Reinstall"
 msgstr "Wiedereinrichtung in Warteschlange stellen"
@@ -1031,6 +1040,8 @@ msgid "Downloading %1..."
 msgstr "Download %1..."
 
 #: src/ui/QueueView.cpp:61 src/ui/PackageInfoWidget.cpp:95
+#: src/ui/PackageView.cpp:140 src/ui/TransactionResultDialog.cpp:167
+#: src/ui/TransactionResultDialog.cpp:219
 msgid "Dependencies"
 msgstr "Abhängigkeiten"
 
@@ -1240,9 +1251,17 @@ msgstr "Ersetzen"
 msgid "Obsolete"
 msgstr "Veraltet"
 
-#: src/ui/TransactionResultDialog.cpp:117
+#: src/ui/TransactionResultDialog.cpp:212
 msgid "Total Download Size"
 msgstr "Gesamte Downloadgröße"
+
+#: src/ui/TransactionResultDialog.cpp:215
+msgid "Total Install Size"
+msgstr "Gesamtgröße der Installation"
+
+#: src/ui/TransactionResultDialog.cpp:280
+msgid "Total Freed Space"
+msgstr "Gesamter freigegebener Speicher"
 
 #: src/ui/TransactionResultDialog.cpp:121
 msgid "Apply offline (on next reboot)"
@@ -1276,23 +1295,33 @@ msgstr "<i>Kein Änderungsprotokoll verfügbar.</i>"
 msgid "<i>No file list available.</i>"
 msgstr "<i>Keine Dateiliste verfügbar.</i>"
 
-#: src/ui/MainWindow.cpp:757 src/ui/MainWindow.cpp:581
+#: src/ui/MainWindow.cpp:747,990
 msgid ""
-"Cannot remove protected packages or critical dependencies.\n"
-"\n"
-"Removing these packages would break the system.\n"
+"Cannot remove protected packages or critical dependencies, removing them would break the system.\n"
 "\n"
 "%1"
 msgstr ""
-"Geschützte Pakete oder kritische Abhängigkeiten können nicht entfernt werden.\n"
-"\n"
-"Das Entfernen dieser Pakete würde das System beschädigen.\n"
+"Geschützte Pakete oder kritische Abhängigkeiten können nicht entfernt werden, dadurch würde das Betriebssystem beschädigt werden.\n"
 "\n"
 "%1"
 
 #: src/ui/MainWindow.cpp:761 src/ui/MainWindow.cpp:585
 msgid "Protected Package Error"
 msgstr "Fehler bei geschütztem Paket"
+
+#: src/ui/MainWindow.cpp:938
+msgid ""
+"Cannot uninstall the running kernel. Doing so would make the system unbootable.\n"
+"\n"
+"Please boot into a different kernel before removing %1."
+msgstr ""
+"Der laufende Kernel kann nicht deinstalliert werden. Dadurch würde das System nicht mehr bootfähig sein.\n"
+"\n"
+"Bitte booten Sie einen anderen Kernel, bevor Sie %1 entfernen."
+
+#: src/ui/MainWindow.cpp:943
+msgid "Cannot Remove Running Kernel"
+msgstr "Laufenden Kernel nicht entfernen"
 
 #: src/core/Dnf5DaemonClient.cpp:471
 msgid "Cannot load repositories."
@@ -1317,29 +1346,55 @@ msgstr "Externe Linglong Store-Anwendung starten"
 msgid "<i>Loading...</i>"
 msgstr "<i>Wird geladen...</i>"
 
-msgid "Cannot connect to the D-Bus system bus.\n\n"
-msgstr "Verbindung zum D-Bus-Systembus nicht möglich.\n\n"
+msgid ""
+"Cannot connect to the D-Bus system bus.\n"
+"\n"
+msgstr ""
+"Verbindung zum D-Bus-Systembus nicht möglich.\n"
+"\n"
 
-msgid "Cannot remove protected packages or critical dependencies.\n\n"
-msgstr "Geschützte Pakete oder kritische Abhängigkeiten können nicht entfernt werden.\n\n"
+msgid ""
+"Cannot remove protected packages or critical dependencies.\n"
+"\n"
+msgstr ""
+"Geschützte Pakete oder kritische Abhängigkeiten können nicht entfernt werden.\n"
+"\n"
 
-msgid "Distribution sync will synchronize all installed packages to the versions available in the repositories. "
-msgstr "Die Distributionssynchronisierung synchronisiert alle installierten Pakete auf die in den Repositorien verfügbaren Versionen. "
+msgid ""
+"Distribution sync will synchronize all installed packages to the versions "
+"available in the repositories. "
+msgstr ""
+"Die Distributionssynchronisierung synchronisiert alle installierten Pakete "
+"auf die in den Repositorien verfügbaren Versionen. "
 
 msgid "Downloading %1"
 msgstr "%1 wird heruntergeladen"
 
-msgid "Failed to connect to dnf5daemon-server.\n\n"
-msgstr "Verbindung zu dnf5daemon-server fehlgeschlagen.\n\n"
+msgid ""
+"Failed to connect to dnf5daemon-server.\n"
+"\n"
+msgstr ""
+"Verbindung zu dnf5daemon-server fehlgeschlagen.\n"
+"\n"
 
-msgid "Failed to launch the Linglong Store.\n\n"
-msgstr "Linglong Store konnte nicht gestartet werden.\n\n"
+msgid ""
+"Failed to launch the Linglong Store.\n"
+"\n"
+msgstr ""
+"Linglong Store konnte nicht gestartet werden.\n"
+"\n"
 
 msgid "Failed to refresh metadata (exit code %1)."
 msgstr "Aktualisieren der Metadaten fehlgeschlagen (Exit-Code %1)."
 
-msgid "Failed to start command.\n%1\n\n"
-msgstr "Befehl konnte nicht gestartet werden.\n%1\n\n"
+msgid ""
+"Failed to start command.\n"
+"%1\n"
+"\n"
+msgstr ""
+"Befehl konnte nicht gestartet werden.\n"
+"%1\n"
+"\n"
 
 msgid "Metadata refreshed."
 msgstr "Metadaten aktualisiert."
@@ -1351,7 +1406,8 @@ msgid "Repository enable / disable management is performed from the main "
 msgstr "Das Aktivieren/Deaktivieren von Repositorien erfolgt über die Haupt "
 
 msgid "The connection to the system D-Bus / dnf5daemon-server was lost"
-msgstr "Die Verbindung zum System-D-Bus / dnf5daemon-server wurde unterbrochen"
+msgstr ""
+"Die Verbindung zum System-D-Bus / dnf5daemon-server wurde unterbrochen"
 
 msgid "The target version (%1) is lower than the current version (%2). "
 msgstr "Die Zielversion (%1) ist niedriger als die aktuelle Version (%2). "
@@ -1360,24 +1416,86 @@ msgid "The target version (%1) is lower than the currently running "
 msgstr "Die Zielversion (%1) ist niedriger als die aktuell ausgeführte "
 
 msgid "This will download all packages needed to upgrade the system to "
-msgstr "Dies lädt alle Pakete herunter, die zum Upgrade des Systems auf  erforderlich sind "
+msgstr ""
+"Dies lädt alle Pakete herunter, die zum Upgrade des Systems auf  "
+"erforderlich sind "
 
 msgid "This will download and rebuild the metadata cache for all enabled "
-msgstr "Dies lädt den Metadaten-Cache für alle aktivierten  herunter und erstellt ihn neu "
+msgstr ""
+"Dies lädt den Metadaten-Cache für alle aktivierten  herunter und erstellt "
+"ihn neu "
 
 msgid "This will synchronise all installed packages to the latest version "
-msgstr "Dies synchronisiert alle installierten Pakete auf die neueste Version "
+msgstr ""
+"Dies synchronisiert alle installierten Pakete auf die neueste Version "
 
 msgid "You have installed software packages that require a computer restart. "
-msgstr "Sie haben Softwarepakete installiert, die einen Neustart des Computers erfordern. "
+msgstr ""
+"Sie haben Softwarepakete installiert, die einen Neustart des Computers "
+"erfordern. "
 
 #: src/core/Dnf5DaemonClient.cpp:1389
 msgid "Failed to send transaction request to dnf5daemon."
 msgstr "Senden der Transaktionsanfrage an dnf5daemon fehlgeschlagen."
 
 #: src/ui/MainWindow.cpp:696 src/ui/MainWindow.cpp:910
-msgid "Dependency resolution failed. The reasons are as follows:\n"
+msgid ""
+"Dependency resolution failed. The reasons are as follows:\n"
 "\n"
-msgstr "Abhängigkeitsauflösung fehlgeschlagen. Die Gründe sind wie folgt:\n"
+msgstr ""
+"Abhängigkeitsauflösung fehlgeschlagen. Die Gründe sind wie folgt:\n"
 "\n"
 
+#: src/ui/MainWindow.cpp:240 src/ui/MainWindow.cpp:357
+msgid "Apply pending operations in the queue"
+msgstr "Ausstehende Vorgänge in der Warteschlange anwenden"
+
+#: src/ui/MainWindow.cpp:1011
+msgid "Transaction"
+msgstr "Transaktion"
+
+#: src/core/Backend.cpp:489
+msgid "Verifying packages..."
+msgstr "Pakete werden überprüft..."
+
+#: src/core/Backend.cpp:490
+msgid "Installing packages..."
+msgstr "Pakete werden installiert..."
+
+#: src/core/Backend.cpp:495
+msgid "Downloading packages..."
+msgstr "Pakete werden heruntergeladen..."
+
+#: src/ui/TransactionResultDialog.cpp:78
+msgid "Download Size"
+msgstr "Downloadgröße"
+
+#: src/ui/TransactionResultDialog.cpp:79
+msgid "Install Size"
+msgstr "Installationsgröße"
+
+#: src/ui/TransactionResultDialog.cpp:108
+msgid "Freed Space"
+msgstr "Freigegebener Speicher"
+
+#: src/core/Dnf5DaemonClient.cpp:439
+msgid ""
+"Cannot connect to the D-Bus system bus.\n"
+"\n"
+"Please make sure the D-Bus system bus is running (dbus-broker / dbus-daemon)."
+msgstr ""
+"Verbindung zum D-Bus-Systembus nicht möglich.\n"
+"\n"
+"Bitte stellen Sie sicher, dass der D-Bus-Systembus läuft (dbus-broker / dbus-daemon)."
+
+#: src/core/Dnf5DaemonClient.cpp:60
+msgid ""
+"The connection to the system D-Bus / dnf5daemon-server was lost (\"%1\"). The service may have restarted.\n"
+"\n"
+"Please try the operation again. If the problem persists, restart the service with:\n"
+"  sudo systemctl restart dnf5daemon-server"
+msgstr ""
+"Die Verbindung zum System-D-Bus / dnf5daemon-server wurde unterbrochen (\"%1\"). Der Dienst wurde möglicherweise neu gestartet.\n"
+"\n"
+"Bitte versuchen Sie den Vorgang erneut. Wenn das Problem weiterhin besteht, starten Sie den Dienst neu mit:\n"
+"  sudo systemctl restart dnf5daemon-server"

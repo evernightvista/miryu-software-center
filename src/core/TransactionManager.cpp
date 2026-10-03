@@ -191,9 +191,23 @@ TransactionResult TransactionManager::buildResult(const QVariantList &transactio
         QString actionStr = parts[1].toString();
         QString actionKey = actionMap.value(actionStr, actionStr.toLower());
 
+        // parts[2] is the dnf5 "reason" string ("User", "Dependency",
+        // "Weak", "Group", "External", "Dependent", ...). Anything that is
+        // not "User" / "External" / empty is treated as a dependency pulled
+        // in to satisfy the user's explicit requests, so the
+        // TransactionResultDialog can mark it accordingly.
+        QString reason = parts[2].toString();
+        bool isDependency = false;
+        if (!reason.isEmpty() &&
+            reason != QStringLiteral("User") &&
+            reason != QStringLiteral("External")) {
+            isDependency = true;
+        }
+
         QString nevra;
         QString repo;
-        qint64 size = 0;
+        qint64 downloadSize = 0;
+        qint64 installSize = 0;
 
         QVariantMap objMap = parts[4].toMap();
         nevra = objMap.value(QStringLiteral("full_nevra")).toString();
@@ -201,20 +215,25 @@ TransactionResult TransactionManager::buildResult(const QVariantList &transactio
             nevra = objMap.value(QStringLiteral("nevra")).toString();
         repo = objMap.value(QStringLiteral("repo_id")).toString();
         // dnf5daemon returns both download_size (RPM payload, what must be
-        // fetched) and install_size (on-disk footprint after install).
-        // For a "Total Download Size" summary the download size is the
-        // relevant figure; fall back to install_size only when the daemon
-        // did not provide a download size (e.g. @commandline packages).
-        size = objMap.value(QStringLiteral("download_size")).toLongLong();
-        if (size == 0)
-            size = objMap.value(QStringLiteral("install_size")).toLongLong();
+        // fetched) and install_size (on-disk footprint after install). Keep
+        // both figures so the TransactionResultDialog can render two size
+        // columns ("Download Size" + "Install Size") like yumex-dnf / dnf5
+        // itself do. The dialog still falls back to install_size for the
+        // download column when the daemon did not provide a download_size
+        // (e.g. @commandline packages).
+        downloadSize = objMap.value(QStringLiteral("download_size")).toLongLong();
+        installSize = objMap.value(QStringLiteral("install_size")).toLongLong();
+        if (downloadSize == 0)
+            downloadSize = installSize;
 
         QVariantList entry;
         QVariantList nevraRepo;
         nevraRepo.append(nevra);
         nevraRepo.append(repo);
         entry.append(QVariant(nevraRepo));
-        entry.append(size);
+        entry.append(QVariant(downloadSize));
+        entry.append(QVariant(installSize));
+        entry.append(QVariant(isDependency));
 
         QVariantMap &dataMap = result.data;
         QVariantList list = dataMap.value(actionKey).toList();

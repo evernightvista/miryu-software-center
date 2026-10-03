@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: miryu\n"
 "Report-Msgid-Bugs-To: https://github.com/EvernightFedora/miryu\n"
 "POT-Creation-Date: 2026-08-21 03:20+0000\n"
-"PO-Revision-Date: 2026-08-20 00:00+0800\n"
+"PO-Revision-Date: 2026-10-03 00:00+0800\n"
 "Last-Translator: KairikiFedora <kairiki@evernightfedora.org>\n"
 "Language-Team: Simplified Chinese <kairiki@evernightfedora.org>\n"
 "Language: zh_CN\n"
@@ -678,13 +678,21 @@ msgstr "配置 Miryu..."
 msgid "Find"
 msgstr "查找"
 
-#: src/ui/MainWindow.cpp:442
+#: src/ui/MainWindow.cpp:601 src/ui/MainWindow.cpp:346
 msgid "Select All"
 msgstr "全选"
 
-#: src/ui/MainWindow.cpp:453
+#: src/ui/MainWindow.cpp:612 src/ui/MainWindow.cpp:351
 msgid "Deselect All"
 msgstr "取消全选"
+
+#: src/ui/MainWindow.cpp:347
+msgid "Queue every update shown in the list"
+msgstr "将列表中显示的每个更新加入队列"
+
+#: src/ui/MainWindow.cpp:352
+msgid "Remove every update from the queue"
+msgstr "从队列中移除每个更新"
 
 #: src/ui/MainWindow.cpp:472
 msgid "Package Browser"
@@ -989,6 +997,8 @@ msgid "Downloading %1..."
 msgstr "下载 %1 中..."
 
 #: src/ui/QueueView.cpp:61 src/ui/PackageInfoWidget.cpp:95
+#: src/ui/PackageView.cpp:140 src/ui/TransactionResultDialog.cpp:167
+#: src/ui/TransactionResultDialog.cpp:219
 msgid "Dependencies"
 msgstr "依赖"
 
@@ -1185,9 +1195,17 @@ msgstr "替换"
 msgid "Obsolete"
 msgstr "废弃"
 
-#: src/ui/TransactionResultDialog.cpp:117
+#: src/ui/TransactionResultDialog.cpp:212
 msgid "Total Download Size"
 msgstr "总下载大小"
+
+#: src/ui/TransactionResultDialog.cpp:215
+msgid "Total Install Size"
+msgstr "总安装大小"
+
+#: src/ui/TransactionResultDialog.cpp:280
+msgid "Total Freed Space"
+msgstr "总释放空间"
 
 #: src/ui/TransactionResultDialog.cpp:121
 msgid "Apply offline (on next reboot)"
@@ -1221,23 +1239,27 @@ msgstr "<i>暂无更新日志。</i>"
 msgid "<i>No file list available.</i>"
 msgstr "<i>暂无文件列表。</i>"
 
-#: src/ui/MainWindow.cpp:757 src/ui/MainWindow.cpp:581
-msgid ""
-"Cannot remove protected packages or critical dependencies.\n"
-"\n"
-"Removing these packages would break the system.\n"
-"\n"
-"%1"
-msgstr ""
-"无法移除受保护的软件包或关键依赖。\n"
-"\n"
-"移除这些软件包将破坏系统。\n"
-"\n"
-"%1"
+#: src/ui/MainWindow.cpp:747,990
+msgid "Cannot remove protected packages or critical dependencies, removing them would break the system.\n\n%1"
+msgstr "无法移除受保护的软件包或关键依赖项，这么做会损坏操作系统。\n\n%1"
 
 #: src/ui/MainWindow.cpp:761 src/ui/MainWindow.cpp:585
 msgid "Protected Package Error"
 msgstr "受保护软件包错误"
+
+#: src/ui/MainWindow.cpp:938
+msgid ""
+"Cannot uninstall the running kernel. Doing so would make the system unbootable.\n"
+"\n"
+"Please boot into a different kernel before removing %1."
+msgstr ""
+"无法卸载正在运行的内核，这么做会导致系统无法启动。\n"
+"\n"
+"请先启动到其他内核，然后再移除 %1。"
+
+#: src/ui/MainWindow.cpp:943
+msgid "Cannot Remove Running Kernel"
+msgstr "无法移除正在运行的内核"
 
 #: src/core/Dnf5DaemonClient.cpp:471
 msgid "Cannot load repositories."
@@ -1325,4 +1347,62 @@ msgid "Dependency resolution failed. The reasons are as follows:\n"
 "\n"
 msgstr "依赖解决失败，原因如下：\n"
 "\n"
+
+#: src/ui/MainWindow.cpp:240 src/ui/MainWindow.cpp:357
+msgid "Apply pending operations in the queue"
+msgstr "应用队列中的待处理操作"
+
+#: src/ui/MainWindow.cpp:1011
+msgid "Transaction"
+msgstr "事务"
+
+#: src/core/Backend.cpp:489
+msgid "Verifying packages..."
+msgstr "正在验证软件包..."
+
+#: src/core/Backend.cpp:490
+msgid "Installing packages..."
+msgstr "正在安装软件包..."
+
+#: src/core/Backend.cpp:495
+msgid "Downloading packages..."
+msgstr "正在下载软件包..."
+
+#: src/ui/TransactionResultDialog.cpp:78
+msgid "Download Size"
+msgstr "下载大小"
+
+#: src/ui/TransactionResultDialog.cpp:79
+msgid "Install Size"
+msgstr "安装大小"
+
+#: src/ui/TransactionResultDialog.cpp:108
+msgid "Freed Space"
+msgstr "释放空间"
+
+#: src/core/Dnf5DaemonClient.cpp:439
+msgid ""
+"Cannot connect to the D-Bus system bus.\n"
+"\n"
+"Please make sure the D-Bus system bus is running (dbus-broker / dbus-"
+"daemon)."
+msgstr ""
+"无法连接到 D-Bus 系统总线。\n"
+"\n"
+"请确保 D-Bus 系统总线正在运行（dbus-broker / dbus-daemon）。"
+
+#: src/core/Dnf5DaemonClient.cpp:60
+msgid ""
+"The connection to the system D-Bus / dnf5daemon-server was lost (\"%1\"). "
+"The service may have restarted.\n"
+"\n"
+"Please try the operation again. If the problem persists, restart the "
+"service with:\n"
+"  sudo systemctl restart dnf5daemon-server"
+msgstr ""
+"到系统 D-Bus / dnf5daemon-server 的连接已丢失（\"%1\"）。服务可能已重"
+"启。\n"
+"\n"
+"请重试该操作。如果问题持续存在，请使用以下命令重启服务：\n"
+"  sudo systemctl restart dnf5daemon-server"
 

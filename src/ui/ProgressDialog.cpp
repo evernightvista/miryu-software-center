@@ -11,7 +11,7 @@ ProgressDialog::ProgressDialog(QWidget *parent)
     // Pass the window flags to the QDialog constructor so they are set at
     // window-creation time. Explicitly enumerate only Minimize + Close button
     // hints and omit Qt::WindowMaximizeButtonHint; Qt::CustomizeWindowHint
-    // tells Qt to honor this exact button set instead of the WM defaults.
+    // tells Qt to honor this exact button set instead of the WM Defaults.
     : QDialog(parent, Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint
                      | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint
                      | Qt::CustomizeWindowHint)
@@ -20,8 +20,7 @@ ProgressDialog::ProgressDialog(QWidget *parent)
     setModal(true);
     // Fixed width so the window manager (notably KWin, which shows a
     // maximize button only for resizable windows) does not display a
-    // maximize button for this small, transient modal dialog. The height
-    // stays automatic so the detail label can wrap when needed.
+    // maximize button for this small, transient modal dialog.
     setFixedWidth(480);
 
     auto *layout = new QVBoxLayout(this);
@@ -38,16 +37,11 @@ ProgressDialog::ProgressDialog(QWidget *parent)
     m_progressBar = new QProgressBar;
     m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
+    // Show the percent value as text inside the bar (e.g. "0%", "42%") so
+    // the dialog mirrors the simple "Preparing... 0%" layout requested.
+    m_progressBar->setTextVisible(true);
+    m_progressBar->setFormat(QStringLiteral("%p%"));
     layout->addWidget(m_progressBar);
-
-    m_detailLabel = new QLabel;
-    // palette(mid) resolves to near-black in dark themes; dim the theme text colour instead.
-    QColor secondary = palette().color(QPalette::WindowText);
-    secondary.setAlpha(160);
-    m_detailLabel->setStyleSheet(
-        QStringLiteral("color: rgba(%1, %2, %3, 0.627);")
-            .arg(secondary.red()).arg(secondary.green()).arg(secondary.blue()));
-    layout->addWidget(m_detailLabel);
 }
 
 void ProgressDialog::setMessage(const QString &message)
@@ -57,23 +51,34 @@ void ProgressDialog::setMessage(const QString &message)
 
 void ProgressDialog::setProgress(int percent)
 {
+    // When the bar is in indeterminate ("busy") mode (range 0,0) Qt ignores
+    // setValue() — the animation keeps spinning. When the bar is back to the
+    // determinate 0..100 range, setValue() updates the fill.
     m_progressBar->setValue(percent);
 }
 
-void ProgressDialog::setDownloadProgress(const QString &downloadId, qint64 total, qint64 downloaded)
+void ProgressDialog::setIndeterminate(bool on)
 {
-    QString detail;
-    if (total > 0) {
-        double mbTotal = total / (1024.0 * 1024);
-        double mbDownloaded = downloaded / (1024.0 * 1024);
-        detail = i18n("Downloading %1: %2 MB / %3 MB",
-                       downloadId,
-                       QString::number(mbDownloaded, 'f', 1),
-                       QString::number(mbTotal, 'f', 1));
+    // QProgressBar's "busy" mode is range(0,0): Qt animates the fill back and
+    // forth and ignores setValue() until the range is reset. We switch the
+    // percent text off in this mode (it would otherwise read "0%" forever
+    // even though the bar is visibly moving) and back on when the determinate
+    // range is restored.
+    if (on) {
+        m_progressBar->setRange(0, 0);
+        m_progressBar->setTextVisible(false);
     } else {
-        detail = i18n("Downloading %1...", downloadId);
+        m_progressBar->setRange(0, 100);
+        m_progressBar->setTextVisible(true);
     }
-    m_detailLabel->setText(detail);
+}
+
+void ProgressDialog::reset()
+{
+    m_messageLabel->setText(i18n("Preparing..."));
+    m_progressBar->setRange(0, 100);
+    m_progressBar->setTextVisible(true);
+    m_progressBar->setValue(0);
 }
 
 }

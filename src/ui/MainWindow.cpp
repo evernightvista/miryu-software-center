@@ -116,6 +116,12 @@ MainWindow::MainWindow(Backend *backend, QWidget *parent)
     connect(m_backend, &Backend::updatesLoaded, this, &MainWindow::onUpdatesLoaded);
     connect(m_backend, &Backend::transactionProgress, this, &MainWindow::onTransactionProgress);
     connect(m_backend, &Backend::downloadProgress, this, &MainWindow::onDownloadProgress);
+    // The modal ProgressDialog is driven entirely by the aggregated
+    // overallProgress signal — onDownloadProgress / onTransactionProgress
+    // only update the bottom status bar now, never the dialog itself, so the
+    // dialog shows ONE overall percent per phase (download / install) as
+    // requested instead of per-package ticks.
+    connect(m_backend, &Backend::overallProgress, this, &MainWindow::onOverallProgress);
     connect(m_backend, &Backend::errorOccurred, this, &MainWindow::onError);
 
     // Disable the auto-generated KDE help menu (handbook, "What's This",
@@ -225,9 +231,20 @@ void MainWindow::setupUI()
         m_searchFieldCombo->addItem(i18n("Summary"), static_cast<int>(SearchField::Summary));
         m_searchFieldCombo->addItem(i18n("Description"), static_cast<int>(SearchField::Description));
 
+        // Per-page "Apply" button. Visible whenever the queue holds pending
+        // transactions so the user can confirm and execute them without
+        // having to switch to the Queue page first. Disabled (still visible
+        // but greyed out) when the queue is empty, mirroring the bottom
+        // status-bar queue counter.
+        m_applyButton = new QPushButton(QIcon::fromTheme(QStringLiteral("dialog-ok-apply")), i18n("Apply"));
+        m_applyButton->setToolTip(i18n("Apply pending operations in the queue"));
+        m_applyButton->setEnabled(false);
+        connect(m_applyButton, &QPushButton::clicked, this, &MainWindow::onApplyQueue);
+
         searchLayout->addWidget(m_searchEdit, 1);
         searchLayout->addWidget(m_filterCombo);
         searchLayout->addWidget(m_searchFieldCombo);
+        searchLayout->addWidget(m_applyButton);
 
         layout->addWidget(searchBar);
 
@@ -313,9 +330,36 @@ void MainWindow::setupUI()
         auto *layout = new QVBoxLayout(m_updatesPage);
         layout->setContentsMargins(0, 0, 0, 0);
 
+        auto *headerRow = new QWidget;
+        auto *headerLayout = new QHBoxLayout(headerRow);
+        headerLayout->setContentsMargins(8, 8, 8, 4);
+
         auto *header = new QLabel(QStringLiteral("<b>%1</b>").arg(i18n("Available Updates")));
-        header->setContentsMargins(8, 8, 8, 4);
-        layout->addWidget(header);
+        headerLayout->addWidget(header);
+        headerLayout->addStretch();
+
+        // "Select All" / "Deselect All" buttons — only on the Updates page.
+        // The Packages page mixes installed / available / update / downgrade
+        // states, so a blanket "queue everything" would be ambiguous there.
+        // Updates are a single intent (upgrade), so the bulk-select buttons
+        // sit next to the Apply button on the right of the header row.
+        m_selectAllUpdatesButton = new QPushButton(QIcon::fromTheme(QStringLiteral("edit-select-all")), i18n("Select All"));
+        m_selectAllUpdatesButton->setToolTip(i18n("Queue every update shown in the list"));
+        connect(m_selectAllUpdatesButton, &QPushButton::clicked, this, &MainWindow::onSelectAllUpdates);
+        headerLayout->addWidget(m_selectAllUpdatesButton);
+
+        m_deselectAllUpdatesButton = new QPushButton(QIcon::fromTheme(QStringLiteral("edit-select-none")), i18n("Deselect All"));
+        m_deselectAllUpdatesButton->setToolTip(i18n("Remove every update from the queue"));
+        connect(m_deselectAllUpdatesButton, &QPushButton::clicked, this, &MainWindow::onDeselectAllUpdates);
+        headerLayout->addWidget(m_deselectAllUpdatesButton);
+
+        m_updatesApplyButton = new QPushButton(QIcon::fromTheme(QStringLiteral("dialog-ok-apply")), i18n("Apply"));
+        m_updatesApplyButton->setToolTip(i18n("Apply pending operations in the queue"));
+        m_updatesApplyButton->setEnabled(false);
+        connect(m_updatesApplyButton, &QPushButton::clicked, this, &MainWindow::onApplyQueue);
+        headerLayout->addWidget(m_updatesApplyButton);
+
+        layout->addWidget(headerRow);
 
         m_updatesView = new PackageView(new PackageModel(this));
         layout->addWidget(m_updatesView, 1);
@@ -685,30 +729,33 @@ void MainWindow::runRpmInstallWithPolkit(const QStringList &files, bool offline)
         watcher->deleteLater();
 
         if (!result.completed) {
-            QString error;
-            if (!result.problems.isEmpty()) {
-                // dnf5 could not resolve the transaction (conflicting
-                // requests, missing dependencies, …). The human-readable
-                // reasons come from get_transaction_problems_string().
-                // Prepend a clear header so the dialog reads "Dependency
-                // resolution failed. The reasons are as follows:" followed
-                // by the raw dnf5 problem text (e.g. "Problem: conflicting
-                // requests - nothing provides ...").
-                error = i18n("Dependency resolution failed. The reasons are as follows:\n\n")
-                        + result.problems.join(QStringLiteral("\n"));
-                if (!result.error.isEmpty())
-                    error += QStringLiteral("\n\n") + result.error;
-            } else {
-                error = result.error;
-            }
+            // The raw dnf5 problem text. Kept separate from the user-facing
+            // header so the protected-package branch can show it without the
+            // misleading "Dependency resolution failed" preamble — the
+            // failure there is not a missing dependency, it is dnf5 refusing
+            // to touch a protected package.
+            const QString problemsText = result.problems.join(QStringLiteral("\n"));
+            const bool isProtected =
+                problemsText.contains(QStringLiteral("protected"), Qt::CaseInsensitive) ||
+                problemsText.contains(QStringLiteral("essential"), Qt::CaseInsensitive);
 
-            if (error.contains(QStringLiteral("protected"), Qt::CaseInsensitive) ||
-                error.contains(QStringLiteral("essential"), Qt::CaseInsensitive)) {
+            if (isProtected) {
+                QString detail = problemsText;
+                if (!result.error.isEmpty())
+                    detail += QStringLiteral("\n\n") + result.error;
                 KMessageBox::error(this,
-                    i18n("Cannot remove protected packages or critical dependencies.\n\n"
-                         "Removing these packages would break the system.\n\n%1").arg(error),
+                    i18n("Cannot remove protected packages or critical dependencies, removing them would break the system.\n\n%1").arg(detail),
                     i18n("Protected Package Error"));
             } else {
+                QString error;
+                if (!result.problems.isEmpty()) {
+                    error = i18n("Dependency resolution failed. The reasons are as follows:\n\n")
+                            + problemsText;
+                    if (!result.error.isEmpty())
+                        error += QStringLiteral("\n\n") + result.error;
+                } else {
+                    error = result.error;
+                }
                 KMessageBox::error(this, error, i18n("Transaction Error"));
             }
             m_statusLabel->setText(i18n("Ready"));
@@ -883,6 +930,24 @@ void MainWindow::onApplyQueue()
         return;
     }
 
+    // Reject any attempt to remove the currently running kernel: doing so
+    // would leave the system without a bootable kernel. We scan the user-
+    // requested packages (not the auto-pulled dependencies) for a removal
+    // whose target is the running kernel. The check is intentionally
+    // conservative — if osrelease cannot be read we let the transaction
+    // through and let dnf5 enforce its own protection (protected_packages).
+    for (const auto &pkg : packages) {
+        if (pkg.todo == PackageTodo::Remove && isRunningKernel(pkg)) {
+            KMessageBox::error(this,
+                i18n("Cannot uninstall the running kernel. "
+                     "Doing so would make the system unbootable.\n\n"
+                     "Please boot into a different kernel before removing %1.")
+                    .arg(pkg.nevra()),
+                i18n("Cannot Remove Running Kernel"));
+            return;
+        }
+    }
+
     // Build transaction
     m_statusLabel->setText(i18n("Resolving transaction..."));
     m_progressBar->setRange(0, 0);
@@ -899,32 +964,43 @@ void MainWindow::onApplyQueue()
         TransactionResult result = watcher->result();
 
         if (!result.completed) {
-            QString error;
-            if (!result.problems.isEmpty()) {
-                // dnf5 could not resolve the transaction (conflicting
-                // requests, missing dependencies, …). The human-readable
-                // reasons come from get_transaction_problems_string().
-                // Prepend a clear header so the dialog reads "Dependency
-                // resolution failed. The reasons are as follows:" followed
-                // by the raw dnf5 problem text (e.g. "Problem: conflicting
-                // requests - nothing provides ...").
-                error = i18n("Dependency resolution failed. The reasons are as follows:\n\n")
-                        + result.problems.join(QStringLiteral("\n"));
-                if (!result.error.isEmpty())
-                    error += QStringLiteral("\n\n") + result.error;
-            } else {
-                error = result.error;
-            }
+            // The raw dnf5 problem text (e.g. "Problem: The operation would
+            // result in removing the following protected packages: ...").
+            // Kept separate from the user-facing header so the protected-
+            // package branch can show it without the misleading "Dependency
+            // resolution failed" preamble — the failure there is not a
+            // missing dependency, it is dnf5 refusing to touch a protected
+            // package.
+            const QString problemsText = result.problems.join(QStringLiteral("\n"));
+            const bool isProtected =
+                problemsText.contains(QStringLiteral("protected"), Qt::CaseInsensitive) ||
+                problemsText.contains(QStringLiteral("essential"), Qt::CaseInsensitive);
 
-            // Detect attempts to remove protected packages or critical
-            // dependencies. dnf5 reports these in the problems string.
-            if (error.contains(QStringLiteral("protected"), Qt::CaseInsensitive) ||
-                error.contains(QStringLiteral("essential"), Qt::CaseInsensitive)) {
+            if (isProtected) {
+                // Protected packages: do not prefix with "Dependency
+                // resolution failed" — the transaction was not blocked by a
+                // missing dependency but by dnf5's protected_packages policy.
+                // Just explain that protected packages cannot be removed and
+                // show which ones dnf5 refused to touch.
+                QString detail = problemsText;
+                if (!result.error.isEmpty())
+                    detail += QStringLiteral("\n\n") + result.error;
                 KMessageBox::error(this,
-                    i18n("Cannot remove protected packages or critical dependencies.\n\n"
-                         "Removing these packages would break the system.\n\n%1").arg(error),
+                    i18n("Cannot remove protected packages or critical dependencies, removing them would break the system.\n\n%1").arg(detail),
                     i18n("Protected Package Error"));
             } else {
+                // Genuine dependency / resolution failure. Prepend the clear
+                // header so the user understands the transaction was rejected
+                // because dnf5 could not satisfy the requested operation.
+                QString error;
+                if (!result.problems.isEmpty()) {
+                    error = i18n("Dependency resolution failed. The reasons are as follows:\n\n")
+                            + problemsText;
+                    if (!result.error.isEmpty())
+                        error += QStringLiteral("\n\n") + result.error;
+                } else {
+                    error = result.error;
+                }
                 KMessageBox::error(this, error, i18n("Transaction Error"));
             }
             m_statusLabel->setText(i18n("Ready"));
@@ -999,6 +1075,60 @@ void MainWindow::onClearQueue()
     m_queueModel->clear();
     m_packageModel->clearQueued();
     updateStatusBar();
+}
+
+void MainWindow::onSelectAllUpdates()
+{
+    // Queue every package currently shown in the Updates list view (every
+    // row of m_updatesView's model that is not yet queued). Goes through
+    // the existing onQueuePackage / onPackagesQueued slots so the queue
+    // model, the package model, the Apply button and the status bar all
+    // stay in sync — the same code path used when the user ticks the
+    // per-row checkbox manually. Skip packages already in the queue to
+    // avoid duplicate entries when the user clicks "Select All" twice.
+    auto *model = qobject_cast<PackageModel *>(m_updatesView ? m_updatesView->model() : nullptr);
+    if (!model)
+        return;
+
+    QList<Package> toQueue;
+    const QList<Package> packages = model->packages();
+    for (auto pkg : packages) {
+        if (!pkg.queued && !m_queueModel->contains(pkg.nevra())) {
+            pkg.queued = true;
+            pkg.todo = calcTodo(pkg.state);
+            model->setQueued(pkg.nevra(), true);
+            toQueue.append(pkg);
+        }
+    }
+    if (!toQueue.isEmpty()) {
+        // Reuse the existing batched-queue path so the queue model,
+        // package model, status bar and Apply button are all updated in
+        // one shot. This also emits the same "N packages queued" status
+        // message the per-row checkbox path produces.
+        onPackagesQueued(toQueue);
+    }
+}
+
+void MainWindow::onDeselectAllUpdates()
+{
+    // Counterpart of onSelectAllUpdates(): remove every package shown in
+    // the Updates list view from the queue. Goes through onUnqueuePackage
+    // for the same single-source-of-truth reason. Packages that are not
+    // actually queued (or not present in the queue model) are skipped to
+    // avoid spurious model churn.
+    auto *model = qobject_cast<PackageModel *>(m_updatesView ? m_updatesView->model() : nullptr);
+    if (!model)
+        return;
+
+    // Walk a *copy* of the package list: onUnqueuePackage() mutates the
+    // underlying model's queued state in place, so iterating the live
+    // QList<Package> reference directly would risk skipping rows after a
+    // removal. The snapshot is unaffected.
+    const QList<Package> packages = model->packages();
+    for (const auto &pkg : packages) {
+        if (pkg.queued || m_queueModel->contains(pkg.nevra()))
+            onUnqueuePackage(pkg.nevra());
+    }
 }
 
 void MainWindow::onRefresh()
@@ -1468,6 +1598,32 @@ QString MainWindow::currentBootId() const
     return QString();
 }
 
+QString MainWindow::runningKernelRelease() const
+{
+    // /proc/sys/kernel/osrelease holds the uname -r string, e.g.
+    // "6.8.10-200.fc39.x86_64". This is exactly the version-release.arch
+    // tuple that identifies the running kernel's RPM subpackages (kernel,
+    // kernel-core, kernel-modules, …).
+    QFile f(QStringLiteral("/proc/sys/kernel/osrelease"));
+    if (f.open(QIODevice::ReadOnly | QIODevice::Text))
+        return QString::fromUtf8(f.readAll()).trimmed();
+    return QString();
+}
+
+bool MainWindow::isRunningKernel(const Package &pkg) const
+{
+    const QString release = runningKernelRelease();
+    if (release.isEmpty())
+        return false;
+    // Kernel subpackages all share the "kernel" name prefix (kernel,
+    // kernel-core, kernel-modules, kernel-devel, kernel-headers, …). The
+    // running kernel's subpackages all carry the same version-release.arch
+    // as the osrelease string.
+    if (!pkg.name.startsWith(QStringLiteral("kernel")))
+        return false;
+    return (pkg.evr() + QStringLiteral(".") + pkg.arch) == release;
+}
+
 void MainWindow::setRestartNeeded()
 {
     KConfigGroup cg(KSharedConfig::openConfig(), QStringLiteral("Restart"));
@@ -1774,10 +1930,10 @@ void MainWindow::onUpdatesLoaded(const QList<Package> &updates)
 
 void MainWindow::onTransactionProgress(const QString &message, int percent)
 {
-    if (m_progressDialog) {
-        m_progressDialog->setMessage(message);
-        m_progressDialog->setProgress(percent);
-    }
+    // The status bar still shows the per-action message + percent so the
+    // user can see what the daemon is currently doing. The modal
+    // ProgressDialog is no longer driven from here — it is driven by
+    // onOverallProgress() with the aggregated overall percent instead.
     m_statusLabel->setText(message);
     if (percent >= 0) {
         m_progressBar->setRange(0, 100);
@@ -1788,19 +1944,11 @@ void MainWindow::onTransactionProgress(const QString &message, int percent)
 
 void MainWindow::onDownloadProgress(const QString &downloadId, qint64 total, qint64 downloaded)
 {
-    // Compose the whole dialog state from THIS signal (like yumex-ng, which
-    // re-asserts "Downloading : <pkg>" on every download progress signal).
-    // This guarantees the dialog always shows which package the numbers
-    // belong to — the top "Downloading <pkg>" line, the progress bar and the
-    // byte detail can never drift apart, and the package name appears the
-    // moment a download starts (downloadAddNew → downloadProgress(...,0))
-    // instead of waiting for the first progress tick.
-    if (m_progressDialog) {
-        m_progressDialog->setMessage(i18n("Downloading %1", downloadId));
-        m_progressDialog->setDownloadProgress(downloadId, total, downloaded);
-        int percent = total > 0 ? static_cast<int>(downloaded * 100 / total) : 0;
-        m_progressDialog->setProgress(percent);
-    }
+    // Status-bar-only: the per-package message lets the user see which
+    // package is currently being downloaded. The modal ProgressDialog is
+    // driven by the aggregated overallProgress signal (onOverallProgress)
+    // so it shows a single overall download percent instead of bouncing
+    // per-package ticks.
     m_statusLabel->setText(i18n("Downloading %1", downloadId));
     if (total > 0) {
         const int percent = static_cast<int>(downloaded * 100 / total);
@@ -1808,6 +1956,35 @@ void MainWindow::onDownloadProgress(const QString &downloadId, qint64 total, qin
         m_progressBar->setValue(percent);
         m_progressBar->setVisible(true);
     }
+}
+
+void MainWindow::onOverallProgress(int percent, const QString &phase, const QString &message)
+{
+    // Single source of truth for the modal ProgressDialog: the backend
+    // already picked the right phase message ("Downloading packages...",
+    // "Installing packages...", "Verifying packages...", "Preparing...")
+    // and computed the overall percent. The dialog only reflects it.
+    if (!m_progressDialog)
+        return;
+
+    m_progressDialog->setMessage(message);
+    // During the "prepare" phase the daemon has not started downloading or
+    // installing yet, so keep BOTH bars (the status-bar one AND the dialog
+    // one) in indeterminate busy mode until real progress arrives. As soon
+    // as the phase switches to download / install / verify, switch back to
+    // a 0..100 range and set the actual percent. The dialog's bar previously
+    // stayed frozen at 0% with no animation during "prepare", which gave the
+    // strong impression the call had deadlocked — the bar now visibly spins
+    // so the user knows the daemon is still resolving the goal / loading
+    // metadata.
+    const bool indeterminate = (phase == QStringLiteral("prepare"));
+    m_progressBar->setRange(0, indeterminate ? 0 : 100);
+    if (!indeterminate) {
+        m_progressBar->setValue(percent);
+        m_progressBar->setVisible(true);
+    }
+    m_progressDialog->setIndeterminate(indeterminate);
+    m_progressDialog->setProgress(percent);
 }
 
 void MainWindow::onError(const QString &error)
@@ -1839,6 +2016,21 @@ void MainWindow::updateStatusBar()
         m_queueCountLabel->clear();
         m_queueCountLabel->setStyleSheet(QString());
     }
+    updateApplyButtons();
+}
+
+void MainWindow::updateApplyButtons()
+{
+    // The per-page "Apply" buttons are visible on the Packages and Updates
+    // pages so the user can execute a pending queue without first switching
+    // to the Queue page. They are enabled only when the queue actually holds
+    // pending transactions; otherwise they are greyed out so the affordance
+    // is still discoverable but cannot be triggered by accident.
+    const bool hasPending = m_queueModel->count() > 0;
+    if (m_applyButton)
+        m_applyButton->setEnabled(hasPending);
+    if (m_updatesApplyButton)
+        m_updatesApplyButton->setEnabled(hasPending);
 }
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event)

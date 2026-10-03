@@ -671,12 +671,20 @@ msgstr ""
 msgid "Find"
 msgstr ""
 
-#: src/ui/MainWindow.cpp:442
+#: src/ui/MainWindow.cpp:601 src/ui/MainWindow.cpp:346
 msgid "Select All"
 msgstr ""
 
-#: src/ui/MainWindow.cpp:453
+#: src/ui/MainWindow.cpp:612 src/ui/MainWindow.cpp:351
 msgid "Deselect All"
+msgstr ""
+
+#: src/ui/MainWindow.cpp:347
+msgid "Queue every update shown in the list"
+msgstr ""
+
+#: src/ui/MainWindow.cpp:352
+msgid "Remove every update from the queue"
 msgstr ""
 
 #: src/ui/MainWindow.cpp:472
@@ -985,6 +993,8 @@ msgid "Downloading %1..."
 msgstr ""
 
 #: src/ui/QueueView.cpp:61 src/ui/PackageInfoWidget.cpp:95
+#: src/ui/PackageView.cpp:140 src/ui/TransactionResultDialog.cpp:167
+#: src/ui/TransactionResultDialog.cpp:219
 msgid "Dependencies"
 msgstr ""
 
@@ -1178,8 +1188,16 @@ msgstr ""
 msgid "Obsolete"
 msgstr ""
 
-#: src/ui/TransactionResultDialog.cpp:117
+#: src/ui/TransactionResultDialog.cpp:212
 msgid "Total Download Size"
+msgstr ""
+
+#: src/ui/TransactionResultDialog.cpp:215
+msgid "Total Install Size"
+msgstr ""
+
+#: src/ui/TransactionResultDialog.cpp:280
+msgid "Total Freed Space"
 msgstr ""
 
 #: src/ui/TransactionResultDialog.cpp:121
@@ -1214,17 +1232,23 @@ msgstr ""
 msgid "<i>No file list available.</i>"
 msgstr ""
 
-#: src/ui/MainWindow.cpp:757 src/ui/MainWindow.cpp:581
-msgid ""
-"Cannot remove protected packages or critical dependencies.\n"
-"\n"
-"Removing these packages would break the system.\n"
-"\n"
-"%1"
+#: src/ui/MainWindow.cpp:747,990
+msgid "Cannot remove protected packages or critical dependencies, removing them would break the system.\n\n%1"
 msgstr ""
 
 #: src/ui/MainWindow.cpp:761 src/ui/MainWindow.cpp:585
 msgid "Protected Package Error"
+msgstr ""
+
+#: src/ui/MainWindow.cpp:938
+msgid ""
+"Cannot uninstall the running kernel. Doing so would make the system unbootable.\n"
+"\n"
+"Please boot into a different kernel before removing %1."
+msgstr ""
+
+#: src/ui/MainWindow.cpp:943
+msgid "Cannot Remove Running Kernel"
 msgstr ""
 
 #: src/core/Dnf5DaemonClient.cpp:471
@@ -1243,6 +1267,7 @@ msgstr ""
 msgid "Launch the external Linglong Store application"
 msgstr ""
 
+#: src/ui/PackageInfoWidget.cpp:210
 msgid "<i>Loading...</i>"
 msgstr ""
 
@@ -1264,15 +1289,18 @@ msgstr ""
 msgid "Failed to launch the Linglong Store.\n\n"
 msgstr ""
 
+#: src/ui/MainWindow.cpp:1268
 msgid "Failed to refresh metadata (exit code %1)."
 msgstr ""
 
 msgid "Failed to start command.\n%1\n\n"
 msgstr ""
 
+#: src/ui/MainWindow.cpp:1255
 msgid "Metadata refreshed."
 msgstr ""
 
+#: src/ui/MainWindow.cpp:1217
 msgid "Refresh Metadata Log"
 msgstr ""
 
@@ -1307,5 +1335,55 @@ msgstr ""
 #: src/ui/MainWindow.cpp:696 src/ui/MainWindow.cpp:910
 msgid "Dependency resolution failed. The reasons are as follows:\n"
 "\n"
+msgstr ""
+
+#: src/ui/MainWindow.cpp:240 src/ui/MainWindow.cpp:357
+msgid "Apply pending operations in the queue"
+msgstr ""
+
+#: src/ui/MainWindow.cpp:1011
+msgid "Transaction"
+msgstr ""
+
+#: src/core/Backend.cpp:489
+msgid "Verifying packages..."
+msgstr ""
+
+#: src/core/Backend.cpp:490
+msgid "Installing packages..."
+msgstr ""
+
+#: src/core/Backend.cpp:495
+msgid "Downloading packages..."
+msgstr ""
+
+#: src/ui/TransactionResultDialog.cpp:78
+msgid "Download Size"
+msgstr ""
+
+#: src/ui/TransactionResultDialog.cpp:79
+msgid "Install Size"
+msgstr ""
+
+#: src/ui/TransactionResultDialog.cpp:108
+msgid "Freed Space"
+msgstr ""
+
+#: src/core/Dnf5DaemonClient.cpp:439
+msgid ""
+"Cannot connect to the D-Bus system bus.\n"
+"\n"
+"Please make sure the D-Bus system bus is running (dbus-broker / dbus-"
+"daemon)."
+msgstr ""
+
+#: src/core/Dnf5DaemonClient.cpp:60
+msgid ""
+"The connection to the system D-Bus / dnf5daemon-server was lost (\"%1\"). "
+"The service may have restarted.\n"
+"\n"
+"Please try the operation again. If the problem persists, restart the "
+"service with:\n"
+"  sudo systemctl restart dnf5daemon-server"
 msgstr ""
 

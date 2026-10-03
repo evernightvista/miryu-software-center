@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: miryu\n"
 "Report-Msgid-Bugs-To: https://github.com/EvernightFedora/miryu\n"
 "POT-Creation-Date: 2026-08-21 03:20+0000\n"
-"PO-Revision-Date: 2026-08-20 00:00+0800\n"
+"PO-Revision-Date: 2026-10-03 00:00+0800\n"
 "Last-Translator: KairikiFedora <kairiki@evernightfedora.org>\n"
 "Language-Team: Korean <miryu@example.com>\n"
 "Language: ko\n"
@@ -678,13 +678,21 @@ msgstr "Miryu 설정..."
 msgid "Find"
 msgstr "찾기"
 
-#: src/ui/MainWindow.cpp:442
+#: src/ui/MainWindow.cpp:601 src/ui/MainWindow.cpp:346
 msgid "Select All"
 msgstr "모두 선택"
 
-#: src/ui/MainWindow.cpp:453
+#: src/ui/MainWindow.cpp:612 src/ui/MainWindow.cpp:351
 msgid "Deselect All"
 msgstr "모두 선택 해제"
+
+#: src/ui/MainWindow.cpp:347
+msgid "Queue every update shown in the list"
+msgstr "목록에 표시된 모든 업데이트를 대기열에 추가"
+
+#: src/ui/MainWindow.cpp:352
+msgid "Remove every update from the queue"
+msgstr "대기열에서 모든 업데이트 제거"
 
 #: src/ui/MainWindow.cpp:472
 msgid "Package Browser"
@@ -899,12 +907,11 @@ msgstr "재시작 필요"
 
 #: src/ui/MainWindow.cpp:1208
 msgid ""
-"You have installed software packages that require a computer restart. "
-"Please restart the operating system as soon as possible to ensure the "
-"updates take full effect."
+"You have installed software packages that require a computer restart. Please"
+" restart the operating system as soon as possible to ensure the updates take"
+" full effect."
 msgstr ""
-"컴퓨터 재시작이 필요한 소프트웨어 패키지를 설치했습니다. 업데이트가 완전히 "
-"적용되도록 운영 체제를 최대한 빨리 재시작해 주세요."
+"컴퓨터 재시작이 필요한 소프트웨어 패키지를 설치했습니다. 업데이트가 완전히 적용되도록 운영 체제를 최대한 빨리 재시작해 주세요."
 
 #: src/ui/PackageInfoWidget.cpp:67
 msgid "Version:"
@@ -957,6 +964,7 @@ msgstr "대기열에서 제거"
 #: src/ui/PackageView.cpp:271
 msgid "Queue for Removal"
 msgstr "제거 대기열에 추가"
+
 #: src/ui/PackageView.cpp:286
 msgid "Queue for Reinstall"
 msgstr "재설치 대기열에 추가"
@@ -994,6 +1002,8 @@ msgid "Downloading %1..."
 msgstr "다운로드 %1..."
 
 #: src/ui/QueueView.cpp:61 src/ui/PackageInfoWidget.cpp:95
+#: src/ui/PackageView.cpp:140 src/ui/TransactionResultDialog.cpp:167
+#: src/ui/TransactionResultDialog.cpp:219
 msgid "Dependencies"
 msgstr "의존성"
 
@@ -1190,9 +1200,17 @@ msgstr "교체"
 msgid "Obsolete"
 msgstr "폐기"
 
-#: src/ui/TransactionResultDialog.cpp:117
+#: src/ui/TransactionResultDialog.cpp:212
 msgid "Total Download Size"
 msgstr "총 다운로드 크기"
+
+#: src/ui/TransactionResultDialog.cpp:215
+msgid "Total Install Size"
+msgstr "총 설치 크기"
+
+#: src/ui/TransactionResultDialog.cpp:280
+msgid "Total Freed Space"
+msgstr "총 해제 공간"
 
 #: src/ui/TransactionResultDialog.cpp:121
 msgid "Apply offline (on next reboot)"
@@ -1226,23 +1244,33 @@ msgstr "<i>변경 로그가 없습니다.</i>"
 msgid "<i>No file list available.</i>"
 msgstr "<i>파일 목록이 없습니다.</i>"
 
-#: src/ui/MainWindow.cpp:757 src/ui/MainWindow.cpp:581
+#: src/ui/MainWindow.cpp:747,990
 msgid ""
-"Cannot remove protected packages or critical dependencies.\n"
-"\n"
-"Removing these packages would break the system.\n"
+"Cannot remove protected packages or critical dependencies, removing them would break the system.\n"
 "\n"
 "%1"
 msgstr ""
-"보호된 패키지나 중요한 의존성을 제거할 수 없습니다.\n"
-"\n"
-"이 패키지를 제거하면 시스템이 손상됩니다.\n"
+"보호된 패키지 또는 중요한 종속성을 제거할 수 없습니다, 그렇게 하면 운영 체제가 손상됩니다.\n"
 "\n"
 "%1"
 
 #: src/ui/MainWindow.cpp:761 src/ui/MainWindow.cpp:585
 msgid "Protected Package Error"
 msgstr "보호 패키지 오류"
+
+#: src/ui/MainWindow.cpp:938
+msgid ""
+"Cannot uninstall the running kernel. Doing so would make the system unbootable.\n"
+"\n"
+"Please boot into a different kernel before removing %1."
+msgstr ""
+"실행 중인 커널을 제거할 수 없습니다. 이렇게 하면 시스템을 부팅할 수 없게 됩니다.\n"
+"\n"
+"%1을(를) 제거하기 전에 다른 커널로 부팅하십시오."
+
+#: src/ui/MainWindow.cpp:943
+msgid "Cannot Remove Running Kernel"
+msgstr "실행 중인 커널 제거 불가"
 
 #: src/core/Dnf5DaemonClient.cpp:471
 msgid "Cannot load repositories."
@@ -1267,29 +1295,53 @@ msgstr "외부 Linglong 스토어 응용 프로그램 시작"
 msgid "<i>Loading...</i>"
 msgstr "<i>불러오는 중...</i>"
 
-msgid "Cannot connect to the D-Bus system bus.\n\n"
-msgstr "D-Bus 시스템 버스에 연결할 수 없습니다.\n\n"
+msgid ""
+"Cannot connect to the D-Bus system bus.\n"
+"\n"
+msgstr ""
+"D-Bus 시스템 버스에 연결할 수 없습니다.\n"
+"\n"
 
-msgid "Cannot remove protected packages or critical dependencies.\n\n"
-msgstr "보호된 패키지나 중요 종속성은 제거할 수 없습니다.\n\n"
+msgid ""
+"Cannot remove protected packages or critical dependencies.\n"
+"\n"
+msgstr ""
+"보호된 패키지나 중요 종속성은 제거할 수 없습니다.\n"
+"\n"
 
-msgid "Distribution sync will synchronize all installed packages to the versions available in the repositories. "
+msgid ""
+"Distribution sync will synchronize all installed packages to the versions "
+"available in the repositories. "
 msgstr "배포판 동기화는 설치된 모든 패키지를 저장소에서 사용 가능한 버전으로 동기화합니다. "
 
 msgid "Downloading %1"
 msgstr "%1 다운로드 중"
 
-msgid "Failed to connect to dnf5daemon-server.\n\n"
-msgstr "dnf5daemon-server에 연결하지 못했습니다.\n\n"
+msgid ""
+"Failed to connect to dnf5daemon-server.\n"
+"\n"
+msgstr ""
+"dnf5daemon-server에 연결하지 못했습니다.\n"
+"\n"
 
-msgid "Failed to launch the Linglong Store.\n\n"
-msgstr "Linglong 스토어를 시작하지 못했습니다.\n\n"
+msgid ""
+"Failed to launch the Linglong Store.\n"
+"\n"
+msgstr ""
+"Linglong 스토어를 시작하지 못했습니다.\n"
+"\n"
 
 msgid "Failed to refresh metadata (exit code %1)."
 msgstr "메타데이터 새로고침 실패(종료 코드 %1)."
 
-msgid "Failed to start command.\n%1\n\n"
-msgstr "명령 시작 실패.\n%1\n\n"
+msgid ""
+"Failed to start command.\n"
+"%1\n"
+"\n"
+msgstr ""
+"명령 시작 실패.\n"
+"%1\n"
+"\n"
 
 msgid "Metadata refreshed."
 msgstr "메타데이터가 새로고침되었습니다."
@@ -1326,8 +1378,63 @@ msgid "Failed to send transaction request to dnf5daemon."
 msgstr "dnf5daemon에 트랜잭션 요청 전송에 실패했습니다."
 
 #: src/ui/MainWindow.cpp:696 src/ui/MainWindow.cpp:910
-msgid "Dependency resolution failed. The reasons are as follows:\n"
+msgid ""
+"Dependency resolution failed. The reasons are as follows:\n"
 "\n"
-msgstr "종속성 해결에 실패했습니다. 이유는 다음과 같습니다:\n"
+msgstr ""
+"종속성 해결에 실패했습니다. 이유는 다음과 같습니다:\n"
 "\n"
 
+#: src/ui/MainWindow.cpp:240 src/ui/MainWindow.cpp:357
+msgid "Apply pending operations in the queue"
+msgstr "대기열의 보류 중인 작업 적용"
+
+#: src/ui/MainWindow.cpp:1011
+msgid "Transaction"
+msgstr "트랜잭션"
+
+#: src/core/Backend.cpp:489
+msgid "Verifying packages..."
+msgstr "패키지 검증 중..."
+
+#: src/core/Backend.cpp:490
+msgid "Installing packages..."
+msgstr "패키지 설치 중..."
+
+#: src/core/Backend.cpp:495
+msgid "Downloading packages..."
+msgstr "패키지 다운로드 중..."
+
+#: src/ui/TransactionResultDialog.cpp:78
+msgid "Download Size"
+msgstr "다운로드 크기"
+
+#: src/ui/TransactionResultDialog.cpp:79
+msgid "Install Size"
+msgstr "설치 크기"
+
+#: src/ui/TransactionResultDialog.cpp:108
+msgid "Freed Space"
+msgstr "해제 공간"
+
+#: src/core/Dnf5DaemonClient.cpp:439
+msgid ""
+"Cannot connect to the D-Bus system bus.\n"
+"\n"
+"Please make sure the D-Bus system bus is running (dbus-broker / dbus-daemon)."
+msgstr ""
+"D-Bus 시스템 버스에 연결할 수 없습니다.\n"
+"\n"
+"D-Bus 시스템 버스가 실행 중인지 확인하세요 (dbus-broker / dbus-daemon)."
+
+#: src/core/Dnf5DaemonClient.cpp:60
+msgid ""
+"The connection to the system D-Bus / dnf5daemon-server was lost (\"%1\"). The service may have restarted.\n"
+"\n"
+"Please try the operation again. If the problem persists, restart the service with:\n"
+"  sudo systemctl restart dnf5daemon-server"
+msgstr ""
+"시스템 D-Bus / dnf5daemon-server 연결이 끊어졌습니다(\"%1\"). 서비스가 다시 시작되었을 수 있습니다.\n"
+"\n"
+"작업을 다시 시도해 보세요. 문제가 지속되면 다음 명령으로 서비스를 다시 시작하세요:\n"
+"  sudo systemctl restart dnf5daemon-server"

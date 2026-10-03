@@ -10,7 +10,10 @@
 #include <QStyledItemDelegate>
 #include <QPainter>
 #include <QApplication>
+#include <QStyleOptionButton>
+#include <QMouseEvent>
 #include <QClipboard>
+#include <QFontMetrics>
 #include <KLocalizedString>
 
 namespace Miryu {
@@ -42,12 +45,35 @@ public:
         bool queued = index.data(PackageModel::QueuedRole).toBool();
         bool installed = index.data(PackageModel::IsInstalledRole).toBool();
         bool isDep = index.data(PackageModel::IsDepRole).toBool();
+        int todo = index.data(PackageModel::TodoRole).toInt();
 
-        // Draw indicator
-        QRect indicatorRect(opt.rect.x() + 4, opt.rect.y() + 4, 4, opt.rect.height() - 8);
+        // Draw the per-row checkbox. The PackageView shares the exact same
+        // rectangle (PackageView::checkboxRect) for click handling, so
+        // clicking anywhere inside this box toggles the queued state.
+        {
+            QStyleOptionButton cbOpt;
+            cbOpt.state |= QStyle::State_Enabled;
+            cbOpt.state |= queued ? QStyle::State_On : QStyle::State_Off;
+            cbOpt.rect = PackageView::checkboxRectFor(opt.rect);
+            QApplication::style()->drawControl(QStyle::CE_CheckBox, &cbOpt, painter, nullptr);
+        }
+
+        // The indicator (status / queued colour bar) lives just to the
+        // right of the checkbox so the user can still tell installed /
+        // available / queued apart at a glance. When the row is queued
+        // the bar takes on the action colour (Remove = red, Install =
+        // green, Update = orange, Reinstall = blue, Downgrade = yellow)
+        // — matching the queue page — so a quick glance at the bar tells
+        // the user *what* will happen to the package, not just that
+        // something will. Previously the bar always turned the palette
+        // Highlight colour (blue) when queued, which gave no clue about
+        // the pending action and was actively misleading for removals
+        // (a checked installed package looked "selected", not "to be
+        // removed").
+        QRect indicatorRect(opt.rect.x() + 28, opt.rect.y() + 4, 4, opt.rect.height() - 8);
         QColor indicatorColor;
         if (queued)
-            indicatorColor = opt.palette.color(QPalette::Highlight);
+            indicatorColor = todoColor(static_cast<PackageTodo>(todo));
         else if (installed)
             indicatorColor = QColor(46, 160, 67);  // green
         else
@@ -56,7 +82,7 @@ public:
         painter->fillRect(indicatorRect, indicatorColor);
 
         // Draw name
-        QRect nameRect = opt.rect.adjusted(16, 4, -opt.rect.width() / 3, -opt.rect.height() / 2);
+        QRect nameRect = opt.rect.adjusted(40, 4, -opt.rect.width() / 3, -opt.rect.height() / 2);
         QFont nameFont = opt.font;
         nameFont.setBold(true);
         painter->setFont(nameFont);
@@ -65,7 +91,7 @@ public:
         painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, name);
 
         // Draw version and arch
-        QRect verRect = opt.rect.adjusted(16, opt.rect.height() / 2, -opt.rect.width() / 3, -4);
+        QRect verRect = opt.rect.adjusted(40, opt.rect.height() / 2, -opt.rect.width() / 3, -4);
         QFont verFont = opt.font;
         verFont.setPointSize(verFont.pointSize() - 1);
         painter->setFont(verFont);
@@ -77,10 +103,10 @@ public:
 
         // Draw summary. Reserve the right edge for the queued todo marker
         // ("Install"/"Reinstall"/"Remove"/"Update"/"Downgrade") or the
-        // "(dep)" tag: those markers are drawn afterwards (on top), so
+        // "[dep]" tag: those markers are drawn afterwards (on top), so
         // without this reservation their text would visually overlap the
         // package description — the exact overlap reported in the bug.
-        const int rightReserve = queued ? 100 : (isDep ? 48 : 8);
+        const int rightReserve = queued ? 100 : (isDep ? 80 : 8);
         QRect summaryRect = opt.rect.adjusted(opt.rect.width() * 2 / 3, 4, -rightReserve, -4);
         painter->setFont(opt.font);
         painter->setPen(opt.palette.color(QPalette::WindowText));
@@ -93,7 +119,6 @@ public:
         if (queued) {
             QRect queueRect(opt.rect.right() - 100, opt.rect.y(), 100, opt.rect.height());
             QString todoText = index.data(PackageModel::TodoTextRole).toString();
-            int todo = index.data(PackageModel::TodoRole).toInt();
             painter->setPen(todoColor(static_cast<PackageTodo>(todo)));
             QFont qFont = opt.font;
             qFont.setBold(true);
@@ -102,14 +127,23 @@ public:
             painter->drawText(queueRect, Qt::AlignRight | Qt::AlignVCenter, todoText);
         }
 
+        // Dependency marker. Localized via the existing "Dependencies" key
+        // (already translated for QueueView / PackageInfoWidget) and drawn
+        // in green so it stays readable in dark mode — the previous
+        // dimmed-secondary-text approach was nearly invisible against dark
+        // themes. Matches the colour used by QueueView and the
+        // TransactionResultDialog for visual consistency.
         if (isDep && !queued) {
-            QRect depRect(opt.rect.right() - 80, opt.rect.y(), 80, opt.rect.height());
-            painter->setPen(secondaryText);
             QFont dFont = opt.font;
             dFont.setPointSize(dFont.pointSize() - 1);
             dFont.setItalic(true);
+            QString depTag = QStringLiteral("[") + i18n("Dependencies") + QStringLiteral("]");
+            QFontMetrics fm(dFont);
+            int tagWidth = fm.horizontalAdvance(depTag) + 6;
+            QRect depRect(opt.rect.right() - tagWidth - 4, opt.rect.y(), tagWidth + 4, opt.rect.height());
             painter->setFont(dFont);
-            painter->drawText(depRect, Qt::AlignRight | Qt::AlignVCenter, QStringLiteral("(dep)"));
+            painter->setPen(QColor(46, 160, 67));  // green
+            painter->drawText(depRect, Qt::AlignRight | Qt::AlignVCenter, depTag);
         }
 
         painter->restore();
@@ -128,6 +162,17 @@ PackageView::PackageView(PackageModel *model, QWidget *parent)
     , m_model(model)
 {
     setupView();
+}
+
+// A 16x16 box vertically centered inside the row rect, with a 6px left
+// padding so it does not touch the viewport border. Both the delegate
+// paint() and mousePressEvent() go through here, so the hit area always
+// matches the painted checkbox exactly.
+QRect PackageView::checkboxRectFor(const QRect &rowRect)
+{
+    return QRect(rowRect.x() + 6,
+                 rowRect.y() + (rowRect.height() - 16) / 2,
+                 16, 16);
 }
 
 void PackageView::setupView()
@@ -168,6 +213,27 @@ void PackageView::currentChanged(const QModelIndex &current, const QModelIndex &
 {
     Q_UNUSED(previous)
     Q_EMIT packageSelected(current);
+}
+
+void PackageView::mousePressEvent(QMouseEvent *event)
+{
+    // Intercept left-button presses that land on a row's checkbox area:
+    // toggle that row's queue state instead of letting the base view treat
+    // it as a normal selection / drag start. This keeps multi-selection
+    // (Ctrl/Click, Shift+Click) working for the rest of the row while
+    // making the checkbox a self-contained toggle.
+    if (event->button() == Qt::LeftButton) {
+        QModelIndex index = indexAt(event->pos());
+        if (index.isValid()) {
+            QRect rowRect = visualRect(index);
+            if (checkboxRectFor(rowRect).contains(event->pos())) {
+                toggleQueue(index);
+                event->accept();
+                return;
+            }
+        }
+    }
+    QTreeView::mousePressEvent(event);
 }
 
 void PackageView::contextMenuEvent(QContextMenuEvent *event)

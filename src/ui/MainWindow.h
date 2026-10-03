@@ -13,6 +13,7 @@ class QComboBox;
 class QLineEdit;
 class QLabel;
 class QProgressBar;
+class QPushButton;
 class KLineEdit;
 class KComboBox;
 class QToolButton;
@@ -67,6 +68,14 @@ private Q_SLOTS:
     void onUnqueuePackage(const QString &nevra);
     void onApplyQueue();
     void onClearQueue();
+    // Queue every package currently shown in the Updates list — the
+    // "Select All" toolbar action. Only present on the Updates page (the
+    // Packages page mixes installed / available / update / downgrade states,
+    // so a blanket "queue everything" would be ambiguous).
+    void onSelectAllUpdates();
+    // Counterpart of onSelectAllUpdates(): unqueue every package shown in
+    // the Updates list ("Deselect All").
+    void onDeselectAllUpdates();
     void onRefresh();
     void onReloadData();
     void onSystemUpgrade();
@@ -84,6 +93,12 @@ private Q_SLOTS:
     void onUpdatesLoaded(const QList<Miryu::Package> &updates);
     void onTransactionProgress(const QString &message, int percent);
     void onDownloadProgress(const QString &downloadId, qint64 total, qint64 downloaded);
+    // Drives the modal ProgressDialog with the *overall* (aggregated)
+    // progress reported by the backend. During the download phase this is
+    // the overall percent across every active download; during the install
+    // phase it is the overall percent across all transaction actions. The
+    // phase string identifies which message the dialog should show.
+    void onOverallProgress(int percent, const QString &phase, const QString &message);
     void onError(const QString &error);
     void onUpdatesAvailable(int count);
 
@@ -92,6 +107,10 @@ private:
     void setupUI();
     void setupSidebar();
     void updateStatusBar();
+    // Enable / disable the per-page "Apply" buttons (Packages & Updates)
+    // according to whether the queue model currently holds any pending
+    // transaction. Called from updateStatusBar() and every queue mutation.
+    void updateApplyButtons();
     void switchToPage(int page);
     void doRefreshMetadataWithLog();
     void doDistroSyncWithLog();
@@ -104,6 +123,15 @@ private:
     void runNeedsRestartingCheck();
     void setRestartNeeded();
     QString currentBootId() const;
+    // Returns the release string of the currently running kernel (e.g.
+    // "6.8.10-200.fc39.x86_64"), read from /proc/sys/kernel/osrelease. Used
+    // to detect whether a package queued for removal is the running kernel.
+    QString runningKernelRelease() const;
+    // Returns true if the given package is the currently running kernel
+    // (name starts with "kernel" and its version-release.arch matches the
+    // running kernel release string). Removing the running kernel would
+    // leave the system unbootable, so such requests must be rejected.
+    bool isRunningKernel(const Miryu::Package &pkg) const;
     // Load package names listed as "suggest reboot" from the dnf5
     // configuration drop-in directories
     // (/usr/share/dnf5/suggest-reboot.d/*.conf and
@@ -133,6 +161,7 @@ private:
     KComboBox *m_searchFieldCombo;
     PackageView *m_packageView;
     PackageInfoWidget *m_infoWidget;
+    QPushButton *m_applyButton = nullptr;        // Packages page "Apply" — visible/enabled when queue non-empty
 
     // Queue page
     QWidget *m_queuePage;
@@ -141,6 +170,9 @@ private:
     // Updates page
     QWidget *m_updatesPage;
     PackageView *m_updatesView;
+    QPushButton *m_updatesApplyButton = nullptr; // Updates page "Apply" — same behaviour as m_applyButton
+    QPushButton *m_selectAllUpdatesButton = nullptr;   // Updates page "Select All"
+    QPushButton *m_deselectAllUpdatesButton = nullptr; // Updates page "Deselect All"
 
     // Repo page
     QWidget *m_repoPage;

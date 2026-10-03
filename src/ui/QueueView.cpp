@@ -60,12 +60,16 @@ public:
         QString name = index.data(QueueModel::NameRole).toString();
         if (isDep) {
             // Show a "[依赖]" tag before the package name for dependency packages.
+            // The tag colour follows the row's action colour: install / update
+            // deps are green, remove deps are red, reinstall deps are blue, etc.
+            // This way the user can see at a glance whether the dependency is
+            // being added or torn out along with the explicitly queued package.
+            // Matches the colour used by PackageView and TransactionResultDialog.
             QString depTag = QStringLiteral("[") + i18n("Dependencies") + QStringLiteral("] ");
             QFontMetrics fm(nameFont);
             int tagWidth = fm.horizontalAdvance(depTag);
 
-            // Draw the dependency tag in a muted colour.
-            painter->setPen(secondaryText);
+            painter->setPen(actionColor);
             painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, depTag);
 
             // Draw the package name in the normal window text colour.

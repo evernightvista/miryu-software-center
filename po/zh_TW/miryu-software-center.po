@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: miryu\n"
 "Report-Msgid-Bugs-To: https://github.com/EvernightFedora/miryu\n"
 "POT-Creation-Date: 2026-08-21 03:20+0000\n"
-"PO-Revision-Date: 2026-08-20 00:00+0800\n"
+"PO-Revision-Date: 2026-10-03 00:00+0800\n"
 "Last-Translator: KairikiFedora <kairiki@evernightfedora.org>\n"
 "Language-Team: Traditional Chinese <miryu@example.com>\n"
 "Language: zh_TW\n"
@@ -678,13 +678,21 @@ msgstr "設定 Miryu..."
 msgid "Find"
 msgstr "尋找"
 
-#: src/ui/MainWindow.cpp:442
+#: src/ui/MainWindow.cpp:601 src/ui/MainWindow.cpp:346
 msgid "Select All"
 msgstr "全選"
 
-#: src/ui/MainWindow.cpp:453
+#: src/ui/MainWindow.cpp:612 src/ui/MainWindow.cpp:351
 msgid "Deselect All"
 msgstr "取消全選"
+
+#: src/ui/MainWindow.cpp:347
+msgid "Queue every update shown in the list"
+msgstr "將清單中顯示的每個更新加入佇列"
+
+#: src/ui/MainWindow.cpp:352
+msgid "Remove every update from the queue"
+msgstr "從佇列中移除每個更新"
 
 #: src/ui/MainWindow.cpp:472
 msgid "Package Browser"
@@ -896,9 +904,9 @@ msgstr "需要重新開機"
 
 #: src/ui/MainWindow.cpp:1208
 msgid ""
-"You have installed software packages that require a computer restart. "
-"Please restart the operating system as soon as possible to ensure the "
-"updates take full effect."
+"You have installed software packages that require a computer restart. Please"
+" restart the operating system as soon as possible to ensure the updates take"
+" full effect."
 msgstr "您已安裝需要重新開機的軟體包，請盡快重新開機作業系統以確保更新完全生效。"
 
 #: src/ui/PackageInfoWidget.cpp:67
@@ -952,6 +960,7 @@ msgstr "從佇列中移除"
 #: src/ui/PackageView.cpp:271
 msgid "Queue for Removal"
 msgstr "加入移除佇列"
+
 #: src/ui/PackageView.cpp:286
 msgid "Queue for Reinstall"
 msgstr "加入重新安裝佇列"
@@ -989,6 +998,8 @@ msgid "Downloading %1..."
 msgstr "下載 %1 中..."
 
 #: src/ui/QueueView.cpp:61 src/ui/PackageInfoWidget.cpp:95
+#: src/ui/PackageView.cpp:140 src/ui/TransactionResultDialog.cpp:167
+#: src/ui/TransactionResultDialog.cpp:219
 msgid "Dependencies"
 msgstr "依賴"
 
@@ -1185,9 +1196,17 @@ msgstr "替換"
 msgid "Obsolete"
 msgstr "廢棄"
 
-#: src/ui/TransactionResultDialog.cpp:117
+#: src/ui/TransactionResultDialog.cpp:212
 msgid "Total Download Size"
 msgstr "總下載大小"
+
+#: src/ui/TransactionResultDialog.cpp:215
+msgid "Total Install Size"
+msgstr "總安裝大小"
+
+#: src/ui/TransactionResultDialog.cpp:280
+msgid "Total Freed Space"
+msgstr "總釋放空間"
 
 #: src/ui/TransactionResultDialog.cpp:121
 msgid "Apply offline (on next reboot)"
@@ -1221,23 +1240,33 @@ msgstr "<i>暫無變更紀錄。</i>"
 msgid "<i>No file list available.</i>"
 msgstr "<i>暫無檔案列表。</i>"
 
-#: src/ui/MainWindow.cpp:757 src/ui/MainWindow.cpp:581
+#: src/ui/MainWindow.cpp:747,990
 msgid ""
-"Cannot remove protected packages or critical dependencies.\n"
-"\n"
-"Removing these packages would break the system.\n"
+"Cannot remove protected packages or critical dependencies, removing them would break the system.\n"
 "\n"
 "%1"
 msgstr ""
-"無法移除受保護的軟體包或關鍵相依性。\n"
-"\n"
-"移除這些軟體包將破壞系統。\n"
+"無法移除受保護的軟體套件或關鍵相依性，這麼做會損壞作業系統。\n"
 "\n"
 "%1"
 
 #: src/ui/MainWindow.cpp:761 src/ui/MainWindow.cpp:585
 msgid "Protected Package Error"
 msgstr "受保護軟體包錯誤"
+
+#: src/ui/MainWindow.cpp:938
+msgid ""
+"Cannot uninstall the running kernel. Doing so would make the system unbootable.\n"
+"\n"
+"Please boot into a different kernel before removing %1."
+msgstr ""
+"無法解除安裝正在執行的核心，這麼做會導致系統無法開機。\n"
+"\n"
+"請先開機至其他核心，然後再移除 %1。"
+
+#: src/ui/MainWindow.cpp:943
+msgid "Cannot Remove Running Kernel"
+msgstr "無法移除正在執行的核心"
 
 #: src/core/Dnf5DaemonClient.cpp:471
 msgid "Cannot load repositories."
@@ -1262,29 +1291,53 @@ msgstr "啟動外部玲瓏商店應用程式"
 msgid "<i>Loading...</i>"
 msgstr "<i>載入中...</i>"
 
-msgid "Cannot connect to the D-Bus system bus.\n\n"
-msgstr "無法連線到 D-Bus 系統匯流排。\n\n"
+msgid ""
+"Cannot connect to the D-Bus system bus.\n"
+"\n"
+msgstr ""
+"無法連線到 D-Bus 系統匯流排。\n"
+"\n"
 
-msgid "Cannot remove protected packages or critical dependencies.\n\n"
-msgstr "無法移除受保護的套件或關鍵相依項目。\n\n"
+msgid ""
+"Cannot remove protected packages or critical dependencies.\n"
+"\n"
+msgstr ""
+"無法移除受保護的套件或關鍵相依項目。\n"
+"\n"
 
-msgid "Distribution sync will synchronize all installed packages to the versions available in the repositories. "
+msgid ""
+"Distribution sync will synchronize all installed packages to the versions "
+"available in the repositories. "
 msgstr "發行版同步會將所有已安裝套件同步到倉庫中可用的版本。 "
 
 msgid "Downloading %1"
 msgstr "正在下載 %1"
 
-msgid "Failed to connect to dnf5daemon-server.\n\n"
-msgstr "無法連線到 dnf5daemon-server。\n\n"
+msgid ""
+"Failed to connect to dnf5daemon-server.\n"
+"\n"
+msgstr ""
+"無法連線到 dnf5daemon-server。\n"
+"\n"
 
-msgid "Failed to launch the Linglong Store.\n\n"
-msgstr "無法啟動 Linglong 商店。\n\n"
+msgid ""
+"Failed to launch the Linglong Store.\n"
+"\n"
+msgstr ""
+"無法啟動 Linglong 商店。\n"
+"\n"
 
 msgid "Failed to refresh metadata (exit code %1)."
 msgstr "重新整理中繼資料失敗（結束代碼 %1）。"
 
-msgid "Failed to start command.\n%1\n\n"
-msgstr "啟動命令失敗。\n%1\n\n"
+msgid ""
+"Failed to start command.\n"
+"%1\n"
+"\n"
+msgstr ""
+"啟動命令失敗。\n"
+"%1\n"
+"\n"
 
 msgid "Metadata refreshed."
 msgstr "中繼資料已重新整理。"
@@ -1321,8 +1374,63 @@ msgid "Failed to send transaction request to dnf5daemon."
 msgstr "向 dnf5daemon 發送事務請求失敗。"
 
 #: src/ui/MainWindow.cpp:696 src/ui/MainWindow.cpp:910
-msgid "Dependency resolution failed. The reasons are as follows:\n"
+msgid ""
+"Dependency resolution failed. The reasons are as follows:\n"
 "\n"
-msgstr "依賴解決失敗，原因如下：\n"
+msgstr ""
+"依賴解決失敗，原因如下：\n"
 "\n"
 
+#: src/ui/MainWindow.cpp:240 src/ui/MainWindow.cpp:357
+msgid "Apply pending operations in the queue"
+msgstr "套用佇列中的待處理操作"
+
+#: src/ui/MainWindow.cpp:1011
+msgid "Transaction"
+msgstr "交易"
+
+#: src/core/Backend.cpp:489
+msgid "Verifying packages..."
+msgstr "正在驗證軟體包..."
+
+#: src/core/Backend.cpp:490
+msgid "Installing packages..."
+msgstr "正在安裝軟體包..."
+
+#: src/core/Backend.cpp:495
+msgid "Downloading packages..."
+msgstr "正在下載軟體包..."
+
+#: src/ui/TransactionResultDialog.cpp:78
+msgid "Download Size"
+msgstr "下載大小"
+
+#: src/ui/TransactionResultDialog.cpp:79
+msgid "Install Size"
+msgstr "安裝大小"
+
+#: src/ui/TransactionResultDialog.cpp:108
+msgid "Freed Space"
+msgstr "釋放空間"
+
+#: src/core/Dnf5DaemonClient.cpp:439
+msgid ""
+"Cannot connect to the D-Bus system bus.\n"
+"\n"
+"Please make sure the D-Bus system bus is running (dbus-broker / dbus-daemon)."
+msgstr ""
+"無法連線到 D-Bus 系統匯流排。\n"
+"\n"
+"請確保 D-Bus 系統匯流排正在執行（dbus-broker / dbus-daemon）。"
+
+#: src/core/Dnf5DaemonClient.cpp:60
+msgid ""
+"The connection to the system D-Bus / dnf5daemon-server was lost (\"%1\"). The service may have restarted.\n"
+"\n"
+"Please try the operation again. If the problem persists, restart the service with:\n"
+"  sudo systemctl restart dnf5daemon-server"
+msgstr ""
+"到系統 D-Bus / dnf5daemon-server 的連線已遺失（\"%1\"）。服務可能已重新啟動。\n"
+"\n"
+"請重試該操作。如果問題持續存在，請使用以下命令重新啟動服務：\n"
+"  sudo systemctl restart dnf5daemon-server"

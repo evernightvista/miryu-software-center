@@ -4,6 +4,8 @@
 #include <QList>
 #include "Package.h"
 
+class QMouseEvent;
+
 namespace Miryu {
 
 class PackageModel;
@@ -19,6 +21,11 @@ public:
 
     QList<Package> selectedPackages() const;
 
+    // Rectangle of the per-row queue checkbox for a given row rect. The
+    // delegate uses this in paint() and PackageView uses it in
+    // mousePressEvent() so the hit area always matches the painted box.
+    static QRect checkboxRectFor(const QRect &rowRect);
+
 Q_SIGNALS:
     void packageSelected(const QModelIndex &index);
     void queuePackage(const Miryu::Package &pkg);
@@ -32,6 +39,7 @@ private Q_SLOTS:
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
     void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
 private:
     void setupView();

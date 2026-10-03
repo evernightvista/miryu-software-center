@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: miryu\n"
 "Report-Msgid-Bugs-To: https://github.com/EvernightFedora/miryu\n"
 "POT-Creation-Date: 2026-08-21 03:20+0000\n"
-"PO-Revision-Date: 2026-08-20 00:00+0800\n"
+"PO-Revision-Date: 2026-10-03 00:00+0800\n"
 "Last-Translator: KairikiFedora <kairiki@evernightfedora.org>\n"
 "Language-Team: Japanese <miryu@example.com>\n"
 "Language: ja\n"
@@ -678,13 +678,21 @@ msgstr "Miryu を設定..."
 msgid "Find"
 msgstr "検索"
 
-#: src/ui/MainWindow.cpp:442
+#: src/ui/MainWindow.cpp:601 src/ui/MainWindow.cpp:346
 msgid "Select All"
 msgstr "すべて選択"
 
-#: src/ui/MainWindow.cpp:453
+#: src/ui/MainWindow.cpp:612 src/ui/MainWindow.cpp:351
 msgid "Deselect All"
 msgstr "選択解除"
+
+#: src/ui/MainWindow.cpp:347
+msgid "Queue every update shown in the list"
+msgstr "リストに表示されているすべての更新をキューに追加"
+
+#: src/ui/MainWindow.cpp:352
+msgid "Remove every update from the queue"
+msgstr "キューからすべての更新を削除"
 
 #: src/ui/MainWindow.cpp:472
 msgid "Package Browser"
@@ -898,13 +906,11 @@ msgstr "再起動が必要です"
 
 #: src/ui/MainWindow.cpp:1208
 msgid ""
-"You have installed software packages that require a computer restart. "
-"Please restart the operating system as soon as possible to ensure the "
-"updates take full effect."
+"You have installed software packages that require a computer restart. Please"
+" restart the operating system as soon as possible to ensure the updates take"
+" full effect."
 msgstr ""
-"コンピュータの再起動が必要なソフトウェアパッケージがインストールされました。"
-"更新が完全に反映されるように、できるだけ早くオペレーティングシステムを"
-"再起動してください。"
+"コンピュータの再起動が必要なソフトウェアパッケージがインストールされました。更新が完全に反映されるように、できるだけ早くオペレーティングシステムを再起動してください。"
 
 #: src/ui/PackageInfoWidget.cpp:67
 msgid "Version:"
@@ -957,6 +963,7 @@ msgstr "キューから削除"
 #: src/ui/PackageView.cpp:271
 msgid "Queue for Removal"
 msgstr "削除キューに追加"
+
 #: src/ui/PackageView.cpp:286
 msgid "Queue for Reinstall"
 msgstr "再インストールをキューに追加"
@@ -994,6 +1001,8 @@ msgid "Downloading %1..."
 msgstr "ダウンロード %1..."
 
 #: src/ui/QueueView.cpp:61 src/ui/PackageInfoWidget.cpp:95
+#: src/ui/PackageView.cpp:140 src/ui/TransactionResultDialog.cpp:167
+#: src/ui/TransactionResultDialog.cpp:219
 msgid "Dependencies"
 msgstr "依存関係"
 
@@ -1190,9 +1199,17 @@ msgstr "置換"
 msgid "Obsolete"
 msgstr "廃止"
 
-#: src/ui/TransactionResultDialog.cpp:117
+#: src/ui/TransactionResultDialog.cpp:212
 msgid "Total Download Size"
 msgstr "総ダウンロードサイズ"
+
+#: src/ui/TransactionResultDialog.cpp:215
+msgid "Total Install Size"
+msgstr "総インストールサイズ"
+
+#: src/ui/TransactionResultDialog.cpp:280
+msgid "Total Freed Space"
+msgstr "総解放容量"
 
 #: src/ui/TransactionResultDialog.cpp:121
 msgid "Apply offline (on next reboot)"
@@ -1226,23 +1243,33 @@ msgstr "<i>変更履歴はありません。</i>"
 msgid "<i>No file list available.</i>"
 msgstr "<i>ファイルリストはありません。</i>"
 
-#: src/ui/MainWindow.cpp:757 src/ui/MainWindow.cpp:581
+#: src/ui/MainWindow.cpp:747,990
 msgid ""
-"Cannot remove protected packages or critical dependencies.\n"
-"\n"
-"Removing these packages would break the system.\n"
+"Cannot remove protected packages or critical dependencies, removing them would break the system.\n"
 "\n"
 "%1"
 msgstr ""
-"保護されたパッケージや重要な依存関係を削除できません。\n"
-"\n"
-"これらのパッケージを削除するとシステムが破損します。\n"
+"保護されたパッケージや重要な依存関係を削除できません、そうするとオペレーティングシステムが破損します。\n"
 "\n"
 "%1"
 
 #: src/ui/MainWindow.cpp:761 src/ui/MainWindow.cpp:585
 msgid "Protected Package Error"
 msgstr "保護パッケージエラー"
+
+#: src/ui/MainWindow.cpp:938
+msgid ""
+"Cannot uninstall the running kernel. Doing so would make the system unbootable.\n"
+"\n"
+"Please boot into a different kernel before removing %1."
+msgstr ""
+"実行中のカーネルをアンインストールできません。これを行うとシステムが起動できなくなります。\n"
+"\n"
+"%1 を削除する前に、別のカーネルで起動してください。"
+
+#: src/ui/MainWindow.cpp:943
+msgid "Cannot Remove Running Kernel"
+msgstr "実行中のカーネルを削除できません"
 
 #: src/core/Dnf5DaemonClient.cpp:471
 msgid "Cannot load repositories."
@@ -1267,29 +1294,53 @@ msgstr "外部Linglongストアアプリケーションを起動"
 msgid "<i>Loading...</i>"
 msgstr "<i>読み込み中...</i>"
 
-msgid "Cannot connect to the D-Bus system bus.\n\n"
-msgstr "D-Bus システムバスに接続できません。\n\n"
+msgid ""
+"Cannot connect to the D-Bus system bus.\n"
+"\n"
+msgstr ""
+"D-Bus システムバスに接続できません。\n"
+"\n"
 
-msgid "Cannot remove protected packages or critical dependencies.\n\n"
-msgstr "保護されたパッケージや重要な依存関係は削除できません。\n\n"
+msgid ""
+"Cannot remove protected packages or critical dependencies.\n"
+"\n"
+msgstr ""
+"保護されたパッケージや重要な依存関係は削除できません。\n"
+"\n"
 
-msgid "Distribution sync will synchronize all installed packages to the versions available in the repositories. "
+msgid ""
+"Distribution sync will synchronize all installed packages to the versions "
+"available in the repositories. "
 msgstr "ディストリビューション同期は、インストール済みの全パッケージをリポジトリで利用可能なバージョンに同期します。 "
 
 msgid "Downloading %1"
 msgstr "%1 をダウンロード中"
 
-msgid "Failed to connect to dnf5daemon-server.\n\n"
-msgstr "dnf5daemon-server に接続できませんでした。\n\n"
+msgid ""
+"Failed to connect to dnf5daemon-server.\n"
+"\n"
+msgstr ""
+"dnf5daemon-server に接続できませんでした。\n"
+"\n"
 
-msgid "Failed to launch the Linglong Store.\n\n"
-msgstr "Linglong ストアを起動できませんでした。\n\n"
+msgid ""
+"Failed to launch the Linglong Store.\n"
+"\n"
+msgstr ""
+"Linglong ストアを起動できませんでした。\n"
+"\n"
 
 msgid "Failed to refresh metadata (exit code %1)."
 msgstr "メタデータの更新に失敗しました（終了コード %1）。"
 
-msgid "Failed to start command.\n%1\n\n"
-msgstr "コマンドの起動に失敗しました。\n%1\n\n"
+msgid ""
+"Failed to start command.\n"
+"%1\n"
+"\n"
+msgstr ""
+"コマンドの起動に失敗しました。\n"
+"%1\n"
+"\n"
 
 msgid "Metadata refreshed."
 msgstr "メタデータを更新しました。"
@@ -1326,8 +1377,63 @@ msgid "Failed to send transaction request to dnf5daemon."
 msgstr "dnf5daemon へのトランザクション要求の送信に失敗しました。"
 
 #: src/ui/MainWindow.cpp:696 src/ui/MainWindow.cpp:910
-msgid "Dependency resolution failed. The reasons are as follows:\n"
+msgid ""
+"Dependency resolution failed. The reasons are as follows:\n"
 "\n"
-msgstr "依存関係の解決に失敗しました。理由は以下の通り：\n"
+msgstr ""
+"依存関係の解決に失敗しました。理由は以下の通り：\n"
 "\n"
 
+#: src/ui/MainWindow.cpp:240 src/ui/MainWindow.cpp:357
+msgid "Apply pending operations in the queue"
+msgstr "キュー内の保留中の操作を適用"
+
+#: src/ui/MainWindow.cpp:1011
+msgid "Transaction"
+msgstr "トランザクション"
+
+#: src/core/Backend.cpp:489
+msgid "Verifying packages..."
+msgstr "パッケージを検証中..."
+
+#: src/core/Backend.cpp:490
+msgid "Installing packages..."
+msgstr "パッケージをインストール中..."
+
+#: src/core/Backend.cpp:495
+msgid "Downloading packages..."
+msgstr "パッケージをダウンロード中..."
+
+#: src/ui/TransactionResultDialog.cpp:78
+msgid "Download Size"
+msgstr "ダウンロードサイズ"
+
+#: src/ui/TransactionResultDialog.cpp:79
+msgid "Install Size"
+msgstr "インストールサイズ"
+
+#: src/ui/TransactionResultDialog.cpp:108
+msgid "Freed Space"
+msgstr "解放容量"
+
+#: src/core/Dnf5DaemonClient.cpp:439
+msgid ""
+"Cannot connect to the D-Bus system bus.\n"
+"\n"
+"Please make sure the D-Bus system bus is running (dbus-broker / dbus-daemon)."
+msgstr ""
+"D-Busシステムバスに接続できません。\n"
+"\n"
+"D-Busシステムバスが実行中であることを確認してください (dbus-broker / dbus-daemon)。"
+
+#: src/core/Dnf5DaemonClient.cpp:60
+msgid ""
+"The connection to the system D-Bus / dnf5daemon-server was lost (\"%1\"). The service may have restarted.\n"
+"\n"
+"Please try the operation again. If the problem persists, restart the service with:\n"
+"  sudo systemctl restart dnf5daemon-server"
+msgstr ""
+"システムD-Bus / dnf5daemon-serverへの接続が失われました(\"%1\")。サービスが再起動された可能性があります。\n"
+"\n"
+"操作を再試行してください。問題が解決しない場合は、以下のコマンドでサービスを再起動してください:\n"
+"  sudo systemctl restart dnf5daemon-server"

@@ -14,8 +14,10 @@ struct TransactionItem
 {
     QString nevra;
     QString repo;
-    qint64 size = 0;
+    qint64 size = 0;            // download size (RPM payload to fetch)
+    qint64 installSize = 0;     // on-disk footprint after install
     QString action;
+    bool isDependency = false;  // pulled in as a dep, not user-requested
 };
 
 struct TransactionResult
@@ -31,18 +33,26 @@ struct TransactionResult
         QList<TransactionItem> result;
         QVariantList list = data.value(action).toList();
         for (const auto &item : list) {
-            QVariantList pair = item.toList();
-            if (pair.size() >= 2) {
-                TransactionItem ti;
-                QVariantList nevraRepo = pair[0].toList();
-                if (nevraRepo.size() >= 2) {
-                    ti.nevra = nevraRepo[0].toString();
-                    ti.repo = nevraRepo[1].toString();
-                }
-                ti.size = pair[1].toLongLong();
-                ti.action = action;
-                result.append(ti);
+            QVariantList triple = item.toList();
+            if (triple.size() < 2)
+                continue;
+            TransactionItem ti;
+            QVariantList nevraRepo = triple[0].toList();
+            if (nevraRepo.size() >= 2) {
+                ti.nevra = nevraRepo[0].toString();
+                ti.repo = nevraRepo[1].toString();
             }
+            ti.size = triple[1].toLongLong();
+            // Optional third slot: install_size (on-disk footprint). Older
+            // callers that still build the legacy 2-tuple form simply leave
+            // installSize at 0.
+            if (triple.size() >= 3)
+                ti.installSize = triple[2].toLongLong();
+            // Optional fourth slot: is_dependency flag.
+            if (triple.size() >= 4)
+                ti.isDependency = triple[3].toBool();
+            ti.action = action;
+            result.append(ti);
         }
         return result;
     }
@@ -66,9 +76,33 @@ struct TransactionResult
                 continue;
             QVariantList list = data.value(key).toList();
             for (const auto &item : list) {
-                QVariantList pair = item.toList();
-                if (pair.size() >= 2)
-                    total += pair[1].toLongLong();
+                QVariantList triple = item.toList();
+                if (triple.size() >= 2)
+                    total += triple[1].toLongLong();
+            }
+        }
+        return total;
+    }
+
+    // Total on-disk footprint after the transaction is applied. Like
+    // totalSize(), remove / replaced / obsoleted are excluded because they
+    // free disk space rather than consume it. Useful as the "Total Install
+    // Size" counterpart to "Total Download Size".
+    qint64 totalInstallSize() const
+    {
+        qint64 total = 0;
+        for (const auto &key : data.keys()) {
+            if (key == QStringLiteral("replaced") ||
+                key == QStringLiteral("remove") ||
+                key == QStringLiteral("obsoleted"))
+                continue;
+            QVariantList list = data.value(key).toList();
+            for (const auto &item : list) {
+                QVariantList triple = item.toList();
+                if (triple.size() >= 3)
+                    total += triple[2].toLongLong();
+                else if (triple.size() >= 2)
+                    total += triple[1].toLongLong();
             }
         }
         return total;
