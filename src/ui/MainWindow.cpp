@@ -948,6 +948,22 @@ void MainWindow::onApplyQueue()
         }
     }
 
+    // Reject any attempt to remove the miryu-software-center package itself:
+    // it is the running application, so removing it from inside the UI would
+    // pull the rug out from under the user (the process would keep running
+    // against a deleted binary / resources, and the post-transaction refresh
+    // would crash). The user should close the app and use a different tool
+    // (dnf5 / dnfdragora) to uninstall it.
+    for (const auto &pkg : packages) {
+        if (pkg.todo == PackageTodo::Remove &&
+            pkg.name == QStringLiteral("miryu-software-center")) {
+            KMessageBox::error(this,
+                i18n("Miryu Software Center is running, cannot uninstall."),
+                i18n("Cannot Remove Miryu Software Center"));
+            return;
+        }
+    }
+
     // Build transaction
     m_statusLabel->setText(i18n("Resolving transaction..."));
     m_progressBar->setRange(0, 0);

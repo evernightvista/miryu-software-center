@@ -128,11 +128,23 @@ bool TransactionManager::buildTransactions(const QList<Package> &packages, const
 
     for (const auto &pkg : packages) {
         switch (pkg.todo) {
-        case PackageTodo::Install:    toInstall.append(pkg.name); break;
-        case PackageTodo::Update:     toUpdate.append(pkg.name); break;
+        // Use the full NEVRA (name-[epoch:]version-release.arch) for
+        // install / upgrade / downgrade / reinstall so each spec uniquely
+        // identifies a single package — including its architecture. Passing
+        // just pkg.name makes the daemon match every package sharing that
+        // name and, on a multilib system, only the best arch (e.g. x86_64)
+        // is selected for upgrade; packages of secondary arches (e.g. i686)
+        // are silently dropped. This is what caused the transaction summary
+        // to show far fewer upgrades than the number of updates DNF5 had
+        // detected (e.g. 150 queued updates collapsing to 45 in the dialog).
+        // remove / distro_sync keep using pkg.name: remove operates on the
+        // installed package by name, and distro_sync intentionally syncs
+        // every arch of the named package.
+        case PackageTodo::Install:    toInstall.append(pkg.nevra()); break;
+        case PackageTodo::Update:     toUpdate.append(pkg.nevra()); break;
         case PackageTodo::Remove:     toRemove.append(pkg.name); break;
-        case PackageTodo::Downgrade:  toDowngrade.append(pkg.name); break;
-        case PackageTodo::Reinstall:  toReinstall.append(pkg.name); break;
+        case PackageTodo::Downgrade:  toDowngrade.append(pkg.nevra()); break;
+        case PackageTodo::Reinstall:  toReinstall.append(pkg.nevra()); break;
         case PackageTodo::DistroSync: toDistroSync.append(pkg.name); break;
         case PackageTodo::None:       break;
         }

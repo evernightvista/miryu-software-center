@@ -1268,6 +1268,14 @@ msgstr ""
 msgid "Cannot Remove Running Kernel"
 msgstr "無法移除正在執行的核心"
 
+#: src/ui/MainWindow.cpp:961
+msgid "Miryu Software Center is running, cannot uninstall."
+msgstr "Miryu 軟體中心正在執行，無法解除安裝"
+
+#: src/ui/MainWindow.cpp:962
+msgid "Cannot Remove Miryu Software Center"
+msgstr "無法移除 Miryu 軟體中心"
+
 #: src/core/Dnf5DaemonClient.cpp:471
 msgid "Cannot load repositories."
 msgstr "無法載入軟體來源。"
