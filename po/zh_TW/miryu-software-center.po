@@ -1442,3 +1442,96 @@ msgstr ""
 "\n"
 "請重試該操作。如果問題持續存在，請使用以下命令重新啟動服務：\n"
 "  sudo systemctl restart dnf5daemon-server"
+
+#: src/ui/MainWindow.cpp:445
+msgid "Refresh Software Repository List"
+msgstr "重新整理軟體倉庫列表"
+
+#: src/ui/MainWindow.cpp:446
+msgid "Reload the list of configured software repositories from disk."
+msgstr "從磁碟重新載入已設定的軟體倉庫列表。"
+
+#: src/ui/MainWindow.cpp:451
+msgid "Add Copr Repository"
+msgstr "添加Copr倉庫"
+
+#: src/ui/MainWindow.cpp:452
+msgid "Add a Copr repository (e.g. evernightvista/evernight-vista)."
+msgstr "添加 Copr 倉庫（例如：evernightvista/evernight-vista）。"
+
+#: src/ui/MainWindow.cpp:1238
+msgid "Refreshing repository list..."
+msgstr "正在重新整理軟體倉庫列表..."
+
+#: src/ui/MainWindow.cpp:1262
+msgid ""
+"The package backend is not initialized. Cannot add a Copr repository."
+msgstr "軟體包後端未初始化。無法添加 Copr 倉庫。"
+
+#: src/ui/MainWindow.cpp:1272
+msgid ""
+"Please enter the Copr repository address you want to add (e.g. "
+"evernightvista/evernight-vista):"
+msgstr "請輸入你需要添加Copr倉庫地址（例如：evernightvista/evernight-vista）："
+
+#: src/ui/MainWindow.cpp:1284
+msgid "Confirm"
+msgstr "確認"
+
+#: src/ui/MainWindow.cpp:1285
+msgid "Cancel"
+msgstr "取消"
+
+#: src/ui/MainWindow.cpp:1309
+msgid "The Copr repository %1 already exists."
+msgstr "該Copr倉庫%1已存在。"
+
+#: src/ui/MainWindow.cpp:1319
+msgid ""
+"Add the %1 Copr repository?\n"
+"Note: Copr repositories are maintained by their owners."
+msgstr ""
+"要添加%1 Copr倉庫嗎？\n"
+"提示：Copr倉庫由Copr倉庫所有者維護。"
+
+#: src/ui/MainWindow.cpp:1331
+msgid "Adding Copr repository %1..."
+msgstr "正在添加 Copr 倉庫%1..."
+
+#: src/ui/MainWindow.cpp:1348
+msgid "The user has cancelled adding the Copr repository."
+msgstr "使用者已取消添加Copr倉庫"
+
+#: src/ui/MainWindow.cpp:1361
+msgid "You have added the %1 Copr repository."
+msgstr "你已添加%1 Copr倉庫。"
+
+#: src/ui/MainWindow.cpp:1371
+msgid "(not reported)"
+msgstr "（未報告）"
+
+#: src/ui/MainWindow.cpp:1377
+msgid "(unknown)"
+msgstr "（未知）"
+
+#: src/ui/MainWindow.cpp:1373
+msgid ""
+"The Copr repository %1 is incompatible with this platform.\n"
+"The Copr repository %1 supports the following platforms: %2\n"
+"Your platform: %3"
+msgstr ""
+"該Copr倉庫%1與此平台不相容。\n"
+"Copr倉庫%1相容以下平台：%2\n"
+"你的平台：%3"
+
+#: src/ui/MainWindow.cpp:1385
+msgid "The Copr repository %1 does not exist or is unreachable."
+msgstr "該Copr倉庫%1不存在或存取不可達。"
+
+#: src/ui/MainWindow.cpp:1503
+msgid "Failed to start the polkit helper. Is polkit installed?"
+msgstr "啟動 polkit 輔助程式失敗。是否已安裝 polkit？"
+
+#: src/ui/MainWindow.cpp:1514
+msgid "The operation timed out."
+msgstr "操作逾時。"

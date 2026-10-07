@@ -429,9 +429,32 @@ void MainWindow::setupUI()
         auto *layout = new QVBoxLayout(m_repoPage);
         layout->setContentsMargins(0, 0, 0, 0);
 
+        // Header row: title on the left, action buttons on the right.
+        // The page-level buttons live here rather than in the per-row
+        // context menu because they operate on the repo set as a whole
+        // (refresh the entire list / add a brand-new Copr repo).
+        auto *headerBar = new QWidget;
+        auto *headerLayout = new QHBoxLayout(headerBar);
+        headerLayout->setContentsMargins(8, 8, 8, 4);
+        headerLayout->setSpacing(6);
+
         auto *header = new QLabel(QStringLiteral("<b>%1</b>").arg(i18n("Repositories")));
-        header->setContentsMargins(8, 8, 8, 4);
-        layout->addWidget(header);
+        headerLayout->addWidget(header);
+        headerLayout->addStretch();
+
+        auto *refreshBtn = new QPushButton(
+            QIcon::fromTheme(QStringLiteral("view-refresh")), i18n("Refresh Software Repository List"));
+        refreshBtn->setToolTip(i18n("Reload the list of configured software repositories from disk."));
+        connect(refreshBtn, &QPushButton::clicked, this, &MainWindow::onRefreshRepoList);
+        headerLayout->addWidget(refreshBtn);
+
+        auto *addCoprBtn = new QPushButton(
+            QIcon::fromTheme(QStringLiteral("list-add")), i18n("Add Copr Repository"));
+        addCoprBtn->setToolTip(i18n("Add a Copr repository (e.g. evernightvista/evernight-vista)."));
+        connect(addCoprBtn, &QPushButton::clicked, this, &MainWindow::onAddCoprRepo);
+        headerLayout->addWidget(addCoprBtn);
+
+        layout->addWidget(headerBar);
 
         m_repoView = new RepoView(m_repoModel, m_backend);
         layout->addWidget(m_repoView, 1);
@@ -1200,6 +1223,359 @@ void MainWindow::onReloadData()
         onLoadUpdates(true);
     if (m_currentPage == 3)
         m_backend->loadRepositories();
+}
+
+// Page-level "Refresh Software Repository List" button. Lighter than
+// onReloadData(): only asks the daemon to drop its in-memory sack and
+// re-read every repo from disk — no metadata re-download, no package
+// list reload. The user gets a fresh view of which repos exist and
+// their enabled/disabled state without paying for a full metadata sync.
+void MainWindow::onRefreshRepoList()
+{
+    if (!m_backend->isInitialized())
+        return;
+
+    m_statusLabel->setText(i18n("Refreshing repository list..."));
+    m_backend->client()->resetSession();
+    m_backend->loadRepositories();
+    m_statusLabel->setText(i18n("Ready"));
+}
+
+// Page-level "Add Copr Repository" button. Drives the full Copr-add
+// dialog flow described in the spec:
+//   1. Input dialog asking for the Copr address
+//      (e.g. evernightvista/evernight-vista) with 确认/取消 buttons.
+//   2. Scan /usr/share/dnf5/repos.d and /etc/yum.repos.d for an existing
+//      repo file whose baseurl points at the same Copr project. If found,
+//      tell the user the repo is already configured.
+//   3. Otherwise confirm with the user that they want to add the repo,
+//      noting that Copr repos are maintained by their owners.
+//   4. polkit-authenticate via the helper script (action id
+//      org.miryugaming.add.copr, message "添加Copr仓库需要认证") and run
+//      `dnf5 copr enable` as root.
+//   5. Report the outcome: success / incompatible (with available chroots
+//      and the local platform) / not-found-or-unreachable.
+void MainWindow::onAddCoprRepo()
+{
+    if (!m_backend->isInitialized()) {
+        KMessageBox::error(this,
+            i18n("The package backend is not initialized. Cannot add a Copr repository."),
+            i18n("Add Copr Repository"));
+        return;
+    }
+
+    // 1. Input dialog: ask for the Copr address. Use QInputDialog so the
+    // OK/Cancel buttons are native to the platform and the input field
+    // gets a placeholder hint.
+    QInputDialog dlg(this);
+    dlg.setWindowTitle(i18n("Add Copr Repository"));
+    dlg.setLabelText(i18n("Please enter the Copr repository address you want to add "
+                          "(e.g. evernightvista/evernight-vista):"));
+    dlg.setTextValue(QString());
+    dlg.setTextEchoMode(QLineEdit::Normal);
+    // Find the line edit inside the dialog so we can give it a placeholder
+    // hint matching the spec's example.
+    const auto lineEdits = dlg.findChildren<QLineEdit *>();
+    if (!lineEdits.isEmpty())
+        lineEdits.first()->setPlaceholderText(QStringLiteral("evernightvista/evernight-vista"));
+    // Localize the OK / Cancel buttons to 确认 / 取消 per the spec.
+    auto *btnBox = dlg.findChild<QDialogButtonBox *>();
+    if (btnBox) {
+        btnBox->button(QDialogButtonBox::Ok)->setText(i18n("Confirm"));
+        btnBox->button(QDialogButtonBox::Cancel)->setText(i18n("Cancel"));
+    }
+    if (dlg.exec() != QDialog::Accepted)
+        return;
+
+    QString coprAddr = dlg.textValue().trimmed();
+    if (coprAddr.isEmpty())
+        return;
+
+    // Normalize: a user may paste the full Copr URL or accidentally include
+    // a leading '/' or trailing '/'. The lookup below compares against the
+    // path that follows `https://download.copr.fedorainfracloud.org/results/`
+    // in existing repo files, so we strip any leading slash and any
+    // trailing slash or path component beyond owner/project.
+    while (coprAddr.startsWith(QLatin1Char('/')))
+        coprAddr.remove(0, 1);
+    while (coprAddr.endsWith(QLatin1Char('/')))
+        coprAddr.chop(1);
+
+    // 2. Scan the existing repo files for a duplicate. The Copr baseurl
+    // is `https://download.copr.fedorainfracloud.org/results/<addr>/...`
+    // so a match means the repo is already configured on the system.
+    if (coprRepoAlreadyConfigured(coprAddr)) {
+        KMessageBox::information(this,
+            i18n("The Copr repository %1 already exists.", coprAddr),
+            i18n("Add Copr Repository"));
+        return;
+    }
+
+    // 3. Confirm with the user. The "Copr repos are maintained by their
+    // owners" warning line is part of the spec, so the user is reminded
+    // that the software they install from this third-party repo is not
+    // vetted by the distribution.
+    auto confirm = KMessageBox::warningTwoActions(this,
+        i18n("Add the %1 Copr repository?\n"
+             "Note: Copr repositories are maintained by their owners.", coprAddr),
+        i18n("Add Copr Repository"),
+        KGuiItem(i18n("Confirm")),
+        KGuiItem(i18n("Cancel")));
+    if (confirm != KMessageBox::PrimaryAction)
+        return;
+
+    // 4. polkit-gated helper invocation. Run it on a worker thread so the
+    // window stays responsive while the polkit authentication dialog is up
+    // (the daemon's hardcoded 2-minute auth window) and during the
+    // subsequent `dnf5 copr enable` network call.
+    m_statusLabel->setText(i18n("Adding Copr repository %1...", coprAddr));
+
+    auto *watcher = new QFutureWatcher<CoprAddResult>(this);
+    QObject::connect(watcher, &QFutureWatcher<CoprAddResult>::finished, this,
+        [this, coprAddr, watcher]() {
+            if (m_closing.load(std::memory_order_acquire)) {
+                watcher->deleteLater();
+                return;
+            }
+            const CoprAddResult r = watcher->result();
+            watcher->deleteLater();
+            m_statusLabel->setText(i18n("Ready"));
+
+            // Polkit auth dismissed / failed — show a friendly message
+            // (mirrors the existing runRepoEnableAsync pattern).
+            if (r.cancelled) {
+                KMessageBox::information(this,
+                    i18n("The user has cancelled adding the Copr repository."),
+                    i18n("Add Copr Repository"));
+                return;
+            }
+
+            if (r.success) {
+                // Re-read the repo list so the newly added Copr repo
+                // appears in the view. resetSession() drops the daemon's
+                // stale in-memory sack so the subsequent repoList() picks
+                // up the new repo file written under /etc/yum.repos.d.
+                m_backend->client()->resetSession();
+                m_backend->loadRepositories();
+                KMessageBox::information(this,
+                    i18n("You have added the %1 Copr repository.", coprAddr),
+                    i18n("Add Copr Repository"));
+                return;
+            }
+
+            if (r.incompatible) {
+                // Available-chroots line from the dnf5 copr plugin output
+                // (best-effort; empty if the helper couldn't extract it).
+                QString chroots = r.availableChroots;
+                if (chroots.isEmpty())
+                    chroots = i18n("(not reported)");
+                KMessageBox::error(this,
+                    i18n("The Copr repository %1 is incompatible with this platform.\n"
+                         "The Copr repository %1 supports the following platforms: %2\n"
+                         "Your platform: %3",
+                         coprAddr, chroots,
+                         r.platform.isEmpty() ? i18n("(unknown)") : r.platform),
+                    i18n("Add Copr Repository"));
+                return;
+            }
+
+            // notFound / unreachable branch (also catches any unknown
+            // failure mode, per spec).
+            KMessageBox::error(this,
+                i18n("The Copr repository %1 does not exist or is unreachable.", coprAddr),
+                i18n("Add Copr Repository"));
+        });
+
+    watcher->setFuture(QtConcurrent::run([this, coprAddr]() {
+        return runCoprAddHelper(coprAddr);
+    }));
+}
+
+// Scan every *.repo file under /usr/share/dnf5/repos.d and
+// /etc/yum.repos.d for a baseurl pointing at
+//   https://download.copr.fedorainfracloud.org/results/<coprAddr>/...
+// Returns true on the first match. Comparison is case-insensitive and
+// anchored to the path immediately after `/results/` so a repo file with
+// baseurl `.../results/evernightvista/evernight-vista/fedora-$releasever-$basearch/`
+// matches the user-supplied `evernightvista/evernight-vista`.
+//
+// The .repo files are INI-style; a single repo block can declare several
+// baseurl lines (one per line, optionally continued with a trailing
+// backslash), and `baseurl` is one of several URL keys (`baseurl`,
+// `mirrorlist`, `metalink`). We only inspect `baseurl` because Copr
+// always sets baseurl directly (never metalink/mirrorlist).
+bool MainWindow::coprRepoAlreadyConfigured(const QString &coprAddr) const
+{
+    if (coprAddr.isEmpty())
+        return false;
+
+    // Defensive normalization in case the caller didn't strip leading /
+    // trailing slashes itself — a user may paste a path with extra slashes
+    // and the lookup below compares character-by-character against the
+    // URL prefix.
+    QString addr = coprAddr;
+    while (addr.startsWith(QLatin1Char('/')))
+        addr.remove(0, 1);
+    while (addr.endsWith(QLatin1Char('/')))
+        addr.chop(1);
+    if (addr.isEmpty())
+        return false;
+
+    const QStringList dirs{
+        QStringLiteral("/usr/share/dnf5/repos.d"),
+        QStringLiteral("/etc/yum.repos.d"),
+    };
+
+    // Build a case-insensitive URL prefix to look for. We don't include
+    // a trailing '/' here so a baseurl whose path is exactly
+    // `results/owner/project` (no trailing slash) still matches.
+    const QString needle = QStringLiteral("https://download.copr.fedorainfracloud.org/results/")
+                           + addr;
+
+    for (const QString &dirPath : dirs) {
+        QDir dir(dirPath);
+        if (!dir.exists())
+            continue;
+        const QStringList repoFiles = dir.entryList({QStringLiteral("*.repo")}, QDir::Files);
+        for (const QString &fileName : repoFiles) {
+            QFile f(dir.absoluteFilePath(fileName));
+            if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+                continue;
+            QTextStream in(&f);
+            QString line;
+            while (in.readLineInto(&line)) {
+                line = line.trimmed();
+                if (line.isEmpty() || line.startsWith(QLatin1Char('#')) || line.startsWith(QLatin1Char('[')))
+                    continue;
+                // Match `baseurl=...` (INI key). value may be quoted or
+                // use multiple space-separated URLs — only one needs to
+                // match.
+                const int eq = line.indexOf(QLatin1Char('='));
+                if (eq <= 0)
+                    continue;
+                const QString key = line.left(eq).trimmed();
+                if (key.compare(QStringLiteral("baseurl"), Qt::CaseInsensitive) != 0)
+                    continue;
+                const QString value = line.mid(eq + 1).trimmed();
+                // baseurl can list multiple URLs separated by spaces.
+                // Check each one. Copr URLs always use the https://
+                // prefix; we accept http:// too in case a repo file was
+                // hand-edited.
+                const QStringList urls = value.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+                for (const QString &u : urls) {
+                    QString urlStr = u.trimmed();
+                    while (urlStr.endsWith(QLatin1Char('/')))
+                        urlStr.chop(1);
+                    if (urlStr.compare(needle, Qt::CaseInsensitive) == 0)
+                        return true;
+                    // Match a baseurl whose path continues past
+                    // /results/<addr>/... (e.g. /results/<addr>/fedora-45-x86_64/).
+                    if (urlStr.startsWith(needle + QLatin1Char('/'), Qt::CaseInsensitive))
+                        return true;
+                }
+            }
+            f.close();
+        }
+    }
+    return false;
+}
+
+// Run the polkit-gated `miryu-add-copr` helper. Must run on a worker
+// thread: polkit authentication blocks for up to 2 minutes (hardcoded
+// window in pkexec), and `dnf5 copr enable` itself takes a few seconds
+// for the Copr API call plus the .repo file write.
+//
+// The helper writes a structured, parseable summary on stdout:
+//   RESULT: success | incompatible | not_found | no_addr
+//   PLATFORM: <chroot>            (e.g. fedora-45-x86_64)
+//   AVAILABLE: <line>             (best-effort, incompatible case only)
+//   OUTPUT_START
+//   <raw dnf5 output>
+//   OUTPUT_END
+//
+// Polkit cancellation (user dismisses the auth dialog) shows up as
+// pkexec exiting non-zero with "Request dismissed" / "Not authorized"
+// on stderr — we detect that and set `cancelled = true` so the caller
+// can show a friendly message instead of an "incompatible / not found"
+// error.
+MainWindow::CoprAddResult MainWindow::runCoprAddHelper(const QString &coprAddr) const
+{
+    CoprAddResult r;
+
+    QProcess proc;
+    proc.setProcessChannelMode(QProcess::MergedChannels);
+
+    // Start synchronously on this worker thread. We can use blocking
+    // waitFor*() calls here because we're not on the GUI thread.
+    proc.start(QStringLiteral("pkexec"),
+               {QStringLiteral("/usr/bin/miryu-add-copr"), coprAddr});
+    if (!proc.waitForStarted()) {
+        r.notFound = true;
+        r.rawOutput = i18n("Failed to start the polkit helper. Is polkit installed?");
+        return r;
+    }
+
+    // Up to ~20 minutes for polkit auth + dnf5 copr enable. Mirrors the
+    // dnf5daemon kLongCallTimeoutMs.
+    constexpr int kTimeoutMs = 20 * 60 * 1000;
+    if (!proc.waitForFinished(kTimeoutMs)) {
+        proc.kill();
+        proc.waitForFinished(2000);
+        r.notFound = true;
+        r.rawOutput = i18n("The operation timed out.");
+        return r;
+    }
+
+    const QString out = QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
+    r.rawOutput = out;
+
+    // Polkit cancellation: pkexec returns 126/127 with one of these
+    // stderr markers. The helper never runs in that case so the helper's
+    // structured output is absent.
+    const QString errLower = out.toLower();
+    if (proc.exitCode() != 0 &&
+        (errLower.contains(QStringLiteral("request dismissed")) ||
+         errLower.contains(QStringLiteral("not authorized")) ||
+         errLower.contains(QStringLiteral("authentication")) ||
+         errLower.contains(QStringLiteral("cancelled")))) {
+        r.cancelled = true;
+        return r;
+    }
+
+    // Parse the helper's structured output.
+    static const QRegularExpression resultRe(QStringLiteral("RESULT:\\s*(\\S+)"));
+    static const QRegularExpression platRe(QStringLiteral("PLATFORM:\\s*(.+)"));
+    static const QRegularExpression availRe(QStringLiteral("AVAILABLE:\\s*(.+)"));
+
+    auto m = resultRe.match(out);
+    const QString resultStr = m.hasMatch() ? m.captured(1).toLower() : QString();
+
+    if (resultStr == QStringLiteral("success")) {
+        r.success = true;
+    } else if (resultStr == QStringLiteral("incompatible")) {
+        r.incompatible = true;
+    } else if (resultStr == QStringLiteral("not_found")) {
+        r.notFound = true;
+    } else if (resultStr == QStringLiteral("no_addr")) {
+        // Helper was invoked with no argument — shouldn't happen from
+        // this code path, but treat as not-found / unreachable per spec.
+        r.notFound = true;
+    } else {
+        // Unknown structured result. Fall back to pkexec's exit code: if
+        // the helper exited non-zero without a structured RESULT line,
+        // treat as not-found / unreachable (the safe default per spec).
+        r.notFound = true;
+    }
+
+    m = platRe.match(out);
+    if (m.hasMatch())
+        r.platform = m.captured(1).trimmed();
+
+    m = availRe.match(out);
+    if (m.hasMatch())
+        r.availableChroots = m.captured(1).trimmed();
+
+    return r;
 }
 
 void MainWindow::onDistroSync()

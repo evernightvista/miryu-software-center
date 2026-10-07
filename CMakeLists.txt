@@ -109,9 +109,15 @@ install(FILES
     DESTINATION ${KDE_INSTALL_METAINFODIR}
 )
 
-# Polkit policy for privileged package operations
+# Polkit policy for privileged package operations. The file MUST end in
+# `.policy` — polkitd's PolkitBackendActionPool only loads files with that
+# suffix from /usr/share/polkit-1/actions/, silently ignoring anything else.
+# A `.polkit` extension would NEVER be loaded, causing pkexec to fall back
+# to the generic `org.freedesktop.policykit.exec` action (which shows
+# "Run a program as another user" instead of the localized message declared
+# in the custom action).
 install(FILES
-    data/org.miryugaming.PackageManager.polkit
+    data/org.miryugaming.PackageManager.policy
     DESTINATION ${CMAKE_INSTALL_DATADIR}/polkit-1/actions
 )
 
@@ -120,6 +126,17 @@ install(FILES
 install(FILES
     data/50-miryu-dnf5daemon.rules
     DESTINATION ${CMAKE_INSTALL_DATADIR}/polkit-1/rules.d
+)
+
+# Polkit-gated helper invoked via `pkexec /usr/bin/miryu-add-copr` to add a
+# Copr repository as root. The polkit action `org.miryugaming.add.copr`
+# (declared in org.miryugaming.PackageManager.policy) is bound to this
+# executable via the `org.freedesktop.policykit.exec.path` annotation, so
+# the authentication dialog shows the localized "添加Copr仓库需要认证"
+# message instead of the bare `pkexec` prompt.
+install(PROGRAMS
+    data/miryu-add-copr
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 ki18n_install(po)

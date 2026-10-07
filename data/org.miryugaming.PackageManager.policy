@@ -13,6 +13,9 @@
 
 <policyconfig>
 
+  <vendor>Evernight Vista Team</vendor>
+  <vendor_url>https://github.com/evernightvista</vendor_url>
+
   <action id="org.miryugaming.PackageManager.manage-packages">
     <description>Manage RPM packages</description>
     <description xml:lang="zh_CN">管理 RPM 软件包</description>
@@ -101,6 +104,30 @@
       <allow_active>auth_admin_keep</allow_active>
     </defaults>
     <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/miryu-software-center</annotate>
+  </action>
+
+  <action id="org.miryugaming.add.copr">
+    <description>Add a Copr repository</description>
+    <description xml:lang="zh_CN">添加Copr仓库</description>
+    <description xml:lang="zh_TW">添加Copr倉庫</description>
+    <description xml:lang="ja">Coprリポジトリの追加</description>
+    <description xml:lang="ko">Copr 저장소 추가</description>
+    <description xml:lang="de">Copr-Paketquelle hinzufügen</description>
+    <description xml:lang="fr">Ajouter un dépôt Copr</description>
+    <message>Authentication is required to add a Copr repository.</message>
+    <message xml:lang="zh_CN">添加Copr仓库需要认证。</message>
+    <message xml:lang="zh_TW">添加Copr倉庫需要認證。</message>
+    <message xml:lang="ja">Coprリポジトリの追加には認証が必要です。</message>
+    <message xml:lang="ko">Copr 저장소를 추가하려면 인증이 필요합니다.</message>
+    <message xml:lang="de">Authentifizierung ist zum Hinzufügen einer Copr-Paketquelle erforderlich.</message>
+    <message xml:lang="fr">Une authentification est requise pour ajouter un dépôt Copr.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/miryu-add-copr</annotate>
+    <annotate key="org.freedesktop.policykit.exec.allow-gui">true</annotate>
   </action>
 
 </policyconfig>

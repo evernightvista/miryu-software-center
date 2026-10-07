@@ -1,0 +1,164 @@
+#!/bin/bash
+# miryu-add-copr: Polkit-gated helper that enables a Copr repository.
+#
+# Invoked as:
+#     pkexec /usr/bin/miryu-add-copr <owner/project>
+#
+# Registering the polkit action `org.miryugaming.add.copr` with the
+# `org.freedesktop.policykit.exec.path` annotation pointing at this
+# script makes pkexec authenticate against that action — so the
+# authentication dialog shows the localized message
+# "添加Copr仓库需要认证" instead of the bare "Authenticating as: root"
+# prompt emitted by the generic `org.freedesktop.policykit.exec` action.
+#
+# The helper writes a small structured, parseable summary on stdout
+# (RESULT / PLATFORM / AVAILABLE / OUTPUT_START…OUTPUT_END) that the
+# caller (Miryu Software Center) uses to drive the user-facing dialog
+# flow. The exit status is always 0 unless invoked with the wrong
+# number of arguments — the caller inspects the RESULT line to decide
+# whether the operation succeeded, the project was incompatible with
+# the local platform, or the project did not exist / was unreachable.
+#
+# © 2027 KairikiFedora and © 2027 MiryuGaming
+
+set -u
+
+# Force the C locale so dnf5 / the copr plugin emit English messages.
+# Without this the user's system locale (e.g. zh_CN) makes the plugin
+# print localized strings like "在给定的 Copr 项目中未找到 Chroot"
+# which the English-only grep patterns below would fail to match,
+# causing an incompatible project to be misreported as not-found.
+export LC_ALL=C
+
+ADDR="${1:-}"
+if [ -z "$ADDR" ]; then
+    printf 'RESULT: no_addr\n'
+    exit 2
+fi
+
+# Determine the platform chroot string dnf5 would use to look up the
+# project (e.g. "fedora-45-x86_64"). dnf5 derives this from
+# /usr/lib/os-release ID + VERSION_ID + uname -m. /etc/os-release is a
+# fallback for distros that only ship that copy.
+#
+# Override: if copr.vendor.conf exists, its [main] section supplies
+# `distribution` and `releasever` keys (e.g. distribution=fedora /
+# releasever=45). This is the same override the dnf5 copr plugin itself
+# consults to decide which chroot to request, so we MUST mirror it here
+# — otherwise the platform we report in the "Your platform:" line of
+# the incompatible dialog wouldn't match the chroot dnf5 actually
+# probed, confusing the user. copr.vendor.conf takes precedence over
+# os-release.
+#
+# Both /usr/share/dnf/plugins/copr.vendor.conf (shipped by the dnf5
+# copr plugin package) and /etc/dnf/plugins/copr.vendor.conf (admin
+# override) are checked; the latter wins if both exist.
+PLATFORM="unknown"
+DISTRIBUTION=""
+RELEASEVER=""
+VENDOR_CONFS="/usr/share/dnf/plugins/copr.vendor.conf /etc/dnf/plugins/copr.vendor.conf"
+for VENDOR_CONF in $VENDOR_CONFS; do
+    if [ -r "$VENDOR_CONF" ]; then
+        # Extract only the [main] section (awk state machine). Strip
+        # carriage returns so files saved with CRLF line endings still
+        # parse. Then pull `distribution`/`releasever` with grep+sed,
+        # tolerating any whitespace around `=`.
+        MAIN_CONTENT="$(awk '
+            /^\[main\]/  { in_main=1; next }
+            /^\[/        { in_main=0; next }
+            in_main      { print }
+        ' "$VENDOR_CONF" | tr -d '\r')"
+        D="$(printf '%s\n' "$MAIN_CONTENT" | \
+            grep -E '^[[:space:]]*distribution[[:space:]]*=' | head -n1 | \
+            sed -E 's/^[[:space:]]*distribution[[:space:]]*=[[:space:]]*//; s/[[:space:]]+$//')"
+        R="$(printf '%s\n' "$MAIN_CONTENT" | \
+            grep -E '^[[:space:]]*releasever[[:space:]]*=' | head -n1 | \
+            sed -E 's/^[[:space:]]*releasever[[:space:]]*=[[:space:]]*//; s/[[:space:]]+$//')"
+        [ -n "$D" ] && DISTRIBUTION="$D"
+        [ -n "$R" ] && RELEASEVER="$R"
+    fi
+done
+if [ -z "$DISTRIBUTION" ] || [ -z "$RELEASEVER" ]; then
+    # Fall back to /usr/lib/os-release (or /etc/os-release) when the
+    # vendor override is absent or incomplete.
+    OS_RELEASE=""
+    if [ -r /usr/lib/os-release ]; then
+        OS_RELEASE="/usr/lib/os-release"
+    elif [ -r /etc/os-release ]; then
+        OS_RELEASE="/etc/os-release"
+    fi
+    if [ -n "$OS_RELEASE" ]; then
+        # Source in a subshell so a malformed file can't poison us.
+        eval "$(
+            # Strip any line that isn't a simple VAR=value assignment
+            # so a stray shell construct in os-release can never
+            # execute here.
+            grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "$OS_RELEASE" | sed -e 's/^/export /'
+        )" 2>/dev/null || true
+    fi
+    DISTRIBUTION="${ID:-unknown}"
+    RELEASEVER="${VERSION_ID:-unknown}"
+fi
+ARCH="$(uname -m)"
+PLATFORM="${DISTRIBUTION}-${RELEASEVER}-${ARCH}"
+
+# Run dnf5 copr enable, capturing both stdout and stderr. The plugin
+# writes the new repo file under /etc/yum.repos.d/_copr:*.repo as root.
+# `-y` skips the interactive "are you sure?" prompt (dnf5 has no --yes).
+OUTPUT="$(dnf5 copr enable "$ADDR" -y 2>&1)"
+RC=$?
+
+if [ "$RC" -eq 0 ]; then
+    printf 'RESULT: success\n'
+else
+    # Detect incompatibility FIRST. The dnf5 copr plugin prints
+    #   "Chroot fedora-45-x86_64 not found in the given Copr project."
+    #   "You can explicitly select one from the available chroots:"
+    #     "  fedora-44-x86_64"
+    #     "  fedora-44-aarch64"
+    # when the project exists but doesn't ship the local chroot.
+    # We look for "chroot" + "not found" appearing together (case-
+    # insensitive) so a generic "not found" (project missing) doesn't
+    # trigger the incompatible branch.
+    if printf '%s' "$OUTPUT" | grep -qiE 'chroot[^a-z0-9]+(.* )?not found|not found.*chroot|no matches for chroot|no matching chroot|incompatible'; then
+        # Extract the available chroots. They are listed one per line
+        # (indented) after the "available chroots" marker line. Collect
+        # every line matching the distro-version-arch pattern that
+        # appears after that marker and join them with ", ".
+        AVAIL_CHROOTS=""
+        IN_LIST=false
+        while IFS= read -r line; do
+            if printf '%s' "$line" | grep -qiE 'available chroots?'; then
+                IN_LIST=true
+                continue
+            fi
+            if [ "$IN_LIST" = "true" ]; then
+                # Match chroot pattern: distro-version-arch. The version
+                # part may be digits (43, 44) OR a named release like
+                # "rawhide", so we use [a-z0-9]+ for it. The distro part
+                # may contain internal dashes (e.g. "centos-stream").
+                # Examples: fedora-44-x86_64, fedora-rawhide-x86_64,
+                # epel-9-aarch64, centos-stream-9-x86_64.
+                CHROOT="$(printf '%s' "$line" | grep -oE '[a-z][a-z0-9-]*-[a-z0-9]+-[a-z0-9_]+' | head -1)"
+                if [ -n "$CHROOT" ]; then
+                    if [ -z "$AVAIL_CHROOTS" ]; then
+                        AVAIL_CHROOTS="$CHROOT"
+                    else
+                        AVAIL_CHROOTS="$AVAIL_CHROOTS, $CHROOT"
+                    fi
+                fi
+            fi
+        done <<< "$OUTPUT"
+        printf 'RESULT: incompatible\n'
+        printf 'AVAILABLE: %s\n' "$AVAIL_CHROOTS"
+    elif printf '%s' "$OUTPUT" | grep -qiE "doesn't exist|unreachable|does not exist|404|connection|could not resolve|temporary failure|not found"; then
+        printf 'RESULT: not_found\n'
+    else
+        # Unknown failure — treat as not-found / unreachable per spec.
+        printf 'RESULT: not_found\n'
+    fi
+fi
+
+printf 'PLATFORM: %s\n' "$PLATFORM"
+printf 'OUTPUT_START\n%s\nOUTPUT_END\n' "$OUTPUT"
+exit 0

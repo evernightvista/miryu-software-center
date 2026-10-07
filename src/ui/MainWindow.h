@@ -86,6 +86,17 @@ private Q_SLOTS:
     void onInstallLocalRpm();
     void launchLinglongStore();
     void showAboutDialog();
+    // Refresh ONLY the repository list shown on the Repositories page
+    // (the page-level "Refresh Software Repository List" button). Asks the
+    // dnf5daemon to expire its in-memory cache and re-read every repo from
+    // disk, then reloads the model. Cheaper than onReloadData() (which
+    // additionally re-downloads repository metadata for the package list).
+    void onRefreshRepoList();
+    // Page-level "Add Copr Repository" button on the Repositories page.
+    // Drives the full Copr-add dialog flow: input the Copr address,
+    // scan the existing repo files for a duplicate, confirm with the user,
+    // polkit-authenticate via the helper script, then report the result.
+    void onAddCoprRepo();
 
     void onPackagesLoaded(int filter, const QList<Miryu::Package> &packages);
     void onSearchCompleted(const QList<Miryu::Package> &packages);
@@ -115,6 +126,31 @@ private:
     void doRefreshMetadataWithLog();
     void doDistroSyncWithLog();
     void runRpmInstallWithPolkit(const QStringList &files, bool offline);
+    // Scan every *.repo file under /usr/share/dnf5/repos.d and
+    // /etc/yum.repos.d for a `baseurl` line pointing at
+    // https://download.copr.fedorainfracloud.org/results/<coprAddr>/...
+    // Returns true if such a baseurl is found, i.e. the Copr repo is
+    // already configured on the system. The lookup is case-insensitive
+    // and ignores trailing slashes / extra path components, so a repo
+    // file whose baseurl is `.../results/evernightvista/evernight-vista/
+    // fedora-$releasever-$basearch/` matches the user-supplied
+    // `evernightvista/evernight-vista`.
+    bool coprRepoAlreadyConfigured(const QString &coprAddr) const;
+    // Run the polkit-gated `miryu-add-copr` helper to add a Copr
+    // repository. Blocks the calling (worker) thread for up to ~20 minutes
+    // (the polkit authentication window plus dnf5 copr enable runtime).
+    // Returns a parsed result; see CoprAddResult for the fields. The raw
+    // dnf5 output is preserved in `rawOutput` for diagnostics.
+    struct CoprAddResult {
+        bool cancelled = false;       // polkit auth dismissed / failed
+        bool success = false;         // repo file written, dnf5 exit 0
+        bool incompatible = false;    // project doesn't ship this chroot
+        bool notFound = false;        // project 404 / network unreachable
+        QString platform;             // e.g. "fedora-45-x86_64"
+        QString availableChroots;     // supported chroots (incompatible case)
+        QString rawOutput;            // raw dnf5 output, for diagnostics
+    };
+    CoprAddResult runCoprAddHelper(const QString &coprAddr) const;
     void createRestartBanner();
     void showInstalledPackages();
     void updateRestartBannerHeight();

@@ -1437,3 +1437,96 @@ msgstr ""
 "\n"
 "操作を再試行してください。問題が解決しない場合は、以下のコマンドでサービスを再起動してください:\n"
 "  sudo systemctl restart dnf5daemon-server"
+
+#: src/ui/MainWindow.cpp:445
+msgid "Refresh Software Repository List"
+msgstr "リポジトリ一覧を更新"
+
+#: src/ui/MainWindow.cpp:446
+msgid "Reload the list of configured software repositories from disk."
+msgstr "ディスクから設定済みソフトウェアリポジトリの一覧を再読み込みします。"
+
+#: src/ui/MainWindow.cpp:451
+msgid "Add Copr Repository"
+msgstr "Coprリポジトリの追加"
+
+#: src/ui/MainWindow.cpp:452
+msgid "Add a Copr repository (e.g. evernightvista/evernight-vista)."
+msgstr "Coprリポジトリを追加（例: evernightvista/evernight-vista）。"
+
+#: src/ui/MainWindow.cpp:1238
+msgid "Refreshing repository list..."
+msgstr "リポジトリ一覧を更新中..."
+
+#: src/ui/MainWindow.cpp:1262
+msgid ""
+"The package backend is not initialized. Cannot add a Copr repository."
+msgstr "パッケージバックエンドが初期化されていません。Coprリポジトリを追加できません。"
+
+#: src/ui/MainWindow.cpp:1272
+msgid ""
+"Please enter the Copr repository address you want to add (e.g. "
+"evernightvista/evernight-vista):"
+msgstr "追加したいCoprリポジトリアドレスを入力してください（例: evernightvista/evernight-vista）:"
+
+#: src/ui/MainWindow.cpp:1284
+msgid "Confirm"
+msgstr "確認"
+
+#: src/ui/MainWindow.cpp:1285
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/ui/MainWindow.cpp:1309
+msgid "The Copr repository %1 already exists."
+msgstr "Coprリポジトリ%1は既に存在します。"
+
+#: src/ui/MainWindow.cpp:1319
+msgid ""
+"Add the %1 Copr repository?\n"
+"Note: Copr repositories are maintained by their owners."
+msgstr ""
+"%1 Coprリポジトリを追加しますか？\n"
+"注意: Coprリポジトリは所有者によって保守されています。"
+
+#: src/ui/MainWindow.cpp:1331
+msgid "Adding Copr repository %1..."
+msgstr "Coprリポジトリ%1を追加中..."
+
+#: src/ui/MainWindow.cpp:1348
+msgid "The user has cancelled adding the Copr repository."
+msgstr "ユーザーはCoprリポジトリの追加をキャンセルしました"
+
+#: src/ui/MainWindow.cpp:1361
+msgid "You have added the %1 Copr repository."
+msgstr "%1 Coprリポジトリを追加しました。"
+
+#: src/ui/MainWindow.cpp:1371
+msgid "(not reported)"
+msgstr "（報告なし）"
+
+#: src/ui/MainWindow.cpp:1377
+msgid "(unknown)"
+msgstr "（不明）"
+
+#: src/ui/MainWindow.cpp:1373
+msgid ""
+"The Copr repository %1 is incompatible with this platform.\n"
+"The Copr repository %1 supports the following platforms: %2\n"
+"Your platform: %3"
+msgstr ""
+"Coprリポジトリ%1はこのプラットフォームと互換性がありません。\n"
+"Coprリポジトリ%1は以下のプラットフォームに対応しています: %2\n"
+"あなたのプラットフォーム: %3"
+
+#: src/ui/MainWindow.cpp:1385
+msgid "The Copr repository %1 does not exist or is unreachable."
+msgstr "Coprリポジトリ%1は存在しないか、アクセスできません。"
+
+#: src/ui/MainWindow.cpp:1503
+msgid "Failed to start the polkit helper. Is polkit installed?"
+msgstr "polkitヘルパーの起動に失敗しました。polkitはインストールされていますか？"
+
+#: src/ui/MainWindow.cpp:1514
+msgid "The operation timed out."
+msgstr "操作がタイムアウトしました。"

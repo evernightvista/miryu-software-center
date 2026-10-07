@@ -1499,3 +1499,96 @@ msgstr ""
 "\n"
 "Bitte versuchen Sie den Vorgang erneut. Wenn das Problem weiterhin besteht, starten Sie den Dienst neu mit:\n"
 "  sudo systemctl restart dnf5daemon-server"
+
+#: src/ui/MainWindow.cpp:445
+msgid "Refresh Software Repository List"
+msgstr "Software-Paketquellenliste aktualisieren"
+
+#: src/ui/MainWindow.cpp:446
+msgid "Reload the list of configured software repositories from disk."
+msgstr "Die Liste der konfigurierten Software-Paketquellen vom Datenträger neu laden."
+
+#: src/ui/MainWindow.cpp:451
+msgid "Add Copr Repository"
+msgstr "Copr-Paketquelle hinzufügen"
+
+#: src/ui/MainWindow.cpp:452
+msgid "Add a Copr repository (e.g. evernightvista/evernight-vista)."
+msgstr "Copr-Paketquelle hinzufügen (z. B. evernightvista/evernight-vista)."
+
+#: src/ui/MainWindow.cpp:1238
+msgid "Refreshing repository list..."
+msgstr "Paketquellenliste wird aktualisiert..."
+
+#: src/ui/MainWindow.cpp:1262
+msgid ""
+"The package backend is not initialized. Cannot add a Copr repository."
+msgstr "Das Paket-Backend ist nicht initialisiert. Copr-Paketquelle kann nicht hinzugefügt werden."
+
+#: src/ui/MainWindow.cpp:1272
+msgid ""
+"Please enter the Copr repository address you want to add (e.g. "
+"evernightvista/evernight-vista):"
+msgstr "Bitte geben Sie die Adresse der Copr-Paketquelle ein, die Sie hinzufügen möchten (z. B. evernightvista/evernight-vista):"
+
+#: src/ui/MainWindow.cpp:1284
+msgid "Confirm"
+msgstr "Bestätigen"
+
+#: src/ui/MainWindow.cpp:1285
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: src/ui/MainWindow.cpp:1309
+msgid "The Copr repository %1 already exists."
+msgstr "Die Copr-Paketquelle %1 ist bereits vorhanden."
+
+#: src/ui/MainWindow.cpp:1319
+msgid ""
+"Add the %1 Copr repository?\n"
+"Note: Copr repositories are maintained by their owners."
+msgstr ""
+"Die Copr-Paketquelle %1 hinzufügen?\n"
+"Hinweis: Copr-Paketquellen werden von ihren Eigentümern gepflegt."
+
+#: src/ui/MainWindow.cpp:1331
+msgid "Adding Copr repository %1..."
+msgstr "Copr-Paketquelle %1 wird hinzugefügt..."
+
+#: src/ui/MainWindow.cpp:1348
+msgid "The user has cancelled adding the Copr repository."
+msgstr "Der Benutzer hat das Hinzufügen der Copr-Paketquelle abgebrochen"
+
+#: src/ui/MainWindow.cpp:1361
+msgid "You have added the %1 Copr repository."
+msgstr "Sie haben die Copr-Paketquelle %1 hinzugefügt."
+
+#: src/ui/MainWindow.cpp:1371
+msgid "(not reported)"
+msgstr "(nicht gemeldet)"
+
+#: src/ui/MainWindow.cpp:1377
+msgid "(unknown)"
+msgstr "(unbekannt)"
+
+#: src/ui/MainWindow.cpp:1373
+msgid ""
+"The Copr repository %1 is incompatible with this platform.\n"
+"The Copr repository %1 supports the following platforms: %2\n"
+"Your platform: %3"
+msgstr ""
+"Die Copr-Paketquelle %1 ist mit dieser Plattform nicht kompatibel.\n"
+"Die Copr-Paketquelle %1 unterstützt die folgenden Plattformen: %2\n"
+"Ihre Plattform: %3"
+
+#: src/ui/MainWindow.cpp:1385
+msgid "The Copr repository %1 does not exist or is unreachable."
+msgstr "Die Copr-Paketquelle %1 ist nicht vorhanden oder nicht erreichbar."
+
+#: src/ui/MainWindow.cpp:1503
+msgid "Failed to start the polkit helper. Is polkit installed?"
+msgstr "Start des polkit-Hilfsprogramms fehlgeschlagen. Ist polkit installiert?"
+
+#: src/ui/MainWindow.cpp:1514
+msgid "The operation timed out."
+msgstr "Der Vorgang hat ein Zeitlimit überschritten."
