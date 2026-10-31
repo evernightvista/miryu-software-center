@@ -27,6 +27,13 @@ struct TransactionResult
     QString error;
     QStringList problems;
     bool keyInstall = false;
+    // True when the solver reported broken dependencies (either as a WARNING
+    // with skipped "broken_dependency" packages, or as a hard ERROR whose
+    // resolve logs describe unsatisfiable requires / conflicts). When set the
+    // UI blocks the transaction and asks the user to resolve dependencies
+    // before retrying, instead of letting a partial upgrade leave the system
+    // in a broken state.
+    bool brokenDependency = false;
 
     QList<TransactionItem> itemsByAction(const QString &action) const
     {

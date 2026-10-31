@@ -21,6 +21,13 @@ public:
 
     QList<Package> selectedPackages() const;
 
+    // Whether the per-row package summary (description) is drawn. Defaults
+    // to true. The Updates page hides it because the old→new version string
+    // already conveys the relevant information and the descriptions tend to
+    // be clipped / redundant in that narrow column.
+    void setShowSummary(bool show);
+    bool showSummary() const { return m_showSummary; }
+
     // Rectangle of the per-row queue checkbox for a given row rect. The
     // delegate uses this in paint() and PackageView uses it in
     // mousePressEvent() so the hit area always matches the painted box.
@@ -48,6 +55,7 @@ private:
     void queuePackages(const QList<Package> &packages);
 
     PackageModel *m_model;
+    bool m_showSummary = true;
 };
 
 }

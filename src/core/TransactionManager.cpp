@@ -2,8 +2,42 @@
 
 #include <QDebug>
 #include <QMetaObject>
+#include <KLocalizedString>
 
 namespace Miryu {
+
+bool TransactionManager::hasBrokenDependencyProblems(const QStringList &problems)
+{
+    // libdnf5 formats solver failures as "Problem: <description>". A genuine
+    // broken dependency mentions unsatisfiable requires, conflicts, or missing
+    // providers. Benign resolve logs (e.g. "package already installed" hints,
+    // "not found" for optional weak deps) do not contain these markers, so
+    // this check only trips on real dependency breakage — matching the
+    // "Problem: installed package X requires Y, but none of the providers can
+    // be installed" text seen when an upgrade would leave a dependent package
+    // unsatisfied.
+    static const QStringList keywords = {
+        QStringLiteral("requires"),
+        QStringLiteral("cannot install both"),
+        QStringLiteral("no provider"),
+        QStringLiteral("none of the providers"),
+        QStringLiteral("conflict"),
+        QStringLiteral("conflicting"),
+        QStringLiteral("broken dependency"),
+        QStringLiteral("problem with installed package"),
+        QStringLiteral("cannot install the best update candidate"),
+    };
+    for (const QString &p : problems) {
+        const QString lower = p.toLower();
+        if (!lower.contains(QStringLiteral("problem:")))
+            continue;
+        for (const QString &kw : keywords) {
+            if (lower.contains(kw))
+                return true;
+        }
+    }
+    return false;
+}
 
 TransactionManager::TransactionManager(Dnf5DaemonClient *client, QObject *parent)
     : QObject(parent)
@@ -128,23 +162,41 @@ bool TransactionManager::buildTransactions(const QList<Package> &packages, const
 
     for (const auto &pkg : packages) {
         switch (pkg.todo) {
-        // Use the full NEVRA (name-[epoch:]version-release.arch) for
-        // install / upgrade / downgrade / reinstall so each spec uniquely
-        // identifies a single package — including its architecture. Passing
-        // just pkg.name makes the daemon match every package sharing that
-        // name and, on a multilib system, only the best arch (e.g. x86_64)
-        // is selected for upgrade; packages of secondary arches (e.g. i686)
-        // are silently dropped. This is what caused the transaction summary
-        // to show far fewer upgrades than the number of updates DNF5 had
-        // detected (e.g. 150 queued updates collapsing to 45 in the dialog).
-        // remove / distro_sync keep using pkg.name: remove operates on the
-        // installed package by name, and distro_sync intentionally syncs
-        // every arch of the named package.
+        // Use the package NAME (not the full NEVRA) for upgrade / downgrade /
+        // reinstall, matching how Nobara's dnf-app-center calls
+        // goal.add_upgrade(name) / add_downgrade(name) / add_reinstall(name).
+        //
+        // Why name and not NEVRA: dnf5's add_up_down_distrosync_to_goal
+        // resolves the spec and then requires an *installed* package with the
+        // same name AND arch (relevant_installed_na.filter_name_arch). The
+        // update list we feed in here comes from filter_upgrades(), which
+        // returns the *available* candidate. When a package transitions arch
+        // between releases (e.g. installed foo.noarch → available foo.x86_64,
+        // or a multilib secondary arch), the available candidate's NEVRA has
+        // a different arch than the installed package, so filter_name_arch
+        // finds nothing. For UPGRADE dnf5 forces skip_unavailable=true, so the
+        // spec is silently dropped with result=NO_PROBLEM — the transaction
+        // ends up empty, resultCode stays 0, and the "Transaction Summary"
+        // dialog opens with no rows (the "occasional empty summary" bug).
+        //
+        // Passing just the name lets resolve_pkg_spec match every arch of the
+        // package, so relevant_installed_na finds the installed counterpart
+        // regardless of arch differences, and the solver picks the correct
+        // upgrade/downgrade/reinstall candidate internally. This is exactly
+        // what `dnf upgrade <name>` does on the command line and what
+        // dnf-app-center relies on.
+        //
+        // Install keeps the full NEVRA: add_install resolves the spec against
+        // available packages only (no installed-counterpart arch check), so a
+        // precise NEVRA installs exactly the package the user selected instead
+        // of every arch sharing the name. remove / distro_sync already use the
+        // name (remove operates on installed packages by name; distro_sync
+        // intentionally syncs every arch).
         case PackageTodo::Install:    toInstall.append(pkg.nevra()); break;
-        case PackageTodo::Update:     toUpdate.append(pkg.nevra()); break;
+        case PackageTodo::Update:     toUpdate.append(pkg.name); break;
         case PackageTodo::Remove:     toRemove.append(pkg.name); break;
-        case PackageTodo::Downgrade:  toDowngrade.append(pkg.nevra()); break;
-        case PackageTodo::Reinstall:  toReinstall.append(pkg.nevra()); break;
+        case PackageTodo::Downgrade:  toDowngrade.append(pkg.name); break;
+        case PackageTodo::Reinstall:  toReinstall.append(pkg.name); break;
         case PackageTodo::DistroSync: toDistroSync.append(pkg.name); break;
         case PackageTodo::None:       break;
         }
@@ -175,7 +227,7 @@ TransactionResult TransactionManager::buildResult(const QVariantList &transactio
         result.completed = true;
     } else {
         result.completed = false;
-        result.error = QStringLiteral("Transaction resolving failed");
+        result.error = i18n("Transaction resolving failed");
     }
 
     if (resultCode == 1) {
@@ -195,10 +247,29 @@ TransactionResult TransactionManager::buildResult(const QVariantList &transactio
         {QStringLiteral("Reason Change"), QStringLiteral("reason_change")},
     };
 
+    // The daemon emits "Skipped" items for packages it could not include in
+    // the resolved transaction. reason_skipped == "broken_dependency" means
+    // the package's requires could not be satisfied (e.g. upgrading libheif
+    // would break libheif-freeworld's dependency). Detect these so we can
+    // block the transaction instead of letting a partial upgrade proceed.
+    bool hasBrokenDepSkipped = false;
+
     for (const auto &item : transactionItems) {
         QVariantList parts = item.toList();
         if (parts.size() < 5)
             continue;
+
+        QString objectType = parts[0].toString();
+        if (objectType.compare(QStringLiteral("Skipped"), Qt::CaseInsensitive) == 0) {
+            QVariantMap attrs = parts[3].toMap();
+            if (attrs.value(QStringLiteral("reason_skipped")).toString()
+                == QStringLiteral("broken_dependency")) {
+                hasBrokenDepSkipped = true;
+            }
+            // Skipped items are not actionable — do not add them to the
+            // transaction groups the dialog renders.
+            continue;
+        }
 
         QString actionStr = parts[1].toString();
         QString actionKey = actionMap.value(actionStr, actionStr.toLower());
@@ -251,6 +322,21 @@ TransactionResult TransactionManager::buildResult(const QVariantList &transactio
         QVariantList list = dataMap.value(actionKey).toList();
         list.append(QVariant(entry));
         dataMap[actionKey] = list;
+    }
+
+    // Block the transaction when the solver reported broken dependencies,
+    // either as skipped broken_dependency packages (WARNING path) or as
+    // resolve-log Problem entries describing unsatisfiable requires /
+    // conflicts. Letting such a transaction through would apply only the
+    // resolvable subset and leave dependent packages (e.g. libheif-freeworld)
+    // with unsatisfied requires — a half-upgraded, broken system.
+    if (result.completed && resultCode == 1 &&
+        (hasBrokenDepSkipped || hasBrokenDependencyProblems(result.problems))) {
+        result.completed = false;
+        result.brokenDependency = true;
+        result.error = i18n(
+            "Dependencies not resolved. Please resolve the dependency issues "
+            "and try updating again.");
     }
 
     return result;
@@ -310,12 +396,34 @@ TransactionResult TransactionManager::buildTransaction(const QList<Package> &pac
 
     auto resolveResult = m_client->resolve(allowErasing);
     if (!resolveResult.success) {
-        result.error = resolveResult.error;
         result.problems = m_client->getTransactionProblemsString();
+        if (hasBrokenDependencyProblems(result.problems)) {
+            result.brokenDependency = true;
+            result.error = i18n(
+                "Dependencies not resolved. Please resolve the dependency issues "
+                "and try updating again.");
+        } else {
+            result.error = resolveResult.error;
+        }
         return result;
     }
 
     result = buildResult(resolveResult.transactionItems, resolveResult.resultCode);
+
+    // Defensive guard: if the goal resolved successfully (resultCode 0/1) but
+    // produced no transaction items, every spec was silently dropped by dnf5
+    // (e.g. an arch-transition upgrade where the available candidate's arch
+    // differs from the installed one). Without this guard the caller shows a
+    // blank "Transaction Summary" dialog with no rows and an enabled Apply
+    // button that does nothing. Surface a clear message instead.
+    if (result.completed && result.data.isEmpty()) {
+        result.completed = false;
+        result.error = i18n(
+            "The transaction resolved to no changes. The requested packages "
+            "may already be up to date or could not be matched against "
+            "installed packages.");
+    }
+
     return result;
 }
 
@@ -345,8 +453,15 @@ TransactionResult TransactionManager::runTransaction(const TransactionOptions &o
 
     auto resolveResult = m_client->resolve(allowErasing);
     if (!resolveResult.success) {
-        result.error = resolveResult.error;
         result.problems = m_client->getTransactionProblemsString();
+        if (hasBrokenDependencyProblems(result.problems)) {
+            result.brokenDependency = true;
+            result.error = i18n(
+                "Dependencies not resolved. Please resolve the dependency issues "
+                "and try updating again.");
+        } else {
+            result.error = resolveResult.error;
+        }
         return result;
     }
 
@@ -405,7 +520,7 @@ TransactionResult TransactionManager::runTransaction(const TransactionOptions &o
         // instead of a generic message, so the UI can detect auth
         // cancellation and show a friendly single dialog.
         result.error = m_client->lastError().isEmpty()
-            ? QStringLiteral("Transaction execution failed")
+            ? i18n("Transaction execution failed")
             : m_client->lastError();
     }
 
@@ -433,12 +548,27 @@ TransactionResult TransactionManager::depsolve(const QList<Package> &packages)
 
     auto resolveResult = m_client->resolve(false);
     if (!resolveResult.success) {
-        result.error = resolveResult.error;
+        result.problems = m_client->getTransactionProblemsString();
+        if (hasBrokenDependencyProblems(result.problems)) {
+            result.brokenDependency = true;
+            result.error = i18n(
+                "Dependencies not resolved. Please resolve the dependency issues "
+                "and try updating again.");
+        } else {
+            result.error = resolveResult.error;
+        }
         return result;
     }
 
     result = buildResult(resolveResult.transactionItems, resolveResult.resultCode);
     result.completed = resolveResult.success;
+    if (result.completed && result.data.isEmpty()) {
+        result.completed = false;
+        result.error = i18n(
+            "The transaction resolved to no changes. The requested packages "
+            "may already be up to date or could not be matched against "
+            "installed packages.");
+    }
     m_client->resetGoal();
     return result;
 }
@@ -450,10 +580,10 @@ QString TransactionManager::transactionBuildError(int reconnectCountBefore) cons
     // (goal-less) session would yield an incomplete transaction. Ask the user
     // to retry the whole operation instead.
     if (m_client->reconnectCount() != reconnectCountBefore) {
-        return QStringLiteral("The connection to dnf5daemon-server was interrupted "
-                              "while preparing the transaction. Please try again.");
+        return i18n("The connection to dnf5daemon-server was interrupted "
+                    "while preparing the transaction. Please try again.");
     }
-    return QStringLiteral("Failed to prepare transaction");
+    return i18n("Failed to prepare transaction");
 }
 
 }

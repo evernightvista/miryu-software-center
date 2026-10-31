@@ -39,6 +39,9 @@ public:
 
     void reload();
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private Q_SLOTS:
     void onSidebarChanged(int index);
     void onSearch();
@@ -74,6 +77,7 @@ private:
     void showStoreDetailView(const FlatpakApp &app);
     void showStoreListView();
     void updateDetailButtons();
+    void applySecondaryColors();
 
     QList<FlatpakApp> selectedStoreApps() const;
     QList<FlatpakApp> selectedInstalledApps() const;

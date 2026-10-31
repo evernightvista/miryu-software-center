@@ -47,6 +47,14 @@ public:
     QString license;
     qint64 size = 0;
 
+    // Installed (old) version for packages that have an upgrade available.
+    // Only populated for the update list so the view can render
+    // "oldVersion → newVersion". Empty for installed / available / downgrade
+    // packages, where version already describes the only relevant EVR.
+    QString installedVersion;
+    QString installedRelease;
+    QString installedEpoch;
+
     PackageState state = PackageState::Available;
     PackageTodo todo = PackageTodo::None;
 
@@ -64,6 +72,17 @@ public:
         if (epoch.isEmpty() || epoch == QStringLiteral("0"))
             return version + QStringLiteral("-") + release;
         return epoch + QStringLiteral(":") + version + QStringLiteral("-") + release;
+    }
+
+    // EVR of the currently installed (old) version. Only meaningful for
+    // update-list entries; returns an empty string otherwise.
+    QString installedEvr() const
+    {
+        if (installedVersion.isEmpty() && installedRelease.isEmpty())
+            return {};
+        if (installedEpoch.isEmpty() || installedEpoch == QStringLiteral("0"))
+            return installedVersion + QStringLiteral("-") + installedRelease;
+        return installedEpoch + QStringLiteral(":") + installedVersion + QStringLiteral("-") + installedRelease;
     }
 
     QString nevra() const

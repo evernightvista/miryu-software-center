@@ -57,6 +57,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
+    void changeEvent(QEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private Q_SLOTS:
@@ -117,6 +118,7 @@ private:
     void setupActions();
     void setupUI();
     void setupSidebar();
+    void applySidebarStyle();
     void updateStatusBar();
     // Enable / disable the per-page "Apply" buttons (Packages & Updates)
     // according to whether the queue model currently holds any pending
@@ -168,6 +170,14 @@ private:
     // running kernel release string). Removing the running kernel would
     // leave the system unbootable, so such requests must be rejected.
     bool isRunningKernel(const Miryu::Package &pkg) const;
+    // Show a transaction failure dialog. Handles three cases:
+    //   1. brokenDependency — the solver reported unsatisfiable requires /
+    //      conflicts; blocks the transaction with a "resolve dependencies"
+    //      message and the raw problem text.
+    //   2. protected package — dnf5 refused to touch a protected/essential
+    //      package.
+    //   3. generic — any other resolution failure, with the problem details.
+    void showTransactionError(const Miryu::TransactionResult &result);
     // Load package names listed as "suggest reboot" from the dnf5
     // configuration drop-in directories
     // (/usr/share/dnf5/suggest-reboot.d/*.conf and

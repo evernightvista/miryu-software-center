@@ -45,6 +45,7 @@ QVariant PackageModel::data(const QModelIndex &index, int role) const
     case NevraRole:       return pkg.nevra();
     case IsInstalledRole: return pkg.isInstalled();
     case PackageRole:     return QVariant::fromValue(pkg);
+    case InstalledVersionRole: return pkg.installedEvr();
     }
 
     return {};
@@ -74,6 +75,7 @@ QHash<int, QByteArray> PackageModel::roleNames() const
         {NevraRole,       "nevra"},
         {IsInstalledRole, "isInstalled"},
         {PackageRole,     "package"},
+        {InstalledVersionRole, "installedVersion"},
     };
 }
 

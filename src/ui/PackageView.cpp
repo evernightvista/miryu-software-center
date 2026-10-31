@@ -47,6 +47,16 @@ public:
         bool isDep = index.data(PackageModel::IsDepRole).toBool();
         int todo = index.data(PackageModel::TodoRole).toInt();
 
+        // The delegate's parent is the owning PackageView (created with
+        // `this` in setupView()), so we can ask it whether the summary
+        // column should be drawn. The Updates page disables it.
+        const PackageView *view = qobject_cast<const PackageView*>(parent());
+        const bool showSummary = !view || view->showSummary();
+
+        // Right edge reserved for the queued todo marker ("Install"/
+        // "Reinstall"/"Remove"/"Update"/"Downgrade") or the "[dep]" tag.
+        const int rightReserve = queued ? 100 : (isDep ? 80 : 8);
+
         // Draw the per-row checkbox. The PackageView shares the exact same
         // rectangle (PackageView::checkboxRect) for click handling, so
         // clicking anywhere inside this box toggles the queued state.
@@ -81,8 +91,11 @@ public:
 
         painter->fillRect(indicatorRect, indicatorColor);
 
-        // Draw name
-        QRect nameRect = opt.rect.adjusted(40, 4, -opt.rect.width() / 3, -opt.rect.height() / 2);
+        // Draw name. When the summary column is hidden (Updates page) the
+        // name/version use the full row width minus the queued-marker
+        // reserve; otherwise they leave the right third for the summary.
+        const int nameRightMargin = showSummary ? opt.rect.width() / 3 : rightReserve;
+        QRect nameRect = opt.rect.adjusted(40, 4, -nameRightMargin, -opt.rect.height() / 2);
         QFont nameFont = opt.font;
         nameFont.setBold(true);
         painter->setFont(nameFont);
@@ -90,28 +103,37 @@ public:
         QString name = index.data(PackageModel::NameRole).toString();
         painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, name);
 
-        // Draw version and arch
-        QRect verRect = opt.rect.adjusted(40, opt.rect.height() / 2, -opt.rect.width() / 3, -4);
+        // Draw version and arch. For update-list entries the installed
+        // (old) EVR is populated, so render "oldEvr → newEvr" instead of
+        // just the new version — that way the user can see at a glance
+        // which version they are moving from and to.
+        QRect verRect = opt.rect.adjusted(40, opt.rect.height() / 2, -nameRightMargin, -4);
         QFont verFont = opt.font;
         verFont.setPointSize(verFont.pointSize() - 1);
         painter->setFont(verFont);
         painter->setPen(secondaryText);
-        QString verText = index.data(PackageModel::VersionRole).toString() +
-                          QStringLiteral("-") + index.data(PackageModel::ReleaseRole).toString() +
-                          QStringLiteral("  (") + index.data(PackageModel::ArchRole).toString() + QStringLiteral(")");
+        const QString newEvr = index.data(PackageModel::VersionRole).toString() +
+                               QStringLiteral("-") + index.data(PackageModel::ReleaseRole).toString();
+        const QString oldEvr = index.data(PackageModel::InstalledVersionRole).toString();
+        QString verText;
+        if (!oldEvr.isEmpty())
+            verText = oldEvr + QStringLiteral(" → ") + newEvr;
+        else
+            verText = newEvr;
+        verText += QStringLiteral("  (") + index.data(PackageModel::ArchRole).toString() + QStringLiteral(")");
         painter->drawText(verRect, Qt::AlignLeft | Qt::AlignTop, verText);
 
-        // Draw summary. Reserve the right edge for the queued todo marker
-        // ("Install"/"Reinstall"/"Remove"/"Update"/"Downgrade") or the
-        // "[dep]" tag: those markers are drawn afterwards (on top), so
-        // without this reservation their text would visually overlap the
-        // package description — the exact overlap reported in the bug.
-        const int rightReserve = queued ? 100 : (isDep ? 80 : 8);
-        QRect summaryRect = opt.rect.adjusted(opt.rect.width() * 2 / 3, 4, -rightReserve, -4);
-        painter->setFont(opt.font);
-        painter->setPen(opt.palette.color(QPalette::WindowText));
-        QString summary = index.data(PackageModel::SummaryRole).toString();
-        painter->drawText(summaryRect, Qt::AlignRight | Qt::AlignVCenter, summary);
+        // Draw summary. The right-edge reservation (for the queued todo
+        // marker or the "[dep]" tag) is computed once above; without it
+        // those markers would overlap the description. Hidden entirely on
+        // the Updates page (showSummary == false).
+        if (showSummary) {
+            QRect summaryRect = opt.rect.adjusted(opt.rect.width() * 2 / 3, 4, -rightReserve, -4);
+            painter->setFont(opt.font);
+            painter->setPen(opt.palette.color(QPalette::WindowText));
+            QString summary = index.data(PackageModel::SummaryRole).toString();
+            painter->drawText(summaryRect, Qt::AlignRight | Qt::AlignVCenter, summary);
+        }
 
         // Draw queued indicator. The marker text is colored by action type:
         // Reinstall = blue, Downgrade = yellow, Remove = red (Install =
@@ -162,6 +184,16 @@ PackageView::PackageView(PackageModel *model, QWidget *parent)
     , m_model(model)
 {
     setupView();
+}
+
+void PackageView::setShowSummary(bool show)
+{
+    if (m_showSummary == show)
+        return;
+    m_showSummary = show;
+    // The visible rows keep their cached pixmaps until a repaint is
+    // requested, so force an update of the whole viewport.
+    viewport()->update();
 }
 
 // A 16x16 box vertically centered inside the row rect, with a 6px left

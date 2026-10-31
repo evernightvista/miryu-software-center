@@ -32,6 +32,9 @@
 #include <KSharedConfig>
 
 #include <QApplication>
+#include <QPalette>
+#include <QColor>
+#include <QEvent>
 #include <QMenu>
 #include <QMenuBar>
 #include <QAction>
@@ -362,6 +365,10 @@ void MainWindow::setupUI()
         layout->addWidget(headerRow);
 
         m_updatesView = new PackageView(new PackageModel(this));
+        // The Updates list shows "old → new (arch)" which already carries
+        // the relevant change information, so hide the description column
+        // to keep the rows compact.
+        m_updatesView->setShowSummary(false);
         layout->addWidget(m_updatesView, 1);
 
         connect(m_updatesView, &PackageView::packageSelected, this, &MainWindow::onPackageSelected);
@@ -513,13 +520,7 @@ void MainWindow::setupSidebar()
     m_sidebar = new QWidget;
     m_sidebar->setObjectName(QStringLiteral("sidebar"));
     m_sidebar->setFixedWidth(180);
-    m_sidebar->setStyleSheet(QStringLiteral(
-        "QWidget#sidebar { background-color: palette(mid); }"
-        "QToolButton { text-align: left; padding: 10px 14px; border: none; "
-        "background: transparent; color: palette(text); font-size: 10pt; }"
-        "QToolButton:hover { background-color: rgba(255,255,255,0.08); }"
-        "QToolButton:checked { background-color: palette(highlight); color: palette(highlighted-text); }"
-    ));
+    applySidebarStyle();
 
     auto *layout = new QVBoxLayout(m_sidebar);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -573,6 +574,33 @@ void MainWindow::setupSidebar()
     layout->addStretch();
 }
 
+void MainWindow::applySidebarStyle()
+{
+    if (!m_sidebar)
+        return;
+
+    // Read the colours from the live palette and bake them into the style
+    // sheet. Style sheets that use palette(...) function colours are resolved
+    // once and are NOT re-resolved when the system switches between light and
+    // dark at runtime, and QPalette::Mid (used previously) is a 3D/bevel shade
+    // that dark schemes may leave at a light value. Re-applying this on
+    // PaletteChange keeps the sidebar in sync with the rest of the window.
+    const QPalette pal = palette();
+    const QColor window = pal.color(QPalette::Window);
+    const QColor text = pal.color(QPalette::WindowText);
+    const QColor highlight = pal.color(QPalette::Highlight);
+    const QColor highlightedText = pal.color(QPalette::HighlightedText);
+
+    m_sidebar->setStyleSheet(QStringLiteral(
+        "QWidget#sidebar { background-color: %1; "
+        "border-right: 1px solid rgba(128,128,128,0.35); }"
+        "QToolButton { text-align: left; padding: 10px 14px; border: none; "
+        "background: transparent; color: %2; font-size: 10pt; }"
+        "QToolButton:hover { background-color: rgba(128,128,128,0.18); }"
+        "QToolButton:checked { background-color: %3; color: %4; }")
+        .arg(window.name(), text.name(), highlight.name(), highlightedText.name()));
+}
+
 void MainWindow::setupActions()
 {
     KActionCollection *ac = actionCollection();
@@ -582,11 +610,10 @@ void MainWindow::setupActions()
     // The manual "Refresh" action force-refreshes the software source, just
     // like the automatic refresh at application startup: it reloads the
     // update list with refreshMetadata=true, which calls
-    // cleanCache("expire-cache") + readAllRepos() + resetSession() so the
-    // daemon expires and re-downloads every repo's metadata. The CLI
-    // cross-check inside fetchUpdates additionally runs
-    // `dnf5 check-upgrade --refresh` so third-party-repo updates
-    // (e.g. microsoft-edge-stable) are always detected.
+    // cleanCache("expire-cache") + resetSession() + readAllRepos() so the
+    // daemon expires and re-downloads every repo's metadata — equivalent to
+    // `dnf5 check-upgrade --refresh` and reliable for detecting
+    // third-party-repo updates (e.g. microsoft-edge-stable).
     connect(refreshAction, &QAction::triggered, this, &MainWindow::onReloadData);
     ac->addAction(QStringLiteral("refresh"), refreshAction);
 
@@ -752,35 +779,7 @@ void MainWindow::runRpmInstallWithPolkit(const QStringList &files, bool offline)
         watcher->deleteLater();
 
         if (!result.completed) {
-            // The raw dnf5 problem text. Kept separate from the user-facing
-            // header so the protected-package branch can show it without the
-            // misleading "Dependency resolution failed" preamble — the
-            // failure there is not a missing dependency, it is dnf5 refusing
-            // to touch a protected package.
-            const QString problemsText = result.problems.join(QStringLiteral("\n"));
-            const bool isProtected =
-                problemsText.contains(QStringLiteral("protected"), Qt::CaseInsensitive) ||
-                problemsText.contains(QStringLiteral("essential"), Qt::CaseInsensitive);
-
-            if (isProtected) {
-                QString detail = problemsText;
-                if (!result.error.isEmpty())
-                    detail += QStringLiteral("\n\n") + result.error;
-                KMessageBox::error(this,
-                    i18n("Cannot remove protected packages or critical dependencies, removing them would break the system.\n\n%1").arg(detail),
-                    i18n("Protected Package Error"));
-            } else {
-                QString error;
-                if (!result.problems.isEmpty()) {
-                    error = i18n("Dependency resolution failed. The reasons are as follows:\n\n")
-                            + problemsText;
-                    if (!result.error.isEmpty())
-                        error += QStringLiteral("\n\n") + result.error;
-                } else {
-                    error = result.error;
-                }
-                KMessageBox::error(this, error, i18n("Transaction Error"));
-            }
+            showTransactionError(result);
             m_statusLabel->setText(i18n("Ready"));
             return;
         }
@@ -820,6 +819,8 @@ void MainWindow::runRpmInstallWithPolkit(const QStringList &files, bool offline)
                 KMessageBox::information(this, i18n("RPM installation completed successfully."));
                 onRefresh();
                 checkRestartNeeded(runResult);
+            } else if (runResult.brokenDependency) {
+                showTransactionError(runResult);
             } else {
                 // Detect polkit authentication cancellation and show a
                 // friendly message instead of a scary error dialog.
@@ -1003,45 +1004,7 @@ void MainWindow::onApplyQueue()
         TransactionResult result = watcher->result();
 
         if (!result.completed) {
-            // The raw dnf5 problem text (e.g. "Problem: The operation would
-            // result in removing the following protected packages: ...").
-            // Kept separate from the user-facing header so the protected-
-            // package branch can show it without the misleading "Dependency
-            // resolution failed" preamble — the failure there is not a
-            // missing dependency, it is dnf5 refusing to touch a protected
-            // package.
-            const QString problemsText = result.problems.join(QStringLiteral("\n"));
-            const bool isProtected =
-                problemsText.contains(QStringLiteral("protected"), Qt::CaseInsensitive) ||
-                problemsText.contains(QStringLiteral("essential"), Qt::CaseInsensitive);
-
-            if (isProtected) {
-                // Protected packages: do not prefix with "Dependency
-                // resolution failed" — the transaction was not blocked by a
-                // missing dependency but by dnf5's protected_packages policy.
-                // Just explain that protected packages cannot be removed and
-                // show which ones dnf5 refused to touch.
-                QString detail = problemsText;
-                if (!result.error.isEmpty())
-                    detail += QStringLiteral("\n\n") + result.error;
-                KMessageBox::error(this,
-                    i18n("Cannot remove protected packages or critical dependencies, removing them would break the system.\n\n%1").arg(detail),
-                    i18n("Protected Package Error"));
-            } else {
-                // Genuine dependency / resolution failure. Prepend the clear
-                // header so the user understands the transaction was rejected
-                // because dnf5 could not satisfy the requested operation.
-                QString error;
-                if (!result.problems.isEmpty()) {
-                    error = i18n("Dependency resolution failed. The reasons are as follows:\n\n")
-                            + problemsText;
-                    if (!result.error.isEmpty())
-                        error += QStringLiteral("\n\n") + result.error;
-                } else {
-                    error = result.error;
-                }
-                KMessageBox::error(this, error, i18n("Transaction Error"));
-            }
+            showTransactionError(result);
             m_statusLabel->setText(i18n("Ready"));
             watcher->deleteLater();
             return;
@@ -1073,15 +1036,23 @@ void MainWindow::onApplyQueue()
                     onRefresh();
                     checkRestartNeeded(runResult);
                 } else {
-                    const QString errLower = runResult.error.toLower();
-                    if (errLower.contains(QStringLiteral("not authorized")) ||
-                        errLower.contains(QStringLiteral("cancel")) ||
-                        errLower.contains(QStringLiteral("auth"))) {
-                        KMessageBox::information(this,
-                            i18n("Operation cancelled by user."),
-                            i18n("Transaction"));
+                    // Broken dependencies detected during the final resolve
+                    // inside runTransaction(): show the dedicated dependency
+                    // error (with the raw problem text as detail) instead of
+                    // a generic "Transaction Failed" dialog.
+                    if (runResult.brokenDependency) {
+                        showTransactionError(runResult);
                     } else {
-                        KMessageBox::error(this, runResult.error, i18n("Transaction Failed"));
+                        const QString errLower = runResult.error.toLower();
+                        if (errLower.contains(QStringLiteral("not authorized")) ||
+                            errLower.contains(QStringLiteral("cancel")) ||
+                            errLower.contains(QStringLiteral("auth"))) {
+                            KMessageBox::information(this,
+                                i18n("Operation cancelled by user."),
+                                i18n("Transaction"));
+                        } else {
+                            KMessageBox::error(this, runResult.error, i18n("Transaction Failed"));
+                        }
                     }
                 }
                 m_statusLabel->setText(i18n("Ready"));
@@ -1209,9 +1180,9 @@ void MainWindow::onReloadData()
     // force-refreshing the software source (repository metadata), exactly
     // as application startup does. Passing refreshMetadata=true to
     // onLoadUpdates makes fetchUpdates call
-    // cleanCache("expire-cache") + readAllRepos() + resetSession()
+    // cleanCache("expire-cache") + resetSession() + readAllRepos()
     // (on a worker thread, so the UI stays responsive), which expires and
-    // re-downloads every repo's metadata. The CLI cross-check runs
+    // re-downloads every repo's metadata — equivalent to
     // `dnf5 check-upgrade --refresh`, guaranteeing that newly published
     // updates (e.g. microsoft-edge-stable) are detected.
     m_backend->cache()->clearDetails();
@@ -1787,6 +1758,8 @@ void MainWindow::onSystemUpgrade()
                     if (r.completed) {
                         KMessageBox::information(this, i18n("System upgrade transaction completed."));
                         checkRestartNeeded(r);
+                    } else if (r.brokenDependency) {
+                        showTransactionError(r);
                     } else {
                         const QString errLower = r.error.toLower();
                         if (errLower.contains(QStringLiteral("not authorized")) ||
@@ -1814,7 +1787,7 @@ void MainWindow::onSystemUpgrade()
             m_resultDialog->deleteLater();
             m_resultDialog = nullptr;
         } else {
-            KMessageBox::error(this, result.error, i18n("System Upgrade Error"));
+            showTransactionError(result);
             m_statusLabel->setText(i18n("Ready"));
         }
         watcher->deleteLater();
@@ -2014,6 +1987,58 @@ bool MainWindow::isRunningKernel(const Package &pkg) const
     if (!pkg.name.startsWith(QStringLiteral("kernel")))
         return false;
     return (pkg.evr() + QStringLiteral(".") + pkg.arch) == release;
+}
+
+void MainWindow::showTransactionError(const TransactionResult &result)
+{
+    const QString problemsText = result.problems.join(QStringLiteral("\n"));
+
+    // Broken dependencies: the solver reported unsatisfiable requires or
+    // package conflicts. Block the transaction and tell the user to resolve
+    // the dependency relationship before retrying — a partial upgrade would
+    // leave dependent packages (e.g. libheif-freeworld) with unsatisfied
+    // requires. The raw problem text is shown as detail so the user knows
+    // exactly which dependency is broken.
+    if (result.brokenDependency) {
+        QString detail = result.error;
+        if (!problemsText.isEmpty())
+            detail += QStringLiteral("\n\n") + problemsText;
+        KMessageBox::error(this, detail, i18n("Dependency Error"));
+        return;
+    }
+
+    const bool isProtected =
+        problemsText.contains(QStringLiteral("protected"), Qt::CaseInsensitive) ||
+        problemsText.contains(QStringLiteral("essential"), Qt::CaseInsensitive);
+
+    if (isProtected) {
+        // Protected packages: do not prefix with "Dependency resolution
+        // failed" — the transaction was not blocked by a missing dependency
+        // but by dnf5's protected_packages policy. Just explain that
+        // protected packages cannot be removed and show which ones dnf5
+        // refused to touch.
+        QString detail = problemsText;
+        if (!result.error.isEmpty())
+            detail += QStringLiteral("\n\n") + result.error;
+        KMessageBox::error(this,
+            i18n("Cannot remove protected packages or critical dependencies, removing them would break the system.\n\n%1").arg(detail),
+            i18n("Protected Package Error"));
+        return;
+    }
+
+    // Genuine dependency / resolution failure. Prepend the clear header so
+    // the user understands the transaction was rejected because dnf5 could
+    // not satisfy the requested operation.
+    QString error;
+    if (!result.problems.isEmpty()) {
+        error = i18n("Dependency resolution failed. The reasons are as follows:\n\n")
+                + problemsText;
+        if (!result.error.isEmpty())
+            error += QStringLiteral("\n\n") + result.error;
+    } else {
+        error = result.error;
+    }
+    KMessageBox::error(this, error, i18n("Transaction Error"));
 }
 
 void MainWindow::setRestartNeeded()
@@ -2438,6 +2463,16 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         updateRestartBannerHeight();
     }
     return KXmlGuiWindow::eventFilter(watched, event);
+}
+
+void MainWindow::changeEvent(QEvent *event)
+{
+    KXmlGuiWindow::changeEvent(event);
+    // The system switched between light and dark (or the palette changed):
+    // refresh the sidebar colours, which are baked into its style sheet.
+    if (event->type() == QEvent::PaletteChange
+        || event->type() == QEvent::ApplicationPaletteChange)
+        applySidebarStyle();
 }
 
 void MainWindow::updateRestartBannerHeight()

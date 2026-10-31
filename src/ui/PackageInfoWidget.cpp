@@ -10,6 +10,8 @@
 #include <QIcon>
 #include <QPushButton>
 #include <QTabWidget>
+#include <QEvent>
+#include <QPalette>
 #include <KLocalizedString>
 
 namespace Miryu {
@@ -38,13 +40,12 @@ PackageInfoWidget::PackageInfoWidget(QWidget *parent)
     QFont sumFont = m_summaryLabel->font();
     sumFont.setPointSize(sumFont.pointSize() + 1);
     m_summaryLabel->setFont(sumFont);
-    // palette(mid) is a 3D/bevel shade that resolves to near-black in dark themes.
-    // Use the theme's window-text colour dimmed, so the summary stays readable.
-    QColor sumColor = palette().color(QPalette::WindowText);
-    sumColor.setAlpha(160);
-    m_summaryLabel->setStyleSheet(
-        QStringLiteral("color: rgba(%1, %2, %3, 0.627);")
-            .arg(sumColor.red()).arg(sumColor.green()).arg(sumColor.blue()));
+    // Dimmed secondary text derived from the theme's window-text colour.
+    // QPalette::Mid is a 3D/bevel shade that resolves to near-black (or a
+    // stale light value) in dark themes, and a colour baked once at
+    // construction does not follow a runtime light/dark switch, so it is
+    // recomputed in changeEvent() on PaletteChange.
+    applySecondaryColor();
 
     titleLayout->addWidget(m_nameLabel);
     titleLayout->addWidget(m_summaryLabel);
@@ -157,6 +158,26 @@ PackageInfoWidget::PackageInfoWidget(QWidget *parent)
     layout->addWidget(m_tabWidget, 1);
 
     setMinimumWidth(300);
+}
+
+void PackageInfoWidget::applySecondaryColor()
+{
+    QColor c = palette().color(QPalette::WindowText);
+    c.setAlpha(160);
+    m_summaryLabel->setStyleSheet(
+        QStringLiteral("color: rgba(%1, %2, %3, 0.627);")
+            .arg(c.red()).arg(c.green()).arg(c.blue()));
+}
+
+void PackageInfoWidget::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    // Re-apply the dimmed colour when the system switches light/dark at
+    // runtime; a value sampled at construction would otherwise stay stale.
+    if ((event->type() == QEvent::PaletteChange
+         || event->type() == QEvent::ApplicationPaletteChange)
+        && m_summaryLabel)
+        applySecondaryColor();
 }
 
 void PackageInfoWidget::setPackage(const Package &pkg)

@@ -27,6 +27,13 @@ public:
     QList<Package> filterUpdates(const QList<Package> &updates,
                                  const QList<Package> &obsoletes = {});
 
+    // Returns true when any of the solver's resolve-log strings describes a
+    // broken dependency (unsatisfiable require, package conflict, missing
+    // provider, ...). Used to block a transaction that the solver marked as
+    // WARNING (resolved but with skipped broken-dependency packages) instead
+    // of letting it proceed and leave the system half-updated.
+    static bool hasBrokenDependencyProblems(const QStringList &problems);
+
 private:
     Dnf5DaemonClient *m_client;
     QList<Package> m_lastTransaction;

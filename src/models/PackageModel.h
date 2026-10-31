@@ -34,7 +34,8 @@ public:
         IsDepRole,
         NevraRole,
         PackageRole,
-        IsInstalledRole
+        IsInstalledRole,
+        InstalledVersionRole
     };
     Q_ENUM(Roles)
 

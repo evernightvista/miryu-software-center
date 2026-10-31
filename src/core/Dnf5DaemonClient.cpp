@@ -358,8 +358,8 @@ bool Dnf5DaemonClient::callSync(const QString &path, const QString &interface,
 
     if (msg.type() == QDBusMessage::InvalidMessage) {
         // This happens when the reply times out or no reply is received.
-        error = QStringLiteral("Did not receive a reply from dnf5daemon-server within the timeout period. "
-                               "The service may be busy or unresponsive.");
+        error = i18n("Did not receive a reply from dnf5daemon-server within the timeout period. "
+                     "The service may be busy or unresponsive.");
         qWarning() << "DBus call timed out:" << interface << method;
         Q_EMIT errorOccurred(error);
         return false;
@@ -528,11 +528,11 @@ bool Dnf5DaemonClient::openSession(const QVariantMap &options)
 
     // Emit the actual D-Bus error so the user sees what really went wrong
     if (m_lastError.isEmpty()) {
-        m_lastError = QStringLiteral("Failed to open a session with dnf5daemon-server. "
-                                    "The service may not be running or may not be reachable "
-                                    "via the system D-Bus. Try:\n"
-                                    "  sudo systemctl start dnf5daemon-server\n"
-                                    "  sudo systemctl enable dnf5daemon-server");
+        m_lastError = i18n("Failed to open a session with dnf5daemon-server. "
+                          "The service may not be running or may not be reachable "
+                          "via the system D-Bus. Try:\n"
+                          "  sudo systemctl start dnf5daemon-server\n"
+                          "  sudo systemctl enable dnf5daemon-server");
     } else if (looksLikeDisconnect(msg)) {
         // The raw error is a terse disconnect message; replace it with an
         // actionable one.
@@ -888,7 +888,7 @@ QList<Repository> Dnf5DaemonClient::repoList(const QStringList &attrs, const QSt
 bool Dnf5DaemonClient::repoEnable(const QString &repoId, bool enabled)
 {
     if (m_sessionPath.isEmpty()) {
-        m_lastError = QStringLiteral("No active dnf5daemon session");
+        m_lastError = i18n("No active dnf5daemon session");
         Q_EMIT errorOccurred(m_lastError);
         return false;
     }
@@ -1254,8 +1254,8 @@ Dnf5DaemonClient::ResolveResult Dnf5DaemonClient::resolve(bool allowErasing)
 
     if (m_reconnectCount != reconnectCountBefore) {
         result.error = friendlyDisconnectError(
-            QStringLiteral("The dnf5daemon-server session was reset while resolving the transaction. "
-                           "The prepared package changes were lost; please try again."));
+            i18n("The dnf5daemon-server session was reset while resolving the transaction. "
+                 "The prepared package changes were lost; please try again."));
         qWarning() << "resolve: session reconnected during call"
                    << "(before=" << reconnectCountBefore
                    << "after=" << m_reconnectCount << ")";
@@ -1286,8 +1286,8 @@ Dnf5DaemonClient::ResolveResult Dnf5DaemonClient::resolve(bool allowErasing)
     // empty summary" bug. Surface an actionable error instead.
     if (msg.type() != QDBusMessage::ReplyMessage) {
         result.error = friendlyDisconnectError(
-            QStringLiteral("The dnf5daemon-server did not return a valid transaction summary. "
-                           "Please try again."));
+            i18n("The dnf5daemon-server did not return a valid transaction summary. "
+                 "Please try again."));
         qWarning() << "resolve: unexpected reply type" << static_cast<int>(msg.type());
         Q_EMIT errorOccurred(result.error);
         return result;
@@ -1295,8 +1295,8 @@ Dnf5DaemonClient::ResolveResult Dnf5DaemonClient::resolve(bool allowErasing)
 
     if (msg.arguments().size() < 2) {
         result.error = friendlyDisconnectError(
-            QStringLiteral("The dnf5daemon-server returned a malformed transaction summary. "
-                           "Please try again."));
+            i18n("The dnf5daemon-server returned a malformed transaction summary. "
+                 "Please try again."));
         qWarning() << "resolve: reply has" << msg.arguments().size() << "arguments (expected >= 2)";
         Q_EMIT errorOccurred(result.error);
         return result;
@@ -1311,8 +1311,8 @@ Dnf5DaemonClient::ResolveResult Dnf5DaemonClient::resolve(bool allowErasing)
         const QVariant itemsVariant = msg.arguments().at(0);
         if (!itemsVariant.canConvert<QDBusArgument>()) {
             result.error = friendlyDisconnectError(
-                QStringLiteral("The dnf5daemon-server returned a transaction summary "
-                               "in an unexpected format. Please try again."));
+                i18n("The dnf5daemon-server returned a transaction summary "
+                     "in an unexpected format. Please try again."));
             qWarning() << "resolve: arg0 cannot convert to QDBusArgument, typeName="
                        << itemsVariant.typeName();
             Q_EMIT errorOccurred(result.error);
@@ -1444,8 +1444,8 @@ bool Dnf5DaemonClient::doTransaction(const QVariantMap &options)
             return true;
         }
         QString error = friendlyDisconnectError(
-            QStringLiteral("The dnf5daemon-server session was reset while running the transaction. "
-                           "The resolved transaction was lost; please try again."));
+            i18n("The dnf5daemon-server session was reset while running the transaction. "
+                 "The resolved transaction was lost; please try again."));
         qWarning() << "do_transaction: session reconnected during call"
                    << "(before=" << reconnectCountBefore
                    << "after=" << m_reconnectCount << ")";
@@ -1493,8 +1493,8 @@ bool Dnf5DaemonClient::doTransaction(const QVariantMap &options)
             return true;
         }
         QString error = friendlyDisconnectError(
-            QStringLiteral("The dnf5daemon-server did not confirm the transaction. "
-                           "Please try again."));
+            i18n("The dnf5daemon-server did not confirm the transaction. "
+                 "Please try again."));
         qWarning() << "do_transaction: unexpected reply type" << static_cast<int>(reply.type());
         Q_EMIT errorOccurred(error);
         return false;

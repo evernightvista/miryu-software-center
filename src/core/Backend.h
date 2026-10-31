@@ -35,20 +35,19 @@ public:
     void searchPackages(const QString &query, SearchField field = SearchField::All,
                         PackageFilter scope = PackageFilter::All);
     void loadRepositories();
-    // Load the update list. When refreshMetadata is true the daemon is asked
-    // to reload its on-disk cache (readAllRepos) before querying, and the CLI
-    // cross-check runs `dnf5 check-upgrade --refresh` to force a fresh
-    // metadata download into the system cache — this reliably detects every
-    // published update (e.g. third-party-repo packages like microsoft-edge-
-    // stable) and drives a daemon-cache refresh when the daemon's list is
-    // incomplete. When refreshMetadata is false the CLI omits --refresh and
-    // reuses the cached system metadata, avoiding the rpmdb/metadata lock
-    // conflict that would otherwise stall an in-progress transaction at
-    // "Preparing...". Per the desired behaviour the software source is
-    // refreshed ONLY at application startup (UpdateChecker calls
-    // loadUpdates(true)) and the explicit Refresh action. Periodic checks,
-    // page switches and post-transaction reloads pass false so they reuse the
-    // cached metadata.
+    // Load the update list. When refreshMetadata is true the daemon's
+    // on-disk cache is expired (cleanCache "expire-cache") so the
+    // subsequent readAllRepos / fill_sack re-downloads every repository's
+    // metadata — equivalent to `dnf5 check-upgrade --refresh` and reliable
+    // for detecting newly published updates (e.g. third-party-repo
+    // packages). When refreshMetadata is false the daemon reuses its cache
+    // and only re-downloads repos whose metadata has expired per
+    // metadata_expire, avoiding a heavy metadata load on every periodic
+    // tick. Per the desired behaviour the software source is refreshed
+    // ONLY at application startup (UpdateChecker calls loadUpdates(true))
+    // and the explicit Refresh action. Periodic checks, page switches and
+    // post-transaction reloads pass false so they reuse the cached
+    // metadata.
     void loadUpdates(bool refreshMetadata = false);
 
     // Sync operations (call from worker threads)

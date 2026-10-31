@@ -22,6 +22,9 @@ public:
     void setPackageDetails(const QVariantMap &details);
     Miryu::Package currentPackage() const { return m_current; }
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 Q_SIGNALS:
     // Emitted when a package is selected and the widget needs extended
     // details (dependencies, provides, files, changelog) from the backend.
@@ -36,6 +39,8 @@ Q_SIGNALS:
     void markForAction(const Miryu::Package &pkg, Miryu::PackageTodo todo);
 
 private:
+    void applySecondaryColor();
+
     Miryu::Package m_current;
 
     QLabel *m_nameLabel;

@@ -23,6 +23,8 @@
 #include <QSet>
 #include <QStandardPaths>
 #include <QFileInfo>
+#include <QEvent>
+#include <QPalette>
 #include <KLineEdit>
 #include <KLocalizedString>
 #include <KMessageBox>
@@ -578,8 +580,12 @@ void FlatpakPage::setupDetailView()
     m_detailIcon = new QLabel;
     m_detailIcon->setFixedSize(64, 64);
     m_detailIcon->setAlignment(Qt::AlignCenter);
+    // Placeholder tile: use palette roles so the letter stays readable in both
+    // schemes (a hard-coded light background made white dark-theme text
+    // invisible on the tile).
     m_detailIcon->setStyleSheet(QStringLiteral(
-        "background: #ddd; border-radius: 8px; font-size: 24pt; font-weight: bold;"));
+        "background: palette(alternate-base); color: palette(window-text);"
+        " border-radius: 8px; font-size: 24pt; font-weight: bold;"));
 
     auto *titleLayout = new QVBoxLayout;
     m_detailName = new QLabel;
@@ -590,14 +596,10 @@ void FlatpakPage::setupDetailView()
 
     m_detailAppId = new QLabel;
     m_detailVersion = new QLabel;
-    // palette(mid) resolves to near-black in dark themes; dim the theme text colour instead.
-    QColor secondary = palette().color(QPalette::WindowText);
-    secondary.setAlpha(160);
-    const QString secondaryQss =
-        QStringLiteral("color: rgba(%1, %2, %3, 0.627);")
-            .arg(secondary.red()).arg(secondary.green()).arg(secondary.blue());
-    m_detailAppId->setStyleSheet(secondaryQss);
-    m_detailVersion->setStyleSheet(secondaryQss);
+    // Dimmed secondary text; recomputed in changeEvent() on PaletteChange so
+    // it follows a runtime light/dark switch (QSS has no muted palette role
+    // that works across schemes).
+    applySecondaryColors();
 
     titleLayout->addWidget(m_detailName);
     titleLayout->addWidget(m_detailAppId);
@@ -667,6 +669,28 @@ void FlatpakPage::setupDetailView()
                                  i18n("Back to List"));
     connect(m_backBtn, &QPushButton::clicked, this, &FlatpakPage::showStoreListView);
     layout->addWidget(m_backBtn);
+}
+
+void FlatpakPage::applySecondaryColors()
+{
+    if (!m_detailAppId || !m_detailVersion)
+        return;
+    QColor c = palette().color(QPalette::WindowText);
+    c.setAlpha(160);
+    const QString qss = QStringLiteral("color: rgba(%1, %2, %3, 0.627);")
+                            .arg(c.red()).arg(c.green()).arg(c.blue());
+    m_detailAppId->setStyleSheet(qss);
+    m_detailVersion->setStyleSheet(qss);
+}
+
+void FlatpakPage::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    // Follow a runtime light/dark switch instead of keeping the colour
+    // sampled when the page was first built.
+    if (event->type() == QEvent::PaletteChange
+        || event->type() == QEvent::ApplicationPaletteChange)
+        applySecondaryColors();
 }
 
 // ---------------------------------------------------------------------------
@@ -838,7 +862,8 @@ void FlatpakPage::showStoreDetailView(const FlatpakApp &app)
         m_detailIcon->clear();
         m_detailIcon->setText(app.name.left(1).toUpper());
         m_detailIcon->setStyleSheet(QStringLiteral(
-            "background: #ddd; border-radius: 8px; font-size: 24pt; font-weight: bold;"));
+            "background: palette(alternate-base); color: palette(window-text);"
+            " border-radius: 8px; font-size: 24pt; font-weight: bold;"));
     }
 
     m_detailName->setText(app.name.isEmpty() ? app.appId : app.name);
