@@ -4,7 +4,7 @@
 
 Name:           miryu-software-center
 Version:        45.0.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        A modern RPM and Linglong software center powered by dnf5daemon
 
 License:        GPL-3.0-or-later
@@ -74,6 +74,9 @@ install -Dm 644 data/evernight-vista.conf %{buildroot}/%{_datadir}/dnf5/suggest-
 %{_datadir}/polkit-1/rules.d/50-miryu-dnf5daemon.rules
 
 %changelog
+* Sat Oct 31 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-9
+- Fix Update Check
+
 * Wed Oct 07 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-8
 - Add Copr Support
 
