@@ -1653,11 +1653,106 @@ msgstr "Taille totale d'installation"
 msgid "Apply offline (on next reboot)"
 msgstr "Appliquer hors ligne (au prochain redémarrage)"
 
+
+# Standalone update checker (miryu-software-check) + File menu entry
+#: src/ui/MainWindow.cpp src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Check Update Frequency Settings"
+msgstr "Paramètres de fréquence de vérification des mises à jour"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Update Notification Frequency"
+msgstr "Fréquence de notification des mises à jour"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid ""
+"How often miryu-software-check may notify you about available updates.\n"
+"The change takes effect the next time the update checker runs (e.g. at login)."
+msgstr ""
+"À quelle fréquence miryu-software-check peut vous notifier les mises à jour "
+"disponibles.\n"
+"La modification prendra effet au prochain lancement du vérificateur de mises "
+"à jour (p. ex. à la connexion)."
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Daily"
+msgstr "Quotidien"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Weekly"
+msgstr "Hebdomadaire"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Monthly"
+msgstr "Mensuel"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Never"
+msgstr "Jamais"
+
+#: checker/main.cpp
+msgid "Miryu Update Checker"
+msgstr "Vérificateur de mises à jour Miryu"
+
+#: checker/main.cpp
+msgid "Checks for available RPM and Flatpak updates and notifies the user."
+msgstr ""
+"Recherche les mises à jour RPM et Flatpak disponibles et en informe "
+"l'utilisateur."
+
+#: checker/main.cpp
+msgid "Delay checking for updates by N seconds"
+msgstr "Retarder la vérification des mises à jour de N secondes"
+
+#: checker/main.cpp
+msgid "Check immediately and ignore the configured notification interval"
+msgstr "Vérifier immédiatement et ignorer l'intervalle de notification configuré"
+
+#: checker/main.cpp
+msgid "Replace an existing instance"
+msgstr "Remplacer une instance existante"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 RPM package(s) and/or %2 Flatpak package(s) available for update"
+msgstr "%1 paquet(s) RPM et/ou %2 paquet(s) Flatpak peuvent être mis à jour"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 RPM package(s) available for update"
+msgstr "%1 paquet(s) RPM peuvent être mis à jour"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 Flatpak package(s) available for update"
+msgstr "%1 paquet(s) Flatpak peuvent être mis à jour"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "View Updates"
+msgstr "Voir les mises à jour"
+
+# System tray entry of miryu-software-check + "--update" option
+#: checker/NotifierItem.cpp
+msgid "Open Miryu Software Center"
+msgstr "Ouvrir Miryu Software Center"
+
+#: checker/NotifierItem.cpp
+msgid "Start Updates"
+msgstr "Démarrer les mises à jour"
+
+#: checker/NotifierItem.cpp
+msgid "Quit"
+msgstr "Quitter"
+
+#: checker/NotifierItem.cpp
+msgid "Updates Available"
+msgstr "Mises à jour disponibles"
+
+#: src/main.cpp
+msgid "Open the updates page and start updating"
+msgstr "Ouvrir la page des mises à jour et lancer la mise à jour"
+
+#: src/main.cpp
+msgid "Open the updates page"
+msgstr "Ouvrir la page des mises à jour"
 #~ msgid "Downloading"
 #~ msgstr "Téléchargement en cours"
-
-#~ msgid "Updates Available"
-#~ msgstr "Mises à jour disponibles"
 
 #~ msgid "%1 update is available for your system."
 #~ msgid_plural "%1 updates are available for your system."

@@ -64,6 +64,18 @@ int main(int argc, char *argv[])
         QStringList{QStringLiteral("install"), QStringLiteral("i")},
         i18n("Install the specified RPM file(s)")));
 
+    // Used by the miryu-software-check tray item ("Start Updates"): open the
+    // updates page and automatically queue + apply every available update.
+    parser.addOption(QCommandLineOption(
+        QStringList{QStringLiteral("update"), QStringLiteral("u")},
+        i18n("Open the updates page and start updating")));
+
+    // Used by the miryu-software-check tray item (tray icon click and the
+    // notification's "View Updates" action): open the updates page only.
+    parser.addOption(QCommandLineOption(
+        QStringList{QStringLiteral("show-updates"), QStringLiteral("U")},
+        i18n("Open the updates page")));
+
     // Positional arguments: RPM files to install
     parser.addPositionalArgument(QStringLiteral("files"),
         i18n("RPM package files to install"), QStringLiteral("[files...]"));
@@ -122,6 +134,19 @@ int main(int argc, char *argv[])
         });
     }
 
+    // "开始更新" entry point (miryu-software-check tray menu / --update
+    // option): open the updates page and start the update flow once the
+    // update list has loaded.
+    if (parser.isSet(QStringLiteral("update"))) {
+        QTimer::singleShot(200, &window, &Miryu::MainWindow::startUpdateFlow);
+    }
+
+    // "查看更新" entry point (tray icon click / notification action /
+    // --show-updates option): open the updates page only.
+    if (parser.isSet(QStringLiteral("show-updates"))) {
+        QTimer::singleShot(200, &window, &Miryu::MainWindow::showUpdatesPage);
+    }
+
     // Single-instance activation: when the main window is ALREADY open and the
     // user double-clicks an RPM file (or picks "Open with" in the file
     // manager), KDBusService::Unique delivers the new command line to this
@@ -134,6 +159,19 @@ int main(int argc, char *argv[])
         window.show();
         window.raise();
         window.activateWindow();
+
+        // A running checker asked to start the updates (tray "Start Updates").
+        if (arguments.contains(QStringLiteral("--update"))) {
+            window.startUpdateFlow();
+            return;
+        }
+
+        // Tray icon click / notification "View Updates" action: only show
+        // the updates page.
+        if (arguments.contains(QStringLiteral("--show-updates"))) {
+            window.showUpdatesPage();
+            return;
+        }
 
         const QStringList files = collectRpmFiles(arguments);
         if (!files.isEmpty())

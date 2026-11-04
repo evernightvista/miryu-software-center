@@ -1578,11 +1578,104 @@ msgstr "総インストールサイズ"
 msgid "Apply offline (on next reboot)"
 msgstr "オフライン適用(次回再起動時)"
 
+
+# Standalone update checker (miryu-software-check) + File menu entry
+#: src/ui/MainWindow.cpp src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Check Update Frequency Settings"
+msgstr "更新確認の頻度設定"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Update Notification Frequency"
+msgstr "更新通知の頻度"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid ""
+"How often miryu-software-check may notify you about available updates.\n"
+"The change takes effect the next time the update checker runs (e.g. at login)."
+msgstr ""
+"miryu-software-check が利用可能な更新を通知する頻度を設定します。\n"
+"変更は更新チェッカーの次回実行時（例：ログイン時）に有効になります。"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Daily"
+msgstr "毎日"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Weekly"
+msgstr "毎週"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Monthly"
+msgstr "毎月"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Never"
+msgstr "通知しない"
+
+#: checker/main.cpp
+msgid "Miryu Update Checker"
+msgstr "Miryu 更新チェッカー"
+
+#: checker/main.cpp
+msgid "Checks for available RPM and Flatpak updates and notifies the user."
+msgstr "利用可能な RPM および Flatpak の更新を確認し、ユーザーに通知します。"
+
+#: checker/main.cpp
+msgid "Delay checking for updates by N seconds"
+msgstr "更新の確認を N 秒遅らせる"
+
+#: checker/main.cpp
+msgid "Check immediately and ignore the configured notification interval"
+msgstr "設定された通知間隔を無視して今すぐ確認する"
+
+#: checker/main.cpp
+msgid "Replace an existing instance"
+msgstr "既存のインスタンスを置き換える"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 RPM package(s) and/or %2 Flatpak package(s) available for update"
+msgstr ""
+"%1 個の RPM パッケージと（または）%2 個の Flatpak パッケージの更新が利用可能"
+"です"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 RPM package(s) available for update"
+msgstr "%1 個の RPM パッケージの更新が利用可能です"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 Flatpak package(s) available for update"
+msgstr "%1 個の Flatpak パッケージの更新が利用可能です"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "View Updates"
+msgstr "更新を表示"
+
+# System tray entry of miryu-software-check + "--update" option
+#: checker/NotifierItem.cpp
+msgid "Open Miryu Software Center"
+msgstr "Miryu ソフトウェアセンターを開く"
+
+#: checker/NotifierItem.cpp
+msgid "Start Updates"
+msgstr "更新を開始"
+
+#: checker/NotifierItem.cpp
+msgid "Quit"
+msgstr "終了"
+
+#: checker/NotifierItem.cpp
+msgid "Updates Available"
+msgstr "利用可能な更新"
+
+#: src/main.cpp
+msgid "Open the updates page and start updating"
+msgstr "更新ページを開いて更新を開始する"
+
+#: src/main.cpp
+msgid "Open the updates page"
+msgstr "更新ページを開く"
 #~ msgid "Downloading"
 #~ msgstr "ダウンロード中"
-
-#~ msgid "Updates Available"
-#~ msgstr "更新が利用可能です"
 
 #~ msgid "%1 update is available for your system."
 #~ msgid_plural "%1 updates are available for your system."

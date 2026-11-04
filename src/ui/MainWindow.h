@@ -55,6 +55,17 @@ public:
     // Install RPM files passed on the command line.
     void installLocalRpmFiles(const QStringList &filePaths);
 
+    // "开始更新" entry point used by the miryu-software-check tray item
+    // (miryu-software-center --update): opens the Updates page and, once the
+    // update list has been loaded, queues every update and opens the
+    // transaction confirmation dialog (same path as "Select All" + "Apply").
+    void startUpdateFlow();
+
+    // "查看更新" entry point (tray icon click / notification action,
+    // miryu-software-center --show-updates): opens the Updates page only —
+    // the update list is loaded and displayed, nothing is queued or applied.
+    void showUpdatesPage();
+
 protected:
     void closeEvent(QCloseEvent *event) override;
     void changeEvent(QEvent *event) override;
@@ -85,6 +96,10 @@ private Q_SLOTS:
     void onRefreshMetadata();
     void onAdvancedOps();
     void onInstallLocalRpm();
+    // "检查更新频率设置"（File menu): opens the dialog that selects how
+    // often the standalone miryu-software-check binary may notify the user
+    // about available updates (daily / weekly / monthly / never).
+    void onUpdateNotifySettings();
     void launchLinglongStore();
     void showAboutDialog();
     // Refresh ONLY the repository list shown on the Repositories page

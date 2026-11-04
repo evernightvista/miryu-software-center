@@ -43,6 +43,10 @@ find_package(KF6 REQUIRED COMPONENTS
     Crash
     DBusAddons
     WindowSystem
+    Notifications
+    JobWidgets
+    StatusNotifierItem
+    Service
 )
 
 ecm_set_disabled_deprecation_versions(
@@ -94,6 +98,12 @@ target_link_libraries(miryu-software-center PRIVATE
 
 install(TARGETS miryu-software-center ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 
+# Standalone update checker binary (dnf5 check-update --refresh +
+# flatpak update + desktop notification). Intentionally separate from the
+# GUI binary so update checks and notifications keep working while the
+# software center is closed — modelled after plasma-discover's notifier.
+add_subdirectory(checker)
+
 install(FILES
     src/miryuui.rc
     DESTINATION ${KDE_INSTALL_KXMLGUIDIR}/miryu
@@ -102,6 +112,25 @@ install(FILES
 install(FILES
     data/org.miryugaming.PackageManager.desktop
     DESTINATION ${KDE_INSTALL_APPDIR}
+)
+
+# Autostart + (hidden) application entry of the standalone update checker.
+# The autostart copy runs miryu-software-check at every session login; the
+# applications copy lets KService / KDBusService resolve the desktop name
+# while staying invisible (NoDisplay) in menus.
+install(FILES
+    data/org.miryugaming.SoftwareCheck.desktop
+    DESTINATION ${KDE_INSTALL_APPDIR}
+)
+install(FILES
+    data/org.miryugaming.SoftwareCheck.desktop
+    DESTINATION ${KDE_INSTALL_AUTOSTARTDIR}
+)
+
+# KNotification event configuration for the "updates available" popup.
+install(FILES
+    data/miryu-software-check.notifyrc
+    DESTINATION ${KDE_INSTALL_KNOTIFYRCDIR}
 )
 
 install(FILES

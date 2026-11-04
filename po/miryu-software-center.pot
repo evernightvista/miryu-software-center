@@ -1543,3 +1543,95 @@ msgstr ""
 #: src/ui/TransactionResultDialog.cpp:297
 msgid "Apply offline (on next reboot)"
 msgstr ""
+
+# Standalone update checker (miryu-software-check) + File menu entry
+#: src/ui/MainWindow.cpp src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Check Update Frequency Settings"
+msgstr ""
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Update Notification Frequency"
+msgstr ""
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid ""
+"How often miryu-software-check may notify you about available updates.\n"
+"The change takes effect the next time the update checker runs (e.g. at login)."
+msgstr ""
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Daily"
+msgstr ""
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Weekly"
+msgstr ""
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Monthly"
+msgstr ""
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Never"
+msgstr ""
+
+#: checker/main.cpp
+msgid "Miryu Update Checker"
+msgstr ""
+
+#: checker/main.cpp
+msgid "Checks for available RPM and Flatpak updates and notifies the user."
+msgstr ""
+
+#: checker/main.cpp
+msgid "Delay checking for updates by N seconds"
+msgstr ""
+
+#: checker/main.cpp
+msgid "Check immediately and ignore the configured notification interval"
+msgstr ""
+
+#: checker/main.cpp
+msgid "Replace an existing instance"
+msgstr ""
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 RPM package(s) and/or %2 Flatpak package(s) available for update"
+msgstr ""
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 RPM package(s) available for update"
+msgstr ""
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 Flatpak package(s) available for update"
+msgstr ""
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "View Updates"
+msgstr ""
+
+# System tray entry of miryu-software-check + "--update" option
+#: checker/NotifierItem.cpp
+msgid "Open Miryu Software Center"
+msgstr ""
+
+#: checker/NotifierItem.cpp
+msgid "Start Updates"
+msgstr ""
+
+#: checker/NotifierItem.cpp
+msgid "Quit"
+msgstr ""
+
+#: checker/NotifierItem.cpp
+msgid "Updates Available"
+msgstr ""
+
+#: src/main.cpp
+msgid "Open the updates page and start updating"
+msgstr ""
+
+#: src/main.cpp
+msgid "Open the updates page"
+msgstr ""

@@ -4,7 +4,7 @@
 
 Name:           miryu-software-center
 Version:        45.0.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        A modern RPM and Linglong software center powered by dnf5daemon
 
 License:        GPL-3.0-or-later
@@ -27,6 +27,8 @@ BuildRequires:  kf6-kio-devel
 BuildRequires:  kf6-kcrash-devel
 BuildRequires:  kf6-kdbusaddons-devel
 BuildRequires:  kf6-knotifications-devel
+BuildRequires:  kf6-kjobwidgets-devel
+BuildRequires:  kf6-kstatusnotifieritem-devel
 BuildRequires:  kf6-kwindowsystem-devel
 BuildRequires:  gettext
 
@@ -66,7 +68,11 @@ install -Dm 644 data/evernight-vista.conf %{buildroot}/%{_datadir}/dnf5/suggest-
 %doc README.md
 %{_bindir}/miryu-software-center
 %{_bindir}/miryu-add-copr
+%{_bindir}/miryu-software-check
 %{_datadir}/applications/org.miryugaming.PackageManager.desktop
+%{_datadir}/applications/org.miryugaming.SoftwareCheck.desktop
+%{_sysconfdir}/xdg/autostart/org.miryugaming.SoftwareCheck.desktop
+%{_datadir}/knotifications6/miryu-software-check.notifyrc
 %{_datadir}/dnf5/suggest-reboot.d/evernight-vista.conf
 %{_datadir}/metainfo/org.miryugaming.PackageManager.metainfo.xml
 %{_datadir}/kxmlgui5/miryu/miryuui.rc
@@ -74,6 +80,9 @@ install -Dm 644 data/evernight-vista.conf %{buildroot}/%{_datadir}/dnf5/suggest-
 %{_datadir}/polkit-1/rules.d/50-miryu-dnf5daemon.rules
 
 %changelog
+* Wed Nov 04 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-10
+- Add Check Notify Support
+
 * Sat Oct 31 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-9
 - Fix Update Check
 

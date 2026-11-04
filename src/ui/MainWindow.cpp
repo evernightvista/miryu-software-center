@@ -17,6 +17,7 @@
 #include "TransactionResultDialog.h"
 #include "FlatpakPage.h"
 #include "AdvancedOpsDialog.h"
+#include "UpdateNotifySettingsDialog.h"
 
 #include <KActionCollection>
 #include <KStandardAction>
@@ -37,6 +38,7 @@
 #include <QEvent>
 #include <QMenu>
 #include <QMenuBar>
+#include <QSharedPointer>
 #include <QAction>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -633,6 +635,13 @@ void MainWindow::setupActions()
     connect(advancedOpsAction, &QAction::triggered, this, &MainWindow::onAdvancedOps);
     ac->addAction(QStringLiteral("advanced_ops"), advancedOpsAction);
 
+    // "检查更新频率设置" — opens the notification frequency dialog
+    // (daily / weekly / monthly / never) consumed by the standalone
+    // miryu-software-check binary.
+    QAction *updateNotifySettingsAction = new QAction(QIcon::fromTheme(QStringLiteral("preferences-desktop-notification")), i18n("Check Update Frequency Settings"), this);
+    connect(updateNotifySettingsAction, &QAction::triggered, this, &MainWindow::onUpdateNotifySettings);
+    ac->addAction(QStringLiteral("update_notify_settings"), updateNotifySettingsAction);
+
     QAction *installRpmAction = new QAction(QIcon::fromTheme(QStringLiteral("application-x-rpm")), i18n("Install RPM File..."), this);
     connect(installRpmAction, &QAction::triggered, this, &MainWindow::onInstallLocalRpm);
     ac->addAction(QStringLiteral("install_rpm"), installRpmAction);
@@ -675,6 +684,15 @@ void MainWindow::switchToPage(int page)
 {
     m_currentPage = page;
     m_pageStack->setCurrentIndex(page);
+
+    // Keep the sidebar highlight in sync with programmatic page switches
+    // (tray icon click, "Start Updates", post-transaction jumps, ...).
+    // Clicking a sidebar button checks it automatically, but a plain
+    // switchToPage() call does not — without this the highlight stayed on
+    // the previous page while the content switched (setChecked on an
+    // exclusive QButtonGroup unchecks the previous button).
+    if (page >= 0 && page < m_sidebarButtons.size())
+        m_sidebarButtons[page]->setChecked(true);
 
     switch (page) {
     case 0:
@@ -1821,6 +1839,47 @@ void MainWindow::onAdvancedOps()
     if (!m_advancedOpsDialog)
         m_advancedOpsDialog = new AdvancedOpsDialog(m_backend, this);
     m_advancedOpsDialog->exec();
+}
+
+void MainWindow::onUpdateNotifySettings()
+{
+    // "检查更新频率设置"：配置 miryu-software-check（独立更新检查程序）
+    // 弹出可用更新通知的频率（每天 / 每周 / 每月 / 不通知）。
+    UpdateNotifySettingsDialog dialog(this);
+    dialog.exec();
+}
+
+void MainWindow::startUpdateFlow()
+{
+    // "开始更新" — entry point for the miryu-software-check tray item
+    // ("Start Updates" menu action, launched as `miryu-software-center
+    // --update`). Opens the Updates page and, once the update list has been
+    // loaded, queues every available update and opens the transaction
+    // confirmation dialog — exactly the same code path as the user pressing
+    // "Select All" followed by "Apply". The user stays in control: the
+    // summary dialog (and polkit, when needed) still has to be confirmed.
+    auto pending = QSharedPointer<QMetaObject::Connection>::create();
+    *pending = connect(m_backend, &Backend::updatesLoaded, this,
+                       [this, pending](const QList<Package> &updates) {
+                           disconnect(*pending);
+                           if (updates.isEmpty()) {
+                               m_statusLabel->setText(i18n("No updates available."));
+                               return;
+                           }
+                           onSelectAllUpdates();
+                           onApplyQueue();
+                       });
+    switchToPage(1);
+}
+
+void MainWindow::showUpdatesPage()
+{
+    // "查看更新" — entry point for the miryu-software-check tray item
+    // (tray icon click / notification "View Updates" action, launched as
+    // `miryu-software-center --show-updates`). Opens the Updates page only:
+    // switchToPage(1) loads (and displays) the update list, nothing is
+    // queued or applied automatically.
+    switchToPage(1);
 }
 
 void MainWindow::showAboutDialog()

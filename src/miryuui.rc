@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gui name="miryu"
-     version="3"
+     version="4"
      xmlns="http://www.kde.org/standards/kxmlgui/1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.kde.org/standards/kxmlgui/1.0
@@ -15,6 +15,7 @@
             <Action name="distro_sync"/>
             <Action name="refresh_metadata"/>
             <Action name="advanced_ops"/>
+            <Action name="update_notify_settings"/>
             <Separator/>
             <Action name="quit"/>
         </Menu>

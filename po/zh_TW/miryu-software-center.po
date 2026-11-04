@@ -1572,9 +1572,6 @@ msgstr "離線套用(下次重啟時)"
 #~ msgid "Downloading"
 #~ msgstr "正在下載"
 
-#~ msgid "Updates Available"
-#~ msgstr "有可用更新"
-
 #~ msgid "%1 update is available for your system."
 #~ msgid_plural "%1 updates are available for your system."
 #~ msgstr[0] "您的系統有 %1 個可用更新。"
@@ -1679,3 +1676,97 @@ msgstr "離線套用(下次重啟時)"
 
 #~ msgid "Failed to send transaction request to dnf5daemon."
 #~ msgstr "向 dnf5daemon 發送事務請求失敗。"
+
+# Standalone update checker (miryu-software-check) + File menu entry
+#: src/ui/MainWindow.cpp:640 src/ui/UpdateNotifySettingsDialog.cpp:44
+msgid "Check Update Frequency Settings"
+msgstr "檢查更新頻率設定"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp:55
+msgid "Update Notification Frequency"
+msgstr "檢查更新通知頻率"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp:74
+msgid ""
+"How often miryu-software-check may notify you about available updates.\n"
+"The change takes effect the next time the update checker runs (e.g. at login)."
+msgstr ""
+"miryu-software-check 向您通知可用更新的頻率。\n"
+"變更將於更新檢查器下次執行時生效（例如登入時）。"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp:51
+msgid "Daily"
+msgstr "每天"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp:52
+msgid "Weekly"
+msgstr "每週"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp:53
+msgid "Monthly"
+msgstr "每月"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp:54
+msgid "Never"
+msgstr "不通知"
+
+#: checker/main.cpp:52
+msgid "Miryu Update Checker"
+msgstr "Miryu 更新檢查器"
+
+#: checker/main.cpp:54
+msgid "Checks for available RPM and Flatpak updates and notifies the user."
+msgstr "檢查可用的 RPM 和 Flatpak 更新並通知使用者。"
+
+#: checker/main.cpp:63
+msgid "Delay checking for updates by N seconds"
+msgstr "延遲 N 秒後檢查更新"
+
+#: checker/main.cpp:67
+msgid "Check immediately and ignore the configured notification interval"
+msgstr "立即檢查並忽略已設定的通知間隔"
+
+#: checker/main.cpp:72
+msgid "Replace an existing instance"
+msgstr "替換現有實例"
+
+#: checker/UpdateCheckNotifier.cpp:287
+msgid "%1 RPM package(s) and/or %2 Flatpak package(s) available for update"
+msgstr "%1個RPM軟體包和（或）%2個Flatpak軟體包更新可用"
+
+#: checker/UpdateCheckNotifier.cpp:289
+msgid "%1 RPM package(s) available for update"
+msgstr "%1個RPM軟體包更新可用"
+
+#: checker/UpdateCheckNotifier.cpp:291
+msgid "%1 Flatpak package(s) available for update"
+msgstr "%1個Flatpak軟體包更新可用"
+
+#: checker/UpdateCheckNotifier.cpp:318
+msgid "View Updates"
+msgstr "檢視更新"
+
+# System tray entry of miryu-software-check + "--update" option
+#: checker/NotifierItem.cpp:57
+msgid "Open Miryu Software Center"
+msgstr "開啟 Miryu 軟體中心"
+
+#: checker/NotifierItem.cpp:64
+msgid "Start Updates"
+msgstr "開始更新"
+
+#: checker/NotifierItem.cpp
+msgid "Quit"
+msgstr "結束"
+
+#: checker/NotifierItem.cpp:36
+msgid "Updates Available"
+msgstr "有可用更新"
+
+#: src/main.cpp:150
+msgid "Open the updates page and start updating"
+msgstr "開啟更新頁面並開始更新"
+
+#: src/main.cpp
+msgid "Open the updates page"
+msgstr "開啟更新頁面"

@@ -1,0 +1,21 @@
+[Desktop Entry]
+Name=Miryu Update Checker
+Name[zh_CN]=Miryu 更新检查器
+Name[zh_TW]=Miryu 更新檢查器
+Name[ja]=Miryu 更新チェッカー
+Name[ko]=Miryu 업데이트 검사기
+Name[de]=Miryu-Aktualisierungsprüfung
+Name[fr]=Vérificateur de mises à jour Miryu
+Comment=Checks for available RPM and Flatpak updates and shows a notification
+Comment[zh_CN]=检查可用的 RPM 和 Flatpak 更新并弹出通知
+Comment[zh_TW]=檢查可用的 RPM 和 Flatpak 更新並彈出通知
+Comment[ja]=利用可能な RPM および Flatpak の更新を確認して通知します
+Comment[ko]=사용 가능한 RPM 및 Flatpak 업데이트를 확인하고 알립니다
+Comment[de]=Prüft auf verfügbare RPM- und Flatpak-Aktualisierungen und benachrichtigt
+Comment[fr]=Recherche les mises à jour RPM et Flatpak disponibles et en informe
+Exec=miryu-software-check --check-delay 60
+Icon=system-software-update
+Type=Application
+NoDisplay=true
+X-KDE-autostart-phase=1
+OnlyShowIn=KDE

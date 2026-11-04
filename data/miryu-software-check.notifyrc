@@ -1,0 +1,34 @@
+[Global]
+IconName=system-software-update
+DesktopEntry=org.miryugaming.SoftwareCheck
+Name=Miryu Update Checker
+Name[zh_CN]=Miryu 更新检查器
+Name[zh_TW]=Miryu 更新檢查器
+Name[ja]=Miryu 更新チェッカー
+Name[ko]=Miryu 업데이트 검사기
+Name[de]=Miryu-Aktualisierungsprüfung
+Name[fr]=Vérificateur de mises à jour Miryu
+Comment=Miryu Software Center update checker
+Comment[zh_CN]=Miryu 软件中心更新检查器
+Comment[zh_TW]=Miryu 軟體中心更新檢查器
+Comment[ja]=Miryu ソフトウェアセンターの更新チェッカー
+Comment[ko]=Miryu 소프트웨어 센터 업데이트 검사기
+Comment[de]=Aktualisierungsprüfung des Miryu Software Center
+Comment[fr]=Vérificateur de mises à jour de Miryu Software Center
+
+[Event/Update]
+Name=Updates Available
+Name[zh_CN]=有可用更新
+Name[zh_TW]=有可用更新
+Name[ja]=利用可能な更新
+Name[ko]=업데이트 사용 가능
+Name[de]=Aktualisierungen verfügbar
+Name[fr]=Mises à jour disponibles
+Comment=There are updates available for your system
+Comment[zh_CN]=系统有可以安装的更新
+Comment[zh_TW]=系統有可以安裝的更新
+Comment[ja]=システムにインストール可能な更新があります
+Comment[ko]=시스템에 설치 가능한 업데이트가 있습니다
+Comment[de]=Für Ihr System sind Aktualisierungen verfügbar
+Comment[fr]=Des mises à jour sont disponibles pour votre système
+Action=Popup

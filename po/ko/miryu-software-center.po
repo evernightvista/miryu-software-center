@@ -1576,11 +1576,102 @@ msgstr "총 설치 크기"
 msgid "Apply offline (on next reboot)"
 msgstr "오프라인 적용(다음 재부팅 시)"
 
+
+# Standalone update checker (miryu-software-check) + File menu entry
+#: src/ui/MainWindow.cpp src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Check Update Frequency Settings"
+msgstr "업데이트 확인 빈도 설정"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Update Notification Frequency"
+msgstr "업데이트 알림 빈도"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid ""
+"How often miryu-software-check may notify you about available updates.\n"
+"The change takes effect the next time the update checker runs (e.g. at login)."
+msgstr ""
+"miryu-software-check가 사용 가능한 업데이트를 알릴 빈도입니다.\n"
+"변경 사항은 업데이트 검사기가 다음에 실행될 때(예: 로그인 시) 적용됩니다."
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Daily"
+msgstr "매일"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Weekly"
+msgstr "매주"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Monthly"
+msgstr "매월"
+
+#: src/ui/UpdateNotifySettingsDialog.cpp
+msgid "Never"
+msgstr "알림 안 함"
+
+#: checker/main.cpp
+msgid "Miryu Update Checker"
+msgstr "Miryu 업데이트 검사기"
+
+#: checker/main.cpp
+msgid "Checks for available RPM and Flatpak updates and notifies the user."
+msgstr "사용 가능한 RPM 및 Flatpak 업데이트를 확인하고 사용자에게 알립니다."
+
+#: checker/main.cpp
+msgid "Delay checking for updates by N seconds"
+msgstr "업데이트 확인을 N초 지연합니다"
+
+#: checker/main.cpp
+msgid "Check immediately and ignore the configured notification interval"
+msgstr "설정된 알림 간격을 무시하고 즉시 확인합니다"
+
+#: checker/main.cpp
+msgid "Replace an existing instance"
+msgstr "기존 인스턴스를 대체합니다"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 RPM package(s) and/or %2 Flatpak package(s) available for update"
+msgstr "%1개의 RPM 패키지 및(또는) %2개의 Flatpak 패키지 업데이트가 있습니다"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 RPM package(s) available for update"
+msgstr "%1개의 RPM 패키지 업데이트가 있습니다"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "%1 Flatpak package(s) available for update"
+msgstr "%1개의 Flatpak 패키지 업데이트가 있습니다"
+
+#: checker/UpdateCheckNotifier.cpp
+msgid "View Updates"
+msgstr "업데이트 보기"
+
+# System tray entry of miryu-software-check + "--update" option
+#: checker/NotifierItem.cpp
+msgid "Open Miryu Software Center"
+msgstr "Miryu 소프트웨어 센터 열기"
+
+#: checker/NotifierItem.cpp
+msgid "Start Updates"
+msgstr "업데이트 시작"
+
+#: checker/NotifierItem.cpp
+msgid "Quit"
+msgstr "종료"
+
+#: checker/NotifierItem.cpp
+msgid "Updates Available"
+msgstr "업데이트 사용 가능"
+
+#: src/main.cpp
+msgid "Open the updates page and start updating"
+msgstr "업데이트 페이지를 열고 업데이트 시작"
+
+#: src/main.cpp
+msgid "Open the updates page"
+msgstr "업데이트 페이지 열기"
 #~ msgid "Downloading"
 #~ msgstr "다운로드 중"
-
-#~ msgid "Updates Available"
-#~ msgstr "업데이트 사용 가능"
 
 #~ msgid "%1 update is available for your system."
 #~ msgid_plural "%1 updates are available for your system."
