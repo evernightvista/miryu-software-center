@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: miryu\n"
 "Report-Msgid-Bugs-To: https://github.com/miryugaming/miryu-software-center/"
 "issues\n"
-"POT-Creation-Date: 2026-11-06 15:43+0800\n"
+"POT-Creation-Date: 2026-11-06 19:18+0800\n"
 "PO-Revision-Date: 2026-10-03 00:00+0800\n"
 "Last-Translator: KairikiFedora <kairiki@evernightfedora.org>\n"
 "Language-Team: German <miryu@example.com>\n"
@@ -18,79 +18,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:176
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:165
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:93
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:320
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:614
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1086
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1103
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:153
-msgid "Install"
-msgstr "Installieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:177
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:166
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:96
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:314
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:623
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:761
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1092
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1107
-msgid "Update"
-msgstr "Aktualisieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:178
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:167
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:95
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:409
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:157
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/QueueView.cpp:173
-msgid "Remove"
-msgstr "Entfernen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:179
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:168
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:97
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:155
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/QueueView.cpp:161
-msgid "Downgrade"
-msgstr "Herabstufen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:180
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:169
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:94
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:156
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/QueueView.cpp:153
-msgid "Reinstall"
-msgstr "Neu installieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:181
-#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:170
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:271
-msgid "Sync"
-msgstr "Synchronisieren"
-
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/main.cpp:35
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/NotifierItem.cpp:19
 msgid "Miryu Software Center"
 msgstr "Miryu Software-Center"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/main.cpp:37
 msgid ""
@@ -100,31 +31,21 @@ msgstr ""
 "Eine moderne RPM-Paketverwaltung mit dnf5daemon, erstellt mit Qt6 und KDE "
 "Frameworks 6."
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/main.cpp:65
 msgid "Install the specified RPM file(s)"
 msgstr "Angegebene RPM-Datei(en) installieren"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/main.cpp:71
 msgid "Open the updates page and start updating"
 msgstr "Die Aktualisierungsseite öffnen und die Aktualisierung starten"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/main.cpp:77
 msgid "Open the updates page"
 msgstr "Updates-Seite öffnen"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/main.cpp:81
 msgid "RPM package files to install"
 msgstr "Zu installierende RPM-Paketdateien"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/main.cpp:111
 msgid ""
@@ -146,72 +67,173 @@ msgstr ""
 "Falls nicht installiert, installieren Sie mit:\n"
 "  dnf install dnf5daemon-server"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/main.cpp:117
 msgid "D-Bus error details:"
 msgstr "D-Bus-Fehlerdetails:"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/main.cpp:120
 msgid "Connection Error"
 msgstr "Verbindungsfehler"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:32
+msgid "scriptlet %1"
+msgstr "Scriptlet %1"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:89
+msgid "Downloading: %1 (0%)"
+msgstr "%1 wird heruntergeladen (0%)"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:230
-msgid "Transaction resolving failed"
-msgstr "Auflösen der Transaktion fehlgeschlagen"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:113
+msgid "Downloading: %1 (%2%)"
+msgstr "%1 wird heruntergeladen (%2%)"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:134
+msgid "Already downloaded: %1 (100%)"
+msgstr "%1 bereits heruntergeladen (100%)"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:135
+msgid "Downloaded: %1 (100%)"
+msgstr "%1 heruntergeladen (100%)"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:338
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:403
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:460
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:546
-msgid ""
-"Dependencies not resolved. Please resolve the dependency issues and try "
-"updating again."
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:138
+msgid "Download failed: %1"
+msgstr "Herunterladen fehlgeschlagen: %1"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:139
+msgid "Download failed: %1 (%2)"
+msgstr "Herunterladen fehlgeschlagen: %1 (%2)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:148
+msgid "Mirror failed for %1: %2 (%3)"
+msgstr "Spiegelserverfehler für %1: %2 (%3)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:150
+msgid "%1; metadata: %2"
+msgstr "%1; Metadaten: %2"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:162
+msgid "%1 %2"
+msgstr "%1 %2"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:163
+msgid "%1 (0%)"
+msgstr "%1 (0%)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:172
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:179
+msgid "Processing %1"
+msgstr "%1 wird verarbeitet"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:173
+msgid "%1 (%2%)"
+msgstr "%1 (%2%)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:183
+msgid "%1 (100%)"
+msgstr "%1 (100%)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:218
+msgid "Verifying package files (0%)"
+msgstr "Paketdateien werden geprüft (0%)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:219
+msgid "Verifying Packages"
+msgstr "Pakete werden überprüft"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:226
+msgid "Verifying package files (%1%)"
+msgstr "Paketdateien werden geprüft (%1%)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:227
+msgid "Verifying package files"
+msgstr "Paketdateien werden geprüft"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:233
+msgid "Package verification completed"
+msgstr "Paketprüfung abgeschlossen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:247
+msgid "Preparing to apply %1 transaction items"
+msgstr "Vorbereitung zur Anwendung von %1 Transaktionselementen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:248
+msgid "Applying Transaction"
+msgstr "Transaktion wird angewendet"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:257
+msgid "Preparing transaction packages (0%)"
+msgstr "Transaktionspakete werden vorbereitet (0%)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:258
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:267
+msgid "Preparing transaction packages"
+msgstr "Transaktionspakete werden vorbereitet"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:266
+msgid "Preparing transaction packages (%1%)"
+msgstr "Transaktionspakete werden vorbereitet (%1%)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:274
+msgid "Transaction packages prepared"
+msgstr "Transaktionspakete vorbereitet"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:283
+msgid "Transaction completed successfully"
+msgstr "Transaktion erfolgreich abgeschlossen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:284
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:288
+msgid "Transaction failed"
+msgstr "Transaktion fehlgeschlagen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:288
+msgid "Transaction completed"
+msgstr "Transaktion abgeschlossen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:293
+msgid "Running script %1: %2"
+msgstr "Skript %1 wird ausgeführt: %2"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:299
+msgid "Script %1 completed: %2"
+msgstr "Skript %1 abgeschlossen: %2"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:305
+msgid "Script %1 failed (exit code %2): %3"
+msgstr "Skript %1 fehlgeschlagen (Exit-Code %2): %3"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:403
+msgid "Preparing transaction..."
+msgstr "Transaktion wird vorbereitet..."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:409
+msgid "Verifying packages..."
+msgstr "Pakete werden überprüft..."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:412
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:882
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1101
+msgid "Applying transaction..."
+msgstr "Transaktion wird angewendet..."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:415
+msgid "Downloading packages..."
+msgstr "Pakete werden heruntergeladen..."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:417
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/ProgressDialog.cpp:65
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/ProgressDialog.cpp:134
+msgid "Preparing..."
+msgstr "Wird vorbereitet..."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:430
+msgid "Cannot connect to system D-Bus. Is the D-Bus system bus running?"
+msgstr "Keine Verbindung zum System-D-Bus. Läuft der D-Bus-Systembus?"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:439
+msgid "Failed to open dnf5daemon session (no error details available)"
 msgstr ""
-"Abhängigkeiten konnten nicht aufgelöst werden. Bitte beheben Sie die "
-"Abhängigkeitsprobleme und versuchen Sie die Aktualisierung erneut."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:422
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:559
-msgid ""
-"The transaction resolved to no changes. The requested packages may already "
-"be up to date or could not be matched against installed packages."
-msgstr ""
-"Die Transaktion ergab keine Änderungen. Die angeforderten Pakete sind "
-"möglicherweise bereits aktuell oder konnten keinen installierten Paketen "
-"zugeordnet werden."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:514
-msgid "Transaction execution failed"
-msgstr "Ausführen der Transaktion fehlgeschlagen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:574
-msgid ""
-"The connection to dnf5daemon-server was interrupted while preparing the "
-"transaction. Please try again."
-msgstr ""
-"Die Verbindung zum dnf5daemon-Server wurde während der Vorbereitung der "
-"Transaktion unterbrochen. Bitte versuchen Sie es erneut."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:577
-msgid "Failed to prepare transaction"
-msgstr "Vorbereiten der Transaktion fehlgeschlagen"
-
-
+"Öffnen der dnf5daemon-Sitzung fehlgeschlagen (keine Fehlerdetails verfügbar)"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:62
 msgid ""
@@ -229,9 +251,7 @@ msgstr ""
 "starten Sie den Dienst neu mit:\n"
 "  sudo systemctl restart dnf5daemon-server"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:362
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:360
 msgid ""
 "Did not receive a reply from dnf5daemon-server within the timeout period. "
 "The service may be busy or unresponsive."
@@ -239,9 +259,7 @@ msgstr ""
 "Innerhalb des Timeout-Zeitraums wurde keine Antwort vom dnf5daemon-Server "
 "empfangen. Der Dienst ist möglicherweise ausgelastet oder reagiert nicht."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:440
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:464
 msgid ""
 "Cannot connect to the D-Bus system bus.\n"
 "\n"
@@ -252,9 +270,7 @@ msgstr ""
 "Bitte stellen Sie sicher, dass der D-Bus-Systembus läuft (dbus-broker / dbus-"
 "daemon)."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:532
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:558
 msgid ""
 "Failed to open a session with dnf5daemon-server. The service may not be "
 "running or may not be reachable via the system D-Bus. Try:\n"
@@ -267,21 +283,15 @@ msgstr ""
 "  sudo systemctl start dnf5daemon-server\n"
 "  sudo systemctl enable dnf5daemon-server"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:900
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:933
 msgid "Cannot load repositories."
 msgstr "Paketquellen können nicht geladen werden."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:922
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:955
 msgid "No active dnf5daemon session"
 msgstr "Keine aktive dnf5daemon-Sitzung"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1288
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1321
 msgid ""
 "The dnf5daemon-server session was reset while resolving the transaction. The "
 "prepared package changes were lost; please try again."
@@ -290,9 +300,7 @@ msgstr ""
 "zurückgesetzt. Die vorbereiteten Paketänderungen gingen verloren; bitte "
 "versuchen Sie es erneut."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1320
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1353
 msgid ""
 "The dnf5daemon-server did not return a valid transaction summary. Please try "
 "again."
@@ -300,9 +308,7 @@ msgstr ""
 "Der dnf5daemon-Server hat keine gültige Transaktionsübersicht zurückgegeben. "
 "Bitte versuchen Sie es erneut."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1329
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1362
 msgid ""
 "The dnf5daemon-server returned a malformed transaction summary. Please try "
 "again."
@@ -310,9 +316,7 @@ msgstr ""
 "Der dnf5daemon-Server hat eine fehlerhafte Transaktionsübersicht "
 "zurückgegeben. Bitte versuchen Sie es erneut."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1345
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1378
 msgid ""
 "The dnf5daemon-server returned a transaction summary in an unexpected "
 "format. Please try again."
@@ -320,9 +324,7 @@ msgstr ""
 "Der dnf5daemon-Server hat eine Transaktionsübersicht in einem unerwarteten "
 "Format zurückgegeben. Bitte versuchen Sie es erneut."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1484
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1517
 msgid ""
 "The dnf5daemon-server session was reset while running the transaction. The "
 "resolved transaction was lost; please try again."
@@ -331,966 +333,852 @@ msgstr ""
 "zurückgesetzt. Die aufgelöste Transaktion ging verloren; bitte versuchen Sie "
 "es erneut."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1533
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Dnf5DaemonClient.cpp:1566
 msgid ""
 "The dnf5daemon-server did not confirm the transaction. Please try again."
 msgstr ""
 "Der dnf5daemon-Server hat die Transaktion nicht bestätigt. Bitte versuchen "
 "Sie es erneut."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:230
+msgid "Transaction resolving failed"
+msgstr "Auflösen der Transaktion fehlgeschlagen"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:338
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:399
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:456
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:542
+msgid ""
+"Dependencies not resolved. Please resolve the dependency issues and try "
+"updating again."
+msgstr ""
+"Abhängigkeiten konnten nicht aufgelöst werden. Bitte beheben Sie die "
+"Abhängigkeitsprobleme und versuchen Sie die Aktualisierung erneut."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:418
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:555
+msgid ""
+"The transaction resolved to no changes. The requested packages may already "
+"be up to date or could not be matched against installed packages."
+msgstr ""
+"Die Transaktion ergab keine Änderungen. Die angeforderten Pakete sind "
+"möglicherweise bereits aktuell oder konnten keinen installierten Paketen "
+"zugeordnet werden."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:510
+msgid "Transaction execution failed"
+msgstr "Ausführen der Transaktion fehlgeschlagen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:570
+msgid ""
+"The connection to dnf5daemon-server was interrupted while preparing the "
+"transaction. Please try again."
+msgstr ""
+"Die Verbindung zum dnf5daemon-Server wurde während der Vorbereitung der "
+"Transaktion unterbrochen. Bitte versuchen Sie es erneut."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/core/TransactionManager.cpp:573
+msgid "Failed to prepare transaction"
+msgstr "Vorbereiten der Transaktion fehlgeschlagen"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:94
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:106
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/ProgressDialog.cpp:19
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/ProgressDialog.cpp:54
 msgid "Processing"
 msgstr "Verarbeitung"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:95
 msgid "Installing"
 msgstr "Wird installiert"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:96
 msgid "Upgrading"
 msgstr "Wird aktualisiert"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:97
 msgid "Downgrading"
 msgstr "Wird heruntergestuft"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:98
 msgid "Reinstalling"
 msgstr "Wird neu installiert"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:99
 msgid "Removing"
 msgstr "Wird entfernt"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:100
 msgid "Replacing"
 msgstr "Wird ersetzt"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:101
 msgid "Changing reason for"
 msgstr "Grund ändern für"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:102
 msgid "Enabling"
 msgstr "Aktivieren"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:103
 msgid "Disabling"
 msgstr "Deaktivieren"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/core/Enums.h:104
 msgid "Resetting"
 msgstr "Zurücksetzen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:32
-msgid "scriptlet %1"
-msgstr "Scriptlet %1"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:89
-msgid "Downloading: %1 (0%)"
-msgstr "%1 wird heruntergeladen (0%)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:113
-msgid "Downloading: %1 (%2%)"
-msgstr "%1 wird heruntergeladen (%2%)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:134
-msgid "Already downloaded: %1 (100%)"
-msgstr "%1 bereits heruntergeladen (100%)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:135
-msgid "Downloaded: %1 (100%)"
-msgstr "%1 heruntergeladen (100%)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:138
-msgid "Download failed: %1"
-msgstr "Herunterladen fehlgeschlagen: %1"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:139
-msgid "Download failed: %1 (%2)"
-msgstr "Herunterladen fehlgeschlagen: %1 (%2)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:148
-msgid "Mirror failed for %1: %2 (%3)"
-msgstr "Spiegelserverfehler für %1: %2 (%3)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:150
-msgid "%1; metadata: %2"
-msgstr "%1; Metadaten: %2"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:162
-msgid "%1 %2"
-msgstr "%1 %2"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:163
-msgid "%1 (0%)"
-msgstr "%1 (0%)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:172
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:179
-msgid "Processing %1"
-msgstr "%1 wird verarbeitet"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:173
-msgid "%1 (%2%)"
-msgstr "%1 (%2%)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:183
-msgid "%1 (100%)"
-msgstr "%1 (100%)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:218
-msgid "Verifying package files (0%)"
-msgstr "Paketdateien werden geprüft (0%)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:219
-msgid "Verifying Packages"
-msgstr "Pakete werden überprüft"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:226
-msgid "Verifying package files (%1%)"
-msgstr "Paketdateien werden geprüft (%1%)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:227
-msgid "Verifying package files"
-msgstr "Paketdateien werden geprüft"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:233
-msgid "Package verification completed"
-msgstr "Paketprüfung abgeschlossen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:247
-msgid "Preparing to apply %1 transaction items"
-msgstr "Vorbereitung zur Anwendung von %1 Transaktionselementen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:248
-msgid "Applying Transaction"
-msgstr "Transaktion wird angewendet"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:257
-msgid "Preparing transaction packages (0%)"
-msgstr "Transaktionspakete werden vorbereitet (0%)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:258
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:267
-msgid "Preparing transaction packages"
-msgstr "Transaktionspakete werden vorbereitet"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:266
-msgid "Preparing transaction packages (%1%)"
-msgstr "Transaktionspakete werden vorbereitet (%1%)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:274
-msgid "Transaction packages prepared"
-msgstr "Transaktionspakete vorbereitet"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:283
-msgid "Transaction completed successfully"
-msgstr "Transaktion erfolgreich abgeschlossen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:284
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:288
-msgid "Transaction failed"
-msgstr "Transaktion fehlgeschlagen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:288
-msgid "Transaction completed"
-msgstr "Transaktion abgeschlossen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:293
-msgid "Running script %1: %2"
-msgstr "Skript %1 wird ausgeführt: %2"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:299
-msgid "Script %1 completed: %2"
-msgstr "Skript %1 abgeschlossen: %2"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:305
-msgid "Script %1 failed (exit code %2): %3"
-msgstr "Skript %1 fehlgeschlagen (Exit-Code %2): %3"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:394
-msgid "Preparing transaction..."
-msgstr "Transaktion wird vorbereitet..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:400
-msgid "Verifying packages..."
-msgstr "Pakete werden überprüft..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:403
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:864
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1083
-msgid "Applying transaction..."
-msgstr "Transaktion wird angewendet..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:406
-msgid "Downloading packages..."
-msgstr "Pakete werden heruntergeladen..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:408
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/ProgressDialog.cpp:30
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/ProgressDialog.cpp:90
-msgid "Preparing..."
-msgstr "Wird vorbereitet..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:421
-msgid "Cannot connect to system D-Bus. Is the D-Bus system bus running?"
-msgstr "Keine Verbindung zum System-D-Bus. Läuft der D-Bus-Systembus?"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/core/Backend.cpp:430
-msgid "Failed to open dnf5daemon session (no error details available)"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:176
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:165
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:320
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:614
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1086
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1103
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:93
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:153
+msgid "Install"
+msgstr "Installieren"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:177
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:166
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:314
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:623
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:761
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1092
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1107
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:96
+msgid "Update"
+msgstr "Aktualisieren"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:178
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:167
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:432
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:95
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/QueueView.cpp:173
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:157
+msgid "Remove"
+msgstr "Entfernen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:179
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:168
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:97
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/QueueView.cpp:161
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:155
+msgid "Downgrade"
+msgstr "Herabstufen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:180
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:169
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:94
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/QueueView.cpp:153
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:156
+msgid "Reinstall"
+msgstr "Neu installieren"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/PackageModel.cpp:181
+#: /workspace/miryu-software-center/miryu-software-center-main/src/models/QueueModel.cpp:170
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:271
+msgid "Sync"
+msgstr "Synchronisieren"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:84
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:92
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:654
+msgid "Advanced Operations"
+msgstr "Erweiterte Operationen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:95
+msgid "System-level package operations that require root privileges."
+msgstr "Systemweite Paketoperationen, die Root-Rechte erfordern."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:109
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:250
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:257
+msgid "Refresh DNF Cache"
+msgstr "DNF-Cache aktualisieren"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:110
+msgid "Run: dnf makecache --refresh"
+msgstr "Ausführen: dnf makecache --refresh"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:114
+msgid "Download and rebuild metadata cache for all enabled repositories."
 msgstr ""
-"Öffnen der dnf5daemon-Sitzung fehlgeschlagen (keine Fehlerdetails verfügbar)"
+"Metadaten-Cache für alle aktivierten Repositories herunterladen und neu "
+"aufbauen."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:124
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:270
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:277
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:646
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1591
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1611
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1617
+msgid "Distro Sync"
+msgstr "Distribution synchronisieren"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:125
+msgid "Run: dnf distro-sync"
+msgstr "Ausführen: dnf distro-sync"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:76
-msgid "Version:"
-msgstr "Version:"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:129
+msgid ""
+"Synchronize all installed packages to the latest versions in repositories."
+msgstr ""
+"Alle installierten Pakete auf die neuesten Versionen in den Repositories "
+"synchronisieren."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:137
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:642
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1726
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1753
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1798
+msgid "System Upgrade"
+msgstr "Systemaktualisierung"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:165
+msgid "Fedora Version"
+msgstr "Fedora-Version"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:77
-msgid "Repository:"
-msgstr "Paketquelle:"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:166
+msgid "Target Fedora release (VERSION_ID from /usr/lib/os-release)."
+msgstr "Ziel-Fedora-Release (VERSION_ID aus /usr/lib/os-release)."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:187
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:312
+msgid "Execute System Upgrade"
+msgstr "Systemaktualisierung ausführen"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:188
+msgid "Run: dnf system-upgrade download --releasever=<version>"
+msgstr "Ausführen: dnf system-upgrade download --releasever=<version>"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:78
-msgid "Size:"
-msgstr "Größe:"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:217
+msgid "Command Output"
+msgstr "Befehlsausgabe"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:228
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1946
+msgid "Close"
+msgstr "Schließen"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:243
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:263
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:283
+msgid "Another operation is still running."
+msgstr "Ein anderer Vorgang läuft noch."
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:79
-msgid "License:"
-msgstr "Lizenz:"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:248
+msgid ""
+"This will download and rebuild the metadata cache for all enabled "
+"repositories. Continue?"
+msgstr ""
+"Dadurch wird der Metadaten-Cache für alle aktivierten Repositories "
+"heruntergeladen und neu aufgebaut. Fortfahren?"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:251
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:472
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:532
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:633
+msgid "Refresh"
+msgstr "Aktualisieren"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:268
+msgid ""
+"This will synchronise all installed packages to the latest version available "
+"in the repositories. Continue?"
+msgstr ""
+"Dadurch werden alle installierten Pakete auf die neueste in den Repositories "
+"verfügbare Version synchronisiert. Fortfahren?"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:80
-msgid "URL:"
-msgstr "URL:"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:289
+msgid "Please enter a target Fedora version."
+msgstr "Bitte eine Ziel-Fedora-Version eingeben."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:297
+msgid ""
+"The target version (%1) is lower than the currently running version (%2). "
+"Downgrading the system is risky and may leave the system in an inconsistent "
+"state.\n"
+"\n"
+"Do you really want to continue?"
+msgstr ""
+"Die Zielversion (%1) ist niedriger als die aktuell laufende Version (%2). "
+"Ein Downgrade des Systems ist riskant und kann das System in einem "
+"inkonsistenten Zustand hinterlassen.\n"
+"\n"
+"Wirklich fortfahren?"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:302
+msgid "Version Downgrade Warning"
+msgstr "Warnung zur Versionsherabstufung"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:81
-msgid "Status:"
-msgstr "Status:"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:308
+msgid ""
+"This will download all packages needed to upgrade the system to Fedora %1. "
+"After the download completes you will need to reboot to apply the upgrade.\n"
+"\n"
+"Continue?"
+msgstr ""
+"Dadurch werden alle Pakete heruntergeladen, die zum Upgrade des Systems auf "
+"Fedora %1 erforderlich sind. Nach Abschluss des Downloads müssen Sie neu "
+"starten, um das Upgrade anzuwenden.\n"
+"\n"
+"Fortfahren?"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:313
+msgid "Download"
+msgstr "Herunterladen"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:322
+msgid "System Upgrade (releasever=%1)"
+msgstr "System-Upgrade (releasever=%1)"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:136
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:239
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:657
-msgid "Description"
-msgstr "Beschreibung"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:337
+msgid ""
+"Warning: Target version %1 is lower than current version %2. This is a "
+"version downgrade and carries risks."
+msgstr ""
+"Warnung: Zielversion %1 ist niedriger als die aktuelle Version %2. Dies ist "
+"ein Versions-Downgrade und birgt Risiken."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:384
+msgid "Executing: %1 ..."
+msgstr "Wird ausgeführt: %1 ..."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:391
+msgid "[started]"
+msgstr "[gestartet]"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:141
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:162
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:210
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:291
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/QueueView.cpp:68
-msgid "Dependencies"
-msgstr "Abhängigkeiten"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:412
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:414
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1072
+msgid "Operation completed successfully."
+msgstr "Vorgang erfolgreich abgeschlossen."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:413
+msgid "[completed successfully]"
+msgstr "[erfolgreich abgeschlossen]"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:418
+msgid "Operation cancelled or authentication failed."
+msgstr "Vorgang abgebrochen oder Authentifizierung fehlgeschlagen."
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:146
-msgid "Provides"
-msgstr "Bereitgestellt"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:419
+msgid "[cancelled or authentication failed (exit %1)]"
+msgstr "[abgebrochen oder Authentifizierung fehlgeschlagen (Exit %1)]"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:421
+msgid "Operation failed (exit code %1)."
+msgstr "Vorgang fehlgeschlagen (Exit-Code %1)."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:422
+msgid "[failed with exit code %1]"
+msgstr "[fehlgeschlagen mit Exit-Code %1]"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:151
-msgid "Changelog"
-msgstr "Änderungsprotokoll"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:424
+msgid "Operation failed with exit code %1. Check the output below for details."
+msgstr ""
+"Vorgang mit Exit-Code %1 fehlgeschlagen. Siehe Ausgabe unten für Details."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:425
+msgid "Operation Failed"
+msgstr "Vorgang fehlgeschlagen"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:433
+msgid "Failed to start command: %1"
+msgstr "Befehl konnte nicht gestartet werden: %1"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:156
-msgid "Files"
-msgstr "Dateien"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:434
+msgid "[error: %1]"
+msgstr "[Fehler: %1]"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:436
+msgid ""
+"Failed to start command.\n"
+"%1\n"
+"\n"
+"Make sure pkexec (polkit) is installed and available."
+msgstr ""
+"Befehl konnte nicht gestartet werden.\n"
+"%1\n"
+"\n"
+"Stellen Sie sicher, dass pkexec (polkit) installiert und verfügbar ist."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:438
+msgid "Command Start Failed"
+msgstr "Befehlsstart fehlgeschlagen"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:201
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:229
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:317
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:230
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:201
 msgid "Installed"
 msgstr "Installiert"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:385
+msgid "Flatpak Apps"
+msgstr "Flatpak-Apps"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:389
+msgid "Flatpak Store"
+msgstr "Flatpak-Store"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:204
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:230
-msgid "Available"
-msgstr "Verfügbar"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:424
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:926
+msgid "Loading..."
+msgstr "Wird geladen..."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:450
+msgid "Filter installed Flatpak apps..."
+msgstr "Installierte Flatpak-Apps filtern..."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:457
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:797
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:996
+msgid "Update All"
+msgstr "Alle aktualisieren"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:207
-msgid "Update Available"
-msgstr "Aktualisierung verfügbar"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:462
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1177
+msgid "Uninstall Selected"
+msgstr "Ausgewählte deinstallieren"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:467
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1207
+msgid "Update Selected"
+msgstr "Ausgewählte aktualisieren"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:516
+msgid "Search Flatpak store..."
+msgstr "Flatpak-Store durchsuchen..."
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:210
-msgid "Downgrade Available"
-msgstr "Herabstufung verfügbar"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:522
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1014
+msgid "All Remotes"
+msgstr "Alle Remotes"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:527
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1155
+msgid "Install Selected"
+msgstr "Ausgewählte installieren"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:619
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:770
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:774
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:930
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1089
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1105
+msgid "Uninstall"
+msgstr "Deinstallieren"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:228
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:881
-msgid "<i>No description available.</i>"
-msgstr "<i>Keine Beschreibung verfügbar.</i>"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:627
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:753
+msgid "Run"
+msgstr "Ausführen"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:657
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:240
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:136
+msgid "Description"
+msgstr "Beschreibung"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:669
+msgid "Back to List"
+msgstr "Zurück zur Liste"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:231
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:232
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:233
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:234
-msgid "<i>Loading...</i>"
-msgstr "<i>Wird geladen...</i>"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:707
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:973
+msgid "Loading installed Flatpak apps..."
+msgstr "Installierte Flatpak-Apps werden geladen..."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:709
+msgid "Search the Flatpak store"
+msgstr "Flatpak-Store durchsuchen"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:733
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1042
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2394
+msgid "%1 result"
+msgstr "%1 Ergebnis"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:254
-msgid "<i>No dependencies.</i>"
-msgstr "<i>Keine Abhängigkeiten.</i>"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:773
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:929
+msgid "Uninstall '%1' (%2)?"
+msgstr "'%1' (%2) deinstallieren?"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:261
-msgid "<i>No provides.</i>"
-msgstr "<i>Keine Bereitstellungen.</i>"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:268
-msgid "<i>No changelog available.</i>"
-msgstr "<i>Kein Änderungsprotokoll verfügbar.</i>"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:275
-msgid "<i>No file list available.</i>"
-msgstr "<i>Keine Dateiliste verfügbar.</i>"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:72
-msgid "Default"
-msgstr "Standard"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:72
-msgid "Priority: %1"
-msgstr "Priorität: %1"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:78
-msgid "Enabled"
-msgstr "Aktiviert"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:78
-msgid "Disabled"
-msgstr "Deaktiviert"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:141
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:853
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1071
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1789
-msgid "Operation cancelled by user."
-msgstr "Vorgang vom Benutzer abgebrochen."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:142
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:107
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:110
-msgid "Repository"
-msgstr "Repository"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:147
-msgid "Failed to enable repository '%1'."
-msgstr "Repository '%1' konnte nicht aktiviert werden."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:148
-msgid "Failed to disable repository '%1'."
-msgstr "Repository '%1' konnte nicht deaktiviert werden."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:150
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2511
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2512
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1117
-msgid "Error"
-msgstr "Fehler"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:172
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:176
-msgid "Disable Repository"
-msgstr "Paketquelle deaktivieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:175
-msgid "Disable repository '%1'?"
-msgstr "Paketquelle '%1' deaktivieren?"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:176
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:192
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1737
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1745
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2607
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:774
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:797
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:930
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1155
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1177
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1207
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1745
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1753
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2616
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:171
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:187
 msgid "Yes"
 msgstr "Ja"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:176
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:192
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1737
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1745
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2607
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:774
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:797
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:930
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1155
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1177
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1207
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1745
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1753
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2616
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:171
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:187
 msgid "No"
 msgstr "Nein"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:791
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1872
+msgid "No updates available."
+msgstr "Keine Aktualisierungen verfügbar."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:796
+msgid "Update %1 Flatpak application?"
+msgstr "%1 Flatpak-Anwendungen aktualisieren?"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:188
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:192
-msgid "Enable Repository"
-msgstr "Paketquelle aktivieren"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:815
+msgid "Searching for '%1'..."
+msgstr "Suche nach '%1'..."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:870
+msgid "Application ID: %1"
+msgstr "Anwendungs-ID: %1"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:871
+msgid "Version: %1"
+msgstr "Version: %1"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:191
-msgid "Enable repository '%1'?"
-msgstr "Paketquelle '%1' aktivieren?"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:872
+msgid "Branch: %1"
+msgstr "Branch: %1"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:873
+msgid "Remote: %1"
+msgstr "Remote: %1"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:874
+msgid "Installation: %1"
+msgstr "Installation: %1"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:206
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:632
-msgid "Refresh Metadata"
-msgstr "Metadaten aktualisieren"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:876
+msgid "Size: %1"
+msgstr "Größe: %1"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:881
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:228
+msgid "<i>No description available.</i>"
+msgstr "<i>Keine Beschreibung verfügbar.</i>"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:916
+msgid "Installing..."
+msgstr "Wird installiert..."
 
-# Standalone update checker (miryu-software-check) + File menu entry
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:37
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:44
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:643
-msgid "Check Update Frequency Settings"
-msgstr "Einstellungen zur Häufigkeit der Aktualisierungsprüfung"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:935
+msgid "Uninstalling..."
+msgstr "Wird deinstalliert..."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:948
+msgid "Updating..."
+msgstr "Wird aktualisiert..."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:994
+msgid "Update All (%1)"
+msgstr "Alle aktualisieren (%1)"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:52
-msgid "Daily"
-msgstr "Täglich"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:999
+msgid "%1 app installed, %2 update available"
+msgstr "%1 Anwendungen installiert, %2 Update verfügbar"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1003
+msgid "%1 app installed"
+msgstr "%1 Anwendungen installiert"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1048
+msgid "Operation: %1"
+msgstr "Vorgang: %1"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:54
-msgid "Weekly"
-msgstr "Wöchentlich"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1100
+msgid "Operation failed."
+msgstr "Vorgang fehlgeschlagen."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1110
+msgid "Flatpak Operation Error"
+msgstr "Flatpak-Vorgangsfehler"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1117
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2520
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2521
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:145
+msgid "Error"
+msgstr "Fehler"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:56
-msgid "Monthly"
-msgstr "Monatlich"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1118
+msgid "Flatpak Error"
+msgstr "Flatpak-Fehler"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1154
+msgid "Install %1 selected Flatpak application?"
+msgstr "%1 ausgewählte Flatpak-Anwendungen installieren?"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1161
+msgid "Installing %1 application..."
+msgstr "%1 Anwendungen werden installiert..."
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:58
-msgid "Never"
-msgstr "Nie"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1176
+msgid "Uninstall %1 selected Flatpak application?"
+msgstr "%1 ausgewählte Flatpak-Anwendungen deinstallieren?"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1183
+msgid "Uninstalling %1 application..."
+msgstr "%1 Anwendungen werden deinstalliert..."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1201
+msgid "No upgradable applications selected."
+msgstr "Keine aktualisierbaren Anwendungen ausgewählt."
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:60
-msgid "Update Notification Frequency"
-msgstr "Häufigkeit der Update-Benachrichtigung"
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1206
+msgid "Update %1 selected Flatpak application?"
+msgstr "%1 ausgewählte Flatpak-Anwendungen aktualisieren?"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1213
+msgid "Updating %1 application..."
+msgstr "%1 Anwendungen werden aktualisiert..."
 
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:67
-msgid ""
-"How often miryu-software-check may notify you about available updates.\n"
-"The change takes effect the next time the update checker runs (e.g. at "
-"login)."
-msgstr ""
-"Wie oft Sie miryu-software-check über verfügbare Aktualisierungen "
-"informieren darf.\n"
-"Die Änderung wird beim nächsten Lauf des Aktualisierungsprüfers wirksam (z. "
-"B. bei der Anmeldung)."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:213
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:214
 msgid "Search packages..."
 msgstr "Pakete suchen..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:228
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:229
 msgid "All"
 msgstr "Alle"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:231
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:539
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:706
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:204
+msgid "Available"
+msgstr "Verfügbar"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:232
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:560
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:724
 msgid "Updates"
 msgstr "Aktualisierungen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:232
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:233
 msgid "Upgradable"
 msgstr "Aktualisierbar"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:236
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:237
 msgid "All Fields"
 msgstr "Alle Felder"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:237
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:238
 msgid "Name"
 msgstr "Name"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:238
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:239
 msgid "Summary"
 msgstr "Zusammenfassung"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:246
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:363
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:407
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:247
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:364
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:430
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:302
 msgid "Apply"
 msgstr "Anwenden"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:247
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:364
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:248
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:365
 msgid "Apply pending operations in the queue"
 msgstr "Ausstehende Vorgänge in der Warteschlange anwenden"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:344
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:345
 msgid "Available Updates"
 msgstr "Verfügbare Aktualisierungen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:353
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:662
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:354
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:680
 msgid "Select All"
 msgstr "Alle auswählen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:354
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:355
 msgid "Queue every update shown in the list"
 msgstr "Alle in der Liste angezeigten Updates in die Warteschlange aufnehmen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:358
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:673
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:359
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:691
 msgid "Deselect All"
 msgstr "Auswahl aufheben"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:359
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:360
 msgid "Remove every update from the queue"
 msgstr "Alle Updates aus der Warteschlange entfernen"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:392
+msgid "You have installed all updates"
+msgstr "Alle Updates wurden installiert"
 
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:408
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:431
 msgid "Clear"
 msgstr "Leeren"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:452
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:541
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:715
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:475
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:562
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:733
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:93
 msgid "Repositories"
 msgstr "Paketquellen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:457
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:480
 msgid "Refresh Software Repository List"
 msgstr "Software-Paketquellenliste aktualisieren"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:458
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:481
 msgid "Reload the list of configured software repositories from disk."
 msgstr ""
 "Die Liste der konfigurierten Software-Paketquellen vom Datenträger neu laden."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:463
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1254
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:486
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1262
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1301
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1312
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1340
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1353
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1369
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1270
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1309
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1320
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1348
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1361
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1377
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1385
 msgid "Add Copr Repository"
 msgstr "Copr-Paketquelle hinzufügen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:464
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:487
 msgid "Add a Copr repository (e.g. evernightvista/evernight-vista)."
 msgstr "Copr-Paketquelle hinzufügen (z. B. evernightvista/evernight-vista)."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:509
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:803
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:816
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:861
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1028
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1078
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1232
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1333
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1611
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1685
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1795
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1811
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2397
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:530
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:821
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:834
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:879
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1046
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1096
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1240
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1341
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1619
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1693
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1803
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1819
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2401
 msgid "Ready"
 msgstr "Bereit"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:538
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:559
 msgid "Packages"
 msgstr "Pakete"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:540
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:561
 msgid "Queue"
 msgstr "Warteschlange"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:542
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:719
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:563
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:737
 msgid "Flatpak"
 msgstr "Flatpak"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:568
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2371
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:589
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2375
 msgid "Linglong Store"
 msgstr "Linglong Store"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:573
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:594
 msgid "Launch the external Linglong Store application"
 msgstr "Externe Linglong Store-Anwendung starten"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:650
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:201
+msgid "Refresh Metadata"
+msgstr "Metadaten aktualisieren"
 
+# Standalone update checker (miryu-software-check) + File menu entry
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:661
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:37
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:44
+msgid "Check Update Frequency Settings"
+msgstr "Einstellungen zur Häufigkeit der Aktualisierungsprüfung"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:612
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:472
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:532
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:251
-msgid "Refresh"
-msgstr "Aktualisieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:624
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1718
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1745
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1790
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:137
-msgid "System Upgrade"
-msgstr "Systemaktualisierung"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:628
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1583
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1603
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1609
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:124
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:270
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:277
-msgid "Distro Sync"
-msgstr "Distribution synchronisieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:636
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:84
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:92
-msgid "Advanced Operations"
-msgstr "Erweiterte Operationen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:647
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:665
 msgid "Install RPM File..."
 msgstr "RPM-Datei installieren..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:651
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1896
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:669
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1900
 msgid "About Miryu Software Center"
 msgstr "Über Miryu Software-Center"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:701
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:719
 msgid "Package Browser"
 msgstr "Paketbrowser"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:712
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:730
 msgid "Transaction Queue"
 msgstr "Transaktionswarteschlange"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:723
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:741
 msgid "Flatpak is not installed on this system."
 msgstr "Flatpak ist auf diesem System nicht installiert."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:769
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:787
 msgid "The package backend is not initialized. Cannot install RPM files."
 msgstr ""
 "Das Paket-Backend ist nicht initialisiert. RPM-Dateien können nicht "
 "installiert werden."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:770
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:854
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:788
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:872
 msgid "RPM Installation"
 msgstr "RPM-Installation"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:790
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:808
 msgid "Preparing RPM installation..."
 msgstr "RPM-Installation wird vorbereitet..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:839
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:857
 msgid "RPM installation completed successfully."
 msgstr "RPM-Installation erfolgreich abgeschlossen."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:871
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1089
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1797
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:136
+msgid "Operation cancelled by user."
+msgstr "Vorgang vom Benutzer abgebrochen."
 
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:857
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:875
 msgid "RPM installation failed."
 msgstr "RPM-Installation fehlgeschlagen."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:858
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1074
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:876
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1092
 msgid "Transaction Failed"
 msgstr "Transaktion fehlgeschlagen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:890
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:908
 msgid "Searching..."
 msgstr "Suche läuft..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:908
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:424
-msgid "Loading..."
-msgstr "Wird geladen..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:958
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:976
 msgid "%1 package queued"
 msgstr "%1 Paket in Warteschlange eingereiht"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:973
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:991
 msgid "Queue is empty. Add packages to the queue first."
 msgstr ""
 "Warteschlange ist leer. Bitte zuerst Pakete zur Warteschlange hinzufügen."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:986
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1004
 msgid ""
 "Cannot uninstall the running kernel. Doing so would make the system "
 "unbootable.\n"
@@ -1302,66 +1190,46 @@ msgstr ""
 "\n"
 "Bitte booten Sie einen anderen Kernel, bevor Sie %1 entfernen."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:990
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1008
 msgid "Cannot Remove Running Kernel"
 msgstr "Laufenden Kernel nicht entfernen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1005
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1023
 msgid "Miryu Software Center is running, cannot uninstall."
 msgstr ""
 "Miryu Software-Center wird ausgeführt, kann nicht deinstalliert werden."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1006
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1024
 msgid "Cannot Remove Miryu Software Center"
 msgstr "Miryu Software-Center kann nicht entfernt werden"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1012
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1030
 msgid "Resolving transaction..."
 msgstr "Transaktion wird aufgelöst..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1052
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1070
 msgid "Transaction completed successfully."
 msgstr "Transaktion erfolgreich abgeschlossen."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1072
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1090
 msgid "Transaction"
 msgstr "Transaktion"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1097
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1115
 msgid "Building transaction..."
 msgstr "Transaktion wird erstellt..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1229
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1237
 msgid "Refreshing repository list..."
 msgstr "Paketquellenliste wird aktualisiert..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1253
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1261
 msgid "The package backend is not initialized. Cannot add a Copr repository."
 msgstr ""
 "Das Paket-Backend ist nicht initialisiert. Copr-Paketquelle kann nicht "
 "hinzugefügt werden."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1263
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1271
 msgid ""
 "Please enter the Copr repository address you want to add (e.g. "
 "evernightvista/evernight-vista):"
@@ -1369,29 +1237,21 @@ msgstr ""
 "Bitte geben Sie die Adresse der Copr-Paketquelle ein, die Sie hinzufügen "
 "möchten (z. B. evernightvista/evernight-vista):"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1275
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1313
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1283
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1321
 msgid "Confirm"
 msgstr "Bestätigen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1276
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1314
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1284
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1322
 msgid "Cancel"
 msgstr "Abbrechen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1300
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1308
 msgid "The Copr repository %1 already exists."
 msgstr "Die Copr-Paketquelle %1 ist bereits vorhanden."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1310
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1318
 msgid ""
 "Add the %1 Copr repository?\n"
 "Note: Copr repositories are maintained by their owners."
@@ -1399,39 +1259,27 @@ msgstr ""
 "Die Copr-Paketquelle %1 hinzufügen?\n"
 "Hinweis: Copr-Paketquellen werden von ihren Eigentümern gepflegt."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1322
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1330
 msgid "Adding Copr repository %1..."
 msgstr "Copr-Paketquelle %1 wird hinzugefügt..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1339
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1347
 msgid "The user has cancelled adding the Copr repository."
 msgstr "Der Benutzer hat das Hinzufügen der Copr-Paketquelle abgebrochen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1352
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1360
 msgid "You have added the %1 Copr repository."
 msgstr "Sie haben die Copr-Paketquelle %1 hinzugefügt."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1362
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1370
 msgid "(not reported)"
 msgstr "(nicht gemeldet)"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1368
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1376
 msgid "(unknown)"
 msgstr "(unbekannt)"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1364
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1372
 msgid ""
 "The Copr repository %1 is incompatible with this platform.\n"
 "The Copr repository %1 supports the following platforms: %2\n"
@@ -1441,28 +1289,20 @@ msgstr ""
 "Die Copr-Paketquelle %1 unterstützt die folgenden Plattformen: %2\n"
 "Ihre Plattform: %3"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1376
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1384
 msgid "The Copr repository %1 does not exist or is unreachable."
 msgstr "Die Copr-Paketquelle %1 ist nicht vorhanden oder nicht erreichbar."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1505
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1513
 msgid "Failed to start the polkit helper. Is polkit installed?"
 msgstr ""
 "Start des polkit-Hilfsprogramms fehlgeschlagen. Ist polkit installiert?"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1516
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1524
 msgid "The operation timed out."
 msgstr "Der Vorgang hat ein Zeitlimit überschritten."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1581
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1589
 msgid ""
 "Distribution sync will synchronize all installed packages to the versions "
 "available in the repositories. This may downgrade or upgrade packages. "
@@ -1472,57 +1312,39 @@ msgstr ""
 "den Paketquellen verfügbaren Versionen synchronisieren. Dies kann Pakete "
 "herab- oder heraufstufen. Fortfahren?"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1588
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1596
 msgid "Performing distribution sync..."
 msgstr "Distributionssynchronisierung wird durchgeführt..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1603
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1611
 msgid "Distribution sync completed successfully."
 msgstr "Distributionssynchronisierung erfolgreich abgeschlossen."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1608
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1616
 msgid "Distribution sync failed."
 msgstr "Distributionssynchronisierung fehlgeschlagen."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1632
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1640
 msgid "Refresh Metadata Log"
 msgstr "Metadatenprotokoll aktualisieren"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1670
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1678
 msgid "Metadata refreshed."
 msgstr "Metadaten aktualisiert."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1683
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1691
 msgid "Failed to refresh metadata (exit code %1)."
 msgstr "Aktualisieren der Metadaten fehlgeschlagen (Exit-Code %1)."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1688
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1696
 msgid "Refreshing repository metadata..."
 msgstr "Paketquellen-Metadaten werden aktualisiert..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1719
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1727
 msgid "Enter the version you want to upgrade to:"
 msgstr "Geben Sie die Version ein, auf die Sie aktualisieren möchten:"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1734
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1742
 msgid ""
 "The target version (%1) is lower than the current version (%2). Downgrading "
 "the system may cause instability. Continue anyway?"
@@ -1530,78 +1352,44 @@ msgstr ""
 "Die Zielversion (%1) ist niedriger als die aktuelle Version (%2). Ein "
 "Herabstufen des Systems kann zu Instabilität führen. Trotzdem fortsetzen?"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1737
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1745
 msgid "Version Warning"
 msgstr "Versionswarnung"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1744
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1752
 msgid "This will prepare a system upgrade transaction. Continue?"
 msgstr ""
 "Dies wird eine Systemaktualisierungstransaktion vorbereiten. Fortfahren?"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1749
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1757
 msgid "Preparing system upgrade..."
 msgstr "Systemaktualisierung wird vorbereitet..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1779
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1787
 msgid "System upgrade transaction completed."
 msgstr "Systemaktualisierungstransaktion abgeschlossen."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1792
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1800
 msgid "System Upgrade Failed"
 msgstr "Systemaktualisierung fehlgeschlagen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1826
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1834
 msgid "Checking for updates..."
 msgstr "Auf Aktualisierungen wird geprüft..."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1868
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:791
-msgid "No updates available."
-msgstr "Keine Aktualisierungen verfügbar."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1910
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1914
 msgid "Version %1"
 msgstr "Version %1"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1931
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1935
 msgid "Authors"
 msgstr "Autoren"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1942
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:228
-msgid "Close"
-msgstr "Schließen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1992
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1996
 msgid "Need to Restart"
 msgstr "Neustart erforderlich"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1995
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1999
 msgid ""
 "You have installed software packages that require a computer restart. Please "
 "restart the operating system as soon as possible to ensure the updates take "
@@ -1611,15 +1399,11 @@ msgstr ""
 "Bitte starten Sie das Betriebssystem so bald wie möglich neu, um "
 "sicherzustellen, dass die Updates vollständig wirksam werden."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2067
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2071
 msgid "Dependency Error"
 msgstr "Abhängigkeitsfehler"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2085
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2089
 msgid ""
 "Cannot remove protected packages or critical dependencies, removing them "
 "would break the system.\n"
@@ -1631,15 +1415,11 @@ msgstr ""
 "\n"
 "%1"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2086
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2090
 msgid "Protected Package Error"
 msgstr "Fehler bei geschütztem Paket"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2095
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2099
 msgid ""
 "Dependency resolution failed. The reasons are as follows:\n"
 "\n"
@@ -1647,53 +1427,37 @@ msgstr ""
 "Abhängigkeitsauflösung fehlgeschlagen. Die Gründe sind wie folgt:\n"
 "\n"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2102
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2106
 msgid "Transaction Error"
 msgstr "Transaktionsfehler"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2346
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2350
 msgid "Select RPM Package Files"
 msgstr "RPM-Paketdateien auswählen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2348
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2352
 msgid "RPM Packages (*.rpm)"
 msgstr "RPM-Pakete (*.rpm)"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2354
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2358
 msgid "Download now and install on next reboot (offline update)?"
 msgstr ""
 "Jetzt herunterladen und beim nächsten Neustart installieren (Offline-"
 "Aktualisierung)?"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2355
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2359
 msgid "Installation Mode"
 msgstr "Installationsmodus"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2356
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2360
 msgid "Offline Update"
 msgstr "Offline-Aktualisierung"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2356
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2360
 msgid "Install Now"
 msgstr "Jetzt installieren"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2368
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2372
 msgid ""
 "Failed to launch the Linglong Store.\n"
 "\n"
@@ -1705,145 +1469,263 @@ msgstr ""
 "Bitte stellen Sie sicher, dass die linglong-store-Anwendung installiert ist\n"
 "und unter %1 zur Verfügung steht."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2380
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2384
 msgid "%1 package"
 msgstr "%1 Paket"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2390
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:733
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1042
-msgid "%1 result"
-msgstr "%1 Ergebnis"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2406
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2415
 msgid "%1 update available"
 msgstr "%1 Update verfügbar"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2430
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2439
 msgid "Downloading %1"
 msgstr "%1 wird heruntergeladen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2482
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2491
 msgid "Unknown"
 msgstr "Unbekannt"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2485
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2494
 msgid ""
 "The repository requests importing an RPM GPG key. Verify the key information "
 "before trusting it."
-msgstr "Das Repository fordert den Import eines RPM-GPG-Schlüssels an. Überprüfen Sie die Schlüsselinformationen, bevor Sie ihm vertrauen."
+msgstr ""
+"Das Repository fordert den Import eines RPM-GPG-Schlüssels an. Überprüfen "
+"Sie die Schlüsselinformationen, bevor Sie ihm vertrauen."
 
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2487
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2496
 msgid "Key ID: %1"
 msgstr "Schlüssel-ID: %1"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2488
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2497
 msgid "User ID: %1"
 msgstr "Benutzer-ID: %1"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2489
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2498
 msgid "Fingerprint: %1"
 msgstr "Fingerabdruck: %1"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2490
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2499
 msgid "Key URL: %1"
 msgstr "Schlüssel-URL: %1"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2491
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2500
 msgid "Created: %1"
 msgstr "Erstellt: %1"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2496
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2505
 msgid "Import RPM GPG Key"
 msgstr "RPM-GPG-Schlüssel importieren"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2497
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2506
 msgid "Import"
 msgstr "Importieren"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2497
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2506
 msgid "Do Not Import"
 msgstr "Nicht importieren"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2518
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2527
 msgid "%1 updates"
 msgstr "%1 Aktualisierungen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2531
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2540
 msgid "Queue: %1 items"
 msgstr "Warteschlange: %1 Einträge"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2606
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2615
 msgid "There are pending operations in the queue. Close anyway?"
 msgstr "Es gibt ausstehende Vorgänge in der Warteschlange. Trotzdem schließen?"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2607
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2616
 msgid "Pending Operations"
 msgstr "Ausstehende Vorgänge"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:76
+msgid "Version:"
+msgstr "Version:"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:77
+msgid "Repository:"
+msgstr "Paketquelle:"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:78
+msgid "Size:"
+msgstr "Größe:"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:79
+msgid "License:"
+msgstr "Lizenz:"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:80
+msgid "URL:"
+msgstr "URL:"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:81
+msgid "Status:"
+msgstr "Status:"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:141
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:162
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/QueueView.cpp:68
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:210
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:291
+msgid "Dependencies"
+msgstr "Abhängigkeiten"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:146
+msgid "Provides"
+msgstr "Bereitgestellt"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:151
+msgid "Changelog"
+msgstr "Änderungsprotokoll"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:156
+msgid "Files"
+msgstr "Dateien"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:207
+msgid "Update Available"
+msgstr "Aktualisierung verfügbar"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:210
+msgid "Downgrade Available"
+msgstr "Herabstufung verfügbar"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:231
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:232
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:233
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:234
+msgid "<i>Loading...</i>"
+msgstr "<i>Wird geladen...</i>"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:254
+msgid "<i>No dependencies.</i>"
+msgstr "<i>Keine Abhängigkeiten.</i>"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:261
+msgid "<i>No provides.</i>"
+msgstr "<i>Keine Bereitstellungen.</i>"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:268
+msgid "<i>No changelog available.</i>"
+msgstr "<i>Kein Änderungsprotokoll verfügbar.</i>"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageInfoWidget.cpp:275
+msgid "<i>No file list available.</i>"
+msgstr "<i>Keine Dateiliste verfügbar.</i>"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:310
+msgid "Install Selected (%1)"
+msgstr "Ausgewählte installieren (%1)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:324
+msgid "Update Selected (%1)"
+msgstr "Ausgewählte aktualisieren (%1)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:338
+msgid "Remove Selected (%1)"
+msgstr "Ausgewählte entfernen (%1)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:351
+msgid "Copy Selected Package Names"
+msgstr "Ausgewählte Paketnamen kopieren"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:372
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/QueueView.cpp:183
+msgid "Remove from Queue"
+msgstr "Aus Warteschlange entfernen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:384
+msgid "Queue for Reinstall"
+msgstr "Wiedereinrichtung in Warteschlange stellen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:390
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:414
+msgid "Queue for Downgrade"
+msgstr "Downgrade in Warteschlange stellen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:396
+msgid "Queue for Removal"
+msgstr "Zur Entfernungs-Warteschlange hinzufügen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:402
+msgid "Queue for Installation"
+msgstr "Zur Installations-Warteschlange hinzufügen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:408
+msgid "Queue for Update"
+msgstr "Zur Aktualisierungs-Warteschlange hinzufügen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:423
+msgid "Copy Package Name"
+msgstr "Paketname kopieren"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:72
+msgid "Default"
+msgstr "Standard"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:72
+msgid "Priority: %1"
+msgstr "Priorität: %1"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:78
+msgid "Enabled"
+msgstr "Aktiviert"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:78
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:137
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:107
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:110
+msgid "Repository"
+msgstr "Repository"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:142
+msgid "Failed to enable repository '%1'."
+msgstr "Repository '%1' konnte nicht aktiviert werden."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:143
+msgid "Failed to disable repository '%1'."
+msgstr "Repository '%1' konnte nicht deaktiviert werden."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:167
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:171
+msgid "Disable Repository"
+msgstr "Paketquelle deaktivieren"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:170
+msgid "Disable repository '%1'?"
+msgstr "Paketquelle '%1' deaktivieren?"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:183
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:187
+msgid "Enable Repository"
+msgstr "Paketquelle aktivieren"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/RepoView.cpp:186
+msgid "Enable repository '%1'?"
+msgstr "Paketquelle '%1' aktivieren?"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:84
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:92
 msgid "Settings"
 msgstr "Einstellungen"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:110
 msgid "Defaults"
 msgstr "Standards"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:145
 msgid "Flatpak Settings"
 msgstr "Flatpak-Einstellungen"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:152
 msgid "Default Location"
 msgstr "Standardort"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:153
 msgid ""
@@ -1852,13 +1734,9 @@ msgstr ""
 "Ob neue Flatpak-Installationen standardmäßig als Benutzer- oder "
 "Systeminstallation erfolgen."
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:157
 msgid "Default Remote Repository"
 msgstr "Standard-Remote-Paketquelle"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:158
 msgid "Remote repository name used for Flatpak operations by default."
@@ -1866,26 +1744,18 @@ msgstr ""
 "Name des Remote-Repositorys, das standardmäßig für Flatpak-Operationen "
 "verwendet wird."
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:163
 msgid "Metadata Settings"
 msgstr "Metadaten-Einstellungen"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:169
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:188
 msgid " minutes"
 msgstr " Minuten"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:171
 msgid "Min Refresh Interval"
 msgstr "Minimales Aktualisierungsintervall"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:172
 msgid "Minimum interval between automatic repository metadata refreshes."
@@ -1893,25 +1763,17 @@ msgstr ""
 "Mindestintervall zwischen automatischen Repository-Metadaten-"
 "Aktualisierungen."
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:177
 msgid "Updater Settings"
 msgstr "Updater-Einstellungen"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:182
 msgid "e.g. /usr/bin/dnfdragora"
 msgstr "z.B. /usr/bin/dnfdragora"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:183
 msgid "Custom System Updater Path"
 msgstr "Benutzerdefinierter System-Updater-Pfad"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:184
 msgid ""
@@ -1921,51 +1783,35 @@ msgstr ""
 "Vollständiger Pfad zu einem externen System-Updater, der anstelle des "
 "integrierten gestartet wird."
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:190
 msgid "Check Update Interval"
 msgstr "Aktualisierungsprüfungsintervall"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:191
 msgid "How often Miryu checks for available RPM updates in the background."
 msgstr ""
 "Wie oft Miryu im Hintergrund nach verfügbaren RPM-Aktualisierungen sucht."
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:194
 msgid "Show Tray Icon"
 msgstr "Tray-Symbol anzeigen"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:199
 msgid "Show a system tray icon while Miryu is running."
 msgstr "Ein System-Tray-Symbol anzeigen, während Miryu läuft."
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:201
 msgid "Dark Tray Icon"
 msgstr "Dunkles Tray-Symbol"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:204
 msgid "Use a dark tray icon for better visibility on light panels."
 msgstr ""
 "Ein dunkles Tray-Symbol für bessere Sichtbarkeit auf hellen Panels verwenden."
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:234
 msgid "Repository Management"
 msgstr "Repository-Verwaltung"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/SettingsDialog.cpp:239
 msgid ""
@@ -1982,708 +1828,132 @@ msgstr ""
 "Software-Repositories anzuzeigen, zu aktivieren oder zu deaktivieren und "
 "deren Metadaten zu aktualisieren."
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:310
-msgid "Install Selected (%1)"
-msgstr "Ausgewählte installieren (%1)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:324
-msgid "Update Selected (%1)"
-msgstr "Ausgewählte aktualisieren (%1)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:338
-msgid "Remove Selected (%1)"
-msgstr "Ausgewählte entfernen (%1)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:351
-msgid "Copy Selected Package Names"
-msgstr "Ausgewählte Paketnamen kopieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:372
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/QueueView.cpp:183
-msgid "Remove from Queue"
-msgstr "Aus Warteschlange entfernen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:384
-msgid "Queue for Reinstall"
-msgstr "Wiedereinrichtung in Warteschlange stellen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:390
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:414
-msgid "Queue for Downgrade"
-msgstr "Downgrade in Warteschlange stellen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:396
-msgid "Queue for Removal"
-msgstr "Zur Entfernungs-Warteschlange hinzufügen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:402
-msgid "Queue for Installation"
-msgstr "Zur Installations-Warteschlange hinzufügen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:408
-msgid "Queue for Update"
-msgstr "Zur Aktualisierungs-Warteschlange hinzufügen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/PackageView.cpp:423
-msgid "Copy Package Name"
-msgstr "Paketname kopieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:385
-msgid "Flatpak Apps"
-msgstr "Flatpak-Apps"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:389
-msgid "Flatpak Store"
-msgstr "Flatpak-Store"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:450
-msgid "Filter installed Flatpak apps..."
-msgstr "Installierte Flatpak-Apps filtern..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:457
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:797
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:996
-msgid "Update All"
-msgstr "Alle aktualisieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:462
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1177
-msgid "Uninstall Selected"
-msgstr "Ausgewählte deinstallieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:467
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1207
-msgid "Update Selected"
-msgstr "Ausgewählte aktualisieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:516
-msgid "Search Flatpak store..."
-msgstr "Flatpak-Store durchsuchen..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:522
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1014
-msgid "All Remotes"
-msgstr "Alle Remotes"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:527
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1155
-msgid "Install Selected"
-msgstr "Ausgewählte installieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:619
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:770
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:774
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:930
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1089
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1105
-msgid "Uninstall"
-msgstr "Deinstallieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:627
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:753
-msgid "Run"
-msgstr "Ausführen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:669
-msgid "Back to List"
-msgstr "Zurück zur Liste"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:707
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:973
-msgid "Loading installed Flatpak apps..."
-msgstr "Installierte Flatpak-Apps werden geladen..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:709
-msgid "Search the Flatpak store"
-msgstr "Flatpak-Store durchsuchen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:773
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:929
-msgid "Uninstall '%1' (%2)?"
-msgstr "'%1' (%2) deinstallieren?"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:796
-msgid "Update %1 Flatpak application?"
-msgstr "%1 Flatpak-Anwendungen aktualisieren?"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:815
-msgid "Searching for '%1'..."
-msgstr "Suche nach '%1'..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:870
-msgid "Application ID: %1"
-msgstr "Anwendungs-ID: %1"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:871
-msgid "Version: %1"
-msgstr "Version: %1"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:872
-msgid "Branch: %1"
-msgstr "Branch: %1"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:873
-msgid "Remote: %1"
-msgstr "Remote: %1"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:874
-msgid "Installation: %1"
-msgstr "Installation: %1"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:876
-msgid "Size: %1"
-msgstr "Größe: %1"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:916
-msgid "Installing..."
-msgstr "Wird installiert..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:935
-msgid "Uninstalling..."
-msgstr "Wird deinstalliert..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:948
-msgid "Updating..."
-msgstr "Wird aktualisiert..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:994
-msgid "Update All (%1)"
-msgstr "Alle aktualisieren (%1)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:999
-msgid "%1 app installed, %2 update available"
-msgstr "%1 Anwendungen installiert, %2 Update verfügbar"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1003
-msgid "%1 app installed"
-msgstr "%1 Anwendungen installiert"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1048
-msgid "Operation: %1"
-msgstr "Vorgang: %1"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1072
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:412
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:414
-msgid "Operation completed successfully."
-msgstr "Vorgang erfolgreich abgeschlossen."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1100
-msgid "Operation failed."
-msgstr "Vorgang fehlgeschlagen."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1110
-msgid "Flatpak Operation Error"
-msgstr "Flatpak-Vorgangsfehler"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1118
-msgid "Flatpak Error"
-msgstr "Flatpak-Fehler"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1154
-msgid "Install %1 selected Flatpak application?"
-msgstr "%1 ausgewählte Flatpak-Anwendungen installieren?"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1161
-msgid "Installing %1 application..."
-msgstr "%1 Anwendungen werden installiert..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1176
-msgid "Uninstall %1 selected Flatpak application?"
-msgstr "%1 ausgewählte Flatpak-Anwendungen deinstallieren?"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1183
-msgid "Uninstalling %1 application..."
-msgstr "%1 Anwendungen werden deinstalliert..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1201
-msgid "No upgradable applications selected."
-msgstr "Keine aktualisierbaren Anwendungen ausgewählt."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1206
-msgid "Update %1 selected Flatpak application?"
-msgstr "%1 ausgewählte Flatpak-Anwendungen aktualisieren?"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1213
-msgid "Updating %1 application..."
-msgstr "%1 Anwendungen werden aktualisiert..."
-
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:56
 msgid "Transaction Summary"
 msgstr "Transaktionsübersicht"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:67
 msgid "The following operations will be performed:"
 msgstr "Die folgenden Vorgänge werden ausgeführt:"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:73
 msgid "Warnings"
 msgstr "Warnungen"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:107
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:110
 msgid "Package"
 msgstr "Paket"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:108
 msgid "Freed Space"
 msgstr "Freigegebener Speicher"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:111
 msgid "Download Size"
 msgstr "Downloadgröße"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:111
 msgid "Install Size"
 msgstr "Installationsgröße"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:154
 msgid "Upgrade"
 msgstr "Aktualisieren"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:158
 msgid "Replace"
 msgstr "Ersetzen"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:159
 msgid "Obsolete"
 msgstr "Veraltet"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:280
 msgid "Total Freed Space"
 msgstr "Gesamter freigegebener Speicher"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:283
 msgid "Total Download Size"
 msgstr "Gesamte Downloadgröße"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:286
 msgid "Total Install Size"
 msgstr "Gesamtgröße der Installation"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:297
 msgid "Apply offline (on next reboot)"
 msgstr "Offline anwenden (beim nächsten Neustart)"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:52
+msgid "Daily"
+msgstr "Täglich"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:54
+msgid "Weekly"
+msgstr "Wöchentlich"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:95
-msgid "System-level package operations that require root privileges."
-msgstr "Systemweite Paketoperationen, die Root-Rechte erfordern."
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:56
+msgid "Monthly"
+msgstr "Monatlich"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:58
+msgid "Never"
+msgstr "Nie"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:60
+msgid "Update Notification Frequency"
+msgstr "Häufigkeit der Update-Benachrichtigung"
 
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:109
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:250
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:257
-msgid "Refresh DNF Cache"
-msgstr "DNF-Cache aktualisieren"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:110
-msgid "Run: dnf makecache --refresh"
-msgstr "Ausführen: dnf makecache --refresh"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:114
-msgid "Download and rebuild metadata cache for all enabled repositories."
-msgstr ""
-"Metadaten-Cache für alle aktivierten Repositories herunterladen und neu "
-"aufbauen."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:125
-msgid "Run: dnf distro-sync"
-msgstr "Ausführen: dnf distro-sync"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:129
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:67
 msgid ""
-"Synchronize all installed packages to the latest versions in repositories."
+"How often miryu-software-check may notify you about available updates.\n"
+"The change takes effect the next time the update checker runs (e.g. at "
+"login)."
 msgstr ""
-"Alle installierten Pakete auf die neuesten Versionen in den Repositories "
-"synchronisieren."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:165
-msgid "Fedora Version"
-msgstr "Fedora-Version"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:166
-msgid "Target Fedora release (VERSION_ID from /usr/lib/os-release)."
-msgstr "Ziel-Fedora-Release (VERSION_ID aus /usr/lib/os-release)."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:187
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:312
-msgid "Execute System Upgrade"
-msgstr "Systemaktualisierung ausführen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:188
-msgid "Run: dnf system-upgrade download --releasever=<version>"
-msgstr "Ausführen: dnf system-upgrade download --releasever=<version>"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:217
-msgid "Command Output"
-msgstr "Befehlsausgabe"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:243
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:263
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:283
-msgid "Another operation is still running."
-msgstr "Ein anderer Vorgang läuft noch."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:248
-msgid ""
-"This will download and rebuild the metadata cache for all enabled "
-"repositories. Continue?"
-msgstr ""
-"Dadurch wird der Metadaten-Cache für alle aktivierten Repositories "
-"heruntergeladen und neu aufgebaut. Fortfahren?"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:268
-msgid ""
-"This will synchronise all installed packages to the latest version available "
-"in the repositories. Continue?"
-msgstr ""
-"Dadurch werden alle installierten Pakete auf die neueste in den Repositories "
-"verfügbare Version synchronisiert. Fortfahren?"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:289
-msgid "Please enter a target Fedora version."
-msgstr "Bitte eine Ziel-Fedora-Version eingeben."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:297
-msgid ""
-"The target version (%1) is lower than the currently running version (%2). "
-"Downgrading the system is risky and may leave the system in an inconsistent "
-"state.\n"
-"\n"
-"Do you really want to continue?"
-msgstr ""
-"Die Zielversion (%1) ist niedriger als die aktuell laufende Version (%2). "
-"Ein Downgrade des Systems ist riskant und kann das System in einem "
-"inkonsistenten Zustand hinterlassen.\n"
-"\n"
-"Wirklich fortfahren?"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:302
-msgid "Version Downgrade Warning"
-msgstr "Warnung zur Versionsherabstufung"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:308
-msgid ""
-"This will download all packages needed to upgrade the system to Fedora %1. "
-"After the download completes you will need to reboot to apply the upgrade.\n"
-"\n"
-"Continue?"
-msgstr ""
-"Dadurch werden alle Pakete heruntergeladen, die zum Upgrade des Systems auf "
-"Fedora %1 erforderlich sind. Nach Abschluss des Downloads müssen Sie neu "
-"starten, um das Upgrade anzuwenden.\n"
-"\n"
-"Fortfahren?"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:313
-msgid "Download"
-msgstr "Herunterladen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:322
-msgid "System Upgrade (releasever=%1)"
-msgstr "System-Upgrade (releasever=%1)"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:337
-msgid ""
-"Warning: Target version %1 is lower than current version %2. This is a "
-"version downgrade and carries risks."
-msgstr ""
-"Warnung: Zielversion %1 ist niedriger als die aktuelle Version %2. Dies ist "
-"ein Versions-Downgrade und birgt Risiken."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:384
-msgid "Executing: %1 ..."
-msgstr "Wird ausgeführt: %1 ..."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:391
-msgid "[started]"
-msgstr "[gestartet]"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:413
-msgid "[completed successfully]"
-msgstr "[erfolgreich abgeschlossen]"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:418
-msgid "Operation cancelled or authentication failed."
-msgstr "Vorgang abgebrochen oder Authentifizierung fehlgeschlagen."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:419
-msgid "[cancelled or authentication failed (exit %1)]"
-msgstr "[abgebrochen oder Authentifizierung fehlgeschlagen (Exit %1)]"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:421
-msgid "Operation failed (exit code %1)."
-msgstr "Vorgang fehlgeschlagen (Exit-Code %1)."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:422
-msgid "[failed with exit code %1]"
-msgstr "[fehlgeschlagen mit Exit-Code %1]"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:424
-msgid "Operation failed with exit code %1. Check the output below for details."
-msgstr ""
-"Vorgang mit Exit-Code %1 fehlgeschlagen. Siehe Ausgabe unten für Details."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:425
-msgid "Operation Failed"
-msgstr "Vorgang fehlgeschlagen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:433
-msgid "Failed to start command: %1"
-msgstr "Befehl konnte nicht gestartet werden: %1"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:434
-msgid "[error: %1]"
-msgstr "[Fehler: %1]"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:436
-msgid ""
-"Failed to start command.\n"
-"%1\n"
-"\n"
-"Make sure pkexec (polkit) is installed and available."
-msgstr ""
-"Befehl konnte nicht gestartet werden.\n"
-"%1\n"
-"\n"
-"Stellen Sie sicher, dass pkexec (polkit) installiert und verfügbar ist."
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:438
-msgid "Command Start Failed"
-msgstr "Befehlsstart fehlgeschlagen"
-
-
+"Wie oft Sie miryu-software-check über verfügbare Aktualisierungen "
+"informieren darf.\n"
+"Die Änderung wird beim nächsten Lauf des Aktualisierungsprüfers wirksam (z. "
+"B. bei der Anmeldung)."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/checker/NotifierItem.cpp:21
+msgid "Updates Available"
+msgstr "Aktualisierungen verfügbar"
+
+# System tray entry of miryu-software-check + "--update" option
+#: /workspace/miryu-software-center/miryu-software-center-main/checker/NotifierItem.cpp:38
+msgid "Open Miryu Software Center"
+msgstr "Miryu Software Center öffnen"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/checker/NotifierItem.cpp:47
+msgid "Start Updates"
+msgstr "Aktualisierungen starten"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/checker/NotifierItem.cpp:64
+msgid "Quit"
+msgstr "Beenden"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/UpdateCheckNotifier.cpp:260
 msgid "%1 RPM package(s) and/or %2 Flatpak package(s) available for update"
 msgstr ""
 "%1 RPM-Paket(e) und/oder %2 Flatpak-Paket(e) können aktualisiert werden"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/UpdateCheckNotifier.cpp:263
 msgid "%1 RPM package(s) available for update"
 msgstr "%1 RPM-Paket(e) können aktualisiert werden"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/UpdateCheckNotifier.cpp:265
 msgid "%1 Flatpak package(s) available for update"
 msgstr "%1 Flatpak-Paket(e) können aktualisiert werden"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/UpdateCheckNotifier.cpp:292
 msgid "View Updates"
 msgstr "Aktualisierungen anzeigen"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/main.cpp:47
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/main.cpp:54
 msgid "Miryu Update Checker"
 msgstr "Miryu-Aktualisierungsprüfung"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/main.cpp:56
 msgid "Checks for available RPM and Flatpak updates and notifies the user."
@@ -2691,145 +1961,76 @@ msgstr ""
 "Prüft auf verfügbare RPM- und Flatpak-Aktualisierungen und benachrichtigt "
 "den Benutzer."
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/main.cpp:66
 msgid "Delay checking for updates by N seconds"
 msgstr "Die Prüfung auf Aktualisierungen um N Sekunden verzögern"
-
-
 
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/main.cpp:73
 msgid "Check immediately and ignore the configured notification interval"
 msgstr ""
 "Sofort prüfen und das konfigurierte Benachrichtigungsintervall ignorieren"
 
-
-
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/main.cpp:78
 msgid "Replace an existing instance"
 msgstr "Eine bereits laufende Instanz ersetzen"
 
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/checker/NotifierItem.cpp:21
-msgid "Updates Available"
-msgstr "Aktualisierungen verfügbar"
-
-
-
-# System tray entry of miryu-software-check + "--update" option
-#: /workspace/miryu-software-center/miryu-software-center-main/checker/NotifierItem.cpp:38
-msgid "Open Miryu Software Center"
-msgstr "Miryu Software Center öffnen"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/checker/NotifierItem.cpp:47
-msgid "Start Updates"
-msgstr "Aktualisierungen starten"
-
-
-
-#: /workspace/miryu-software-center/miryu-software-center-main/checker/NotifierItem.cpp:64
-msgid "Quit"
-msgstr "Beenden"
-
-
-
 #~ msgid "Download complete"
 #~ msgstr "Download abgeschlossen"
-
-
 
 #~ msgid "Verifying"
 #~ msgstr "Wird überprüft"
 
-
-
 #~ msgid "Installing packages..."
 #~ msgstr "Pakete werden installiert..."
 
-
-
 #~ msgid "Downloading"
 #~ msgstr "Wird heruntergeladen"
-
-
 
 #~ msgid "%1 update is available for your system."
 #~ msgid_plural "%1 updates are available for your system."
 #~ msgstr[0] "%1 Aktualisierung ist für Ihr System verfügbar."
 #~ msgstr[1] "%1 Aktualisierungen sind für Ihr System verfügbar."
 
-
-
 #~ msgid "Resolve Dependencies"
 #~ msgstr "Abhängigkeiten auflösen"
-
-
 
 #~ msgid "Offline update"
 #~ msgstr "Offline-Aktualisierung"
 
-
-
 #~ msgid "Download packages now, install on next reboot"
 #~ msgstr "Pakete jetzt herunterladen, beim nächsten Neustart installieren"
-
-
 
 #~ msgid "Miryu"
 #~ msgstr "Miryu"
 
-
-
 #~ msgid "Configure Miryu..."
 #~ msgstr "Miryu einrichten..."
-
-
 
 #~ msgid "Find"
 #~ msgstr "Suchen"
 
-
-
 #~ msgid "Metadata refreshed successfully."
 #~ msgstr "Metadaten erfolgreich aktualisiert."
-
-
 
 #~ msgid "System Upgrade Error"
 #~ msgstr "Systemaktualisierungsfehler"
 
-
-
 #~ msgid "Downloading %1: %2 MB / %3 MB"
 #~ msgstr "Download %1: %2 MB / %3 MB"
-
-
 
 #~ msgid "Downloading %1..."
 #~ msgstr "Download %1..."
 
-
-
 #~ msgid "Update Notifications"
 #~ msgstr "Aktualisierungsbenachrichtigungen"
-
-
 
 #~ msgid "Show a desktop notification when updates become available."
 #~ msgstr ""
 #~ "Eine Desktop-Benachrichtigung anzeigen, wenn Aktualisierungen verfügbar "
 #~ "werden."
 
-
-
 #~ msgid "Size"
 #~ msgstr "Größe"
-
-
 
 #~ msgid ""
 #~ "Cannot remove protected packages or critical dependencies.\n"
@@ -2839,16 +2040,12 @@ msgstr "Beenden"
 #~ "werden.\n"
 #~ "\n"
 
-
-
 #~ msgid ""
 #~ "Distribution sync will synchronize all installed packages to the versions "
 #~ "available in the repositories. "
 #~ msgstr ""
 #~ "Die Distributionssynchronisierung synchronisiert alle installierten "
 #~ "Pakete auf die in den Repositorien verfügbaren Versionen. "
-
-
 
 #~ msgid ""
 #~ "Failed to connect to dnf5daemon-server.\n"
@@ -2857,16 +2054,12 @@ msgstr "Beenden"
 #~ "Verbindung zu dnf5daemon-server fehlgeschlagen.\n"
 #~ "\n"
 
-
-
 #~ msgid ""
 #~ "Failed to launch the Linglong Store.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "Linglong Store konnte nicht gestartet werden.\n"
 #~ "\n"
-
-
 
 #~ msgid ""
 #~ "Failed to start command.\n"
@@ -2877,57 +2070,39 @@ msgstr "Beenden"
 #~ "%1\n"
 #~ "\n"
 
-
-
 #~ msgid "Repository enable / disable management is performed from the main "
 #~ msgstr ""
 #~ "Das Aktivieren/Deaktivieren von Repositorien erfolgt über die Haupt "
-
-
 
 #~ msgid "The connection to the system D-Bus / dnf5daemon-server was lost"
 #~ msgstr ""
 #~ "Die Verbindung zum System-D-Bus / dnf5daemon-server wurde unterbrochen"
 
-
-
 #~ msgid "The target version (%1) is lower than the current version (%2). "
 #~ msgstr "Die Zielversion (%1) ist niedriger als die aktuelle Version (%2). "
 
-
-
 #~ msgid "The target version (%1) is lower than the currently running "
 #~ msgstr "Die Zielversion (%1) ist niedriger als die aktuell ausgeführte "
-
-
 
 #~ msgid "This will download all packages needed to upgrade the system to "
 #~ msgstr ""
 #~ "Dies lädt alle Pakete herunter, die zum Upgrade des Systems auf  "
 #~ "erforderlich sind "
 
-
-
 #~ msgid "This will download and rebuild the metadata cache for all enabled "
 #~ msgstr ""
 #~ "Dies lädt den Metadaten-Cache für alle aktivierten  herunter und erstellt "
 #~ "ihn neu "
 
-
-
 #~ msgid "This will synchronise all installed packages to the latest version "
 #~ msgstr ""
 #~ "Dies synchronisiert alle installierten Pakete auf die neueste Version "
-
-
 
 #~ msgid ""
 #~ "You have installed software packages that require a computer restart. "
 #~ msgstr ""
 #~ "Sie haben Softwarepakete installiert, die einen Neustart des Computers "
 #~ "erfordern. "
-
-
 
 #~ msgid "Failed to send transaction request to dnf5daemon."
 #~ msgstr "Senden der Transaktionsanfrage an dnf5daemon fehlgeschlagen."

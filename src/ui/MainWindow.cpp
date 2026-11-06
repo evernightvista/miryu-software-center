@@ -374,7 +374,29 @@ void MainWindow::setupUI()
         // the relevant change information, so hide the description column
         // to keep the rows compact.
         m_updatesView->setShowSummary(false);
-        layout->addWidget(m_updatesView, 1);
+
+        m_updatesStack = new QStackedWidget;
+        m_updatesStack->addWidget(m_updatesView);
+
+        auto *emptyUpdatesPage = new QWidget;
+        auto *emptyLayout = new QVBoxLayout(emptyUpdatesPage);
+        emptyLayout->setContentsMargins(24, 24, 24, 24);
+        emptyLayout->setSpacing(12);
+        emptyLayout->addStretch();
+
+        auto *emptyIcon = new QLabel;
+        emptyIcon->setAlignment(Qt::AlignCenter);
+        emptyIcon->setPixmap(QIcon::fromTheme(QStringLiteral("emblem-checked")).pixmap(96, 96));
+        emptyLayout->addWidget(emptyIcon);
+
+        auto *emptyText = new QLabel(i18n("You have installed all updates"));
+        emptyText->setAlignment(Qt::AlignCenter);
+        emptyText->setWordWrap(true);
+        emptyLayout->addWidget(emptyText);
+        emptyLayout->addStretch();
+
+        m_updatesStack->addWidget(emptyUpdatesPage);
+        layout->addWidget(m_updatesStack, 1);
 
         connect(m_updatesView, &PackageView::packageSelected, this, &MainWindow::onPackageSelected);
         connect(m_updatesView, &PackageView::queuePackage, this, &MainWindow::onQueuePackage);
@@ -2385,7 +2407,12 @@ void MainWindow::onUpdatesLoaded(const QList<Package> &updates)
     auto *model = qobject_cast<PackageModel*>(m_updatesView->model());
     if (model)
         model->setPackages(updates);
-    m_statusLabel->setText(i18np("%1 update available", "%1 updates available", updates.size()));
+
+    m_updatesStack->setCurrentIndex(updates.isEmpty() ? 1 : 0);
+    if (updates.isEmpty())
+        m_statusLabel->clear();
+    else
+        m_statusLabel->setText(i18np("%1 update available", "%1 updates available", updates.size()));
 }
 
 void MainWindow::onTransactionProgress(const QString &message, int percent)

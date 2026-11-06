@@ -235,6 +235,7 @@ private:
     // Updates page
     QWidget *m_updatesPage;
     PackageView *m_updatesView;
+    QStackedWidget *m_updatesStack;
     QPushButton *m_updatesApplyButton = nullptr; // Updates page "Apply" — same behaviour as m_applyButton
     QPushButton *m_selectAllUpdatesButton = nullptr;   // Updates page "Select All"
     QPushButton *m_deselectAllUpdatesButton = nullptr; // Updates page "Deselect All"
