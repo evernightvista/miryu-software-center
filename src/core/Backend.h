@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <atomic>
 #include <QFutureWatcher>
 #include <QHash>
 #include <QString>
@@ -43,11 +44,9 @@ public:
     // packages). When refreshMetadata is false the daemon reuses its cache
     // and only re-downloads repos whose metadata has expired per
     // metadata_expire, avoiding a heavy metadata load on every periodic
-    // tick. Per the desired behaviour the software source is refreshed
-    // ONLY at application startup (UpdateChecker calls loadUpdates(true))
-    // and the explicit Refresh action. Periodic checks, page switches and
-    // post-transaction reloads pass false so they reuse the cached
-    // metadata.
+    // tick. A full refresh happens only at startup when the daemon was not
+    // already running, or after the explicit Refresh action. Periodic checks,
+    // page switches and cached reloads pass false.
     void loadUpdates(bool refreshMetadata = false);
 
     // Sync operations (call from worker threads)
@@ -74,8 +73,13 @@ Q_SIGNALS:
     // transaction phase it is the overall percent across all transaction
     // actions (completed actions + fraction of the current action). The
     // phase string identifies which phase the dialog should be describing
-    // ("download" / "install" / "prepare" / "verify").
-    void overallProgress(int percent, const QString &phase, const QString &message);
+    // ("download" / "install" / "prepare" / "transaction-prepare" / "verify").
+    // detail carries the current package, action, script or per-item percent.
+    void overallProgress(int percent, const QString &phase, const QString &message,
+                         const QString &detail);
+    void repoKeyImportRequest(const QString &keyId, const QStringList &userIds,
+                              const QString &keyFingerprint, const QString &keyUrl,
+                              qint64 timestamp);
     void errorOccurred(const QString &error);
     void initialized();
 
@@ -85,20 +89,25 @@ private:
     PackageCache *m_cache;
     bool m_initialized = false;
     QString m_lastError;
+    // Written by update workers and read on the GUI thread when forwarding
+    // client errors. This suppresses only error popups, never progress signals.
+    std::atomic<int> m_backgroundUpdateChecks{0};
     // Maps dnf5daemon download ids to the package description captured in
     // downloadAddNew, so downloadProgress(id, ...) can show which package is
     // currently being downloaded (the progress signal carries only the id).
     QHash<QString, QString> m_downloadDescs;
 
     // --- Aggregated progress state -------------------------------------
-    // Download phase: a running table of every active download keyed by the
-    // dnf5daemon download id, plus the rolling byte totals so the overall
+    // Download phase: a running table of every queued download (including
+    // completed entries) keyed by id, plus rolling byte totals so the overall
     // percent can be computed in O(1) on every progress tick instead of
     // walking the hash.
     struct DownloadStat { qint64 total = 0; qint64 downloaded = 0; };
     QHash<QString, DownloadStat> m_activeDownloads;
     qint64 m_downloadTotalBytes = 0;
     qint64 m_downloadDownloadedBytes = 0;
+    QString m_progressDetail;
+    QString m_currentActionText;
 
     // Transaction (install) phase: the daemon reports the total number of
     // actions in transaction_before_begin and then a per-action progress
@@ -111,6 +120,10 @@ private:
     quint64 m_transactionVerifyTotal = 0;
     quint64 m_transactionVerifyProcessed = 0;
     bool m_inVerifyPhase = false;
+    quint64 m_transactionPrepareTotal = 0;
+    quint64 m_transactionPrepareProcessed = 0;
+    bool m_inTransactionPreparePhase = false;
+    bool m_hasTransactionElemProgress = false;
     // True once transaction_before_begin fires — used to switch the dialog
     // from the download phase to the install phase.
     bool m_inTransactionPhase = false;

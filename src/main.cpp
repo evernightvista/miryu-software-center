@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     app.setApplicationName(QStringLiteral("miryu"));
     app.setOrganizationName(QStringLiteral("miryu"));
     app.setApplicationDisplayName(QStringLiteral("Miryu Software Center"));
-    app.setApplicationVersion(QStringLiteral("45.0.0"));
+    app.setApplicationVersion(QStringLiteral("45.0.1"));
     app.setDesktopFileName(QStringLiteral("org.miryugaming.PackageManager"));
 
     // Set the translation domain so i18n() calls find the compiled .mo files.
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     KAboutData aboutData(
         QStringLiteral("miryu"),
         i18n("Miryu Software Center"),
-        QStringLiteral("45.0.0"),
+        QStringLiteral("45.0.1"),
         i18n("A modern RPM package manager powered by dnf5daemon, built with Qt6 and KDE Frameworks 6."),
         KAboutLicense::GPL_V3,
         QStringLiteral("© 2027 KairikiFedora © 2027 MiryuGaming"),

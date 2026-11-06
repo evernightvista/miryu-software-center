@@ -115,15 +115,10 @@ static void runRepoEnableAsync(RepoView *view, Backend *backend,
         const bool ok = watcher->result();
         watcher->deleteLater();
         if (ok) {
-            // Do NOT refresh the software source here: per the desired
-            // behaviour repository metadata is refreshed only at
-            // application startup and when the user applies an upgrade
-            // queue. repoEnable() already wrote the new enabled state
-            // to the repo config; resetSession() drops the daemon's
-            // stale in-memory sack so the subsequent repoList()
-            // re-reads the updated configuration. The next package
-            // query reloads metadata from disk on demand instead of
-            // forcing an immediate (and possibly slow) re-download.
+            // Do NOT force a full metadata refresh here. repoEnable() already
+            // wrote the new state; resetSession() drops the stale in-memory
+            // sack so the next query re-reads the configuration and loads
+            // metadata on demand instead of forcing an immediate re-download.
             backend->client()->resetSession();
             backend->loadRepositories();
             Q_EMIT view->repositoriesChanged();

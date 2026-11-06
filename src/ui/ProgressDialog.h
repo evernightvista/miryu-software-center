@@ -14,11 +14,11 @@ class ProgressDialog : public QDialog
 public:
     explicit ProgressDialog(QWidget *parent = nullptr);
 
-    // Overall progress API. The dialog now shows ONE aggregated progress
-    // bar plus a phase message; per-package detail is no longer displayed.
-    // MainWindow::onOverallProgress() is the single entry point that drives
-    // both the message and the percent.
+    // The main label describes the current phase, while the detail label
+    // mirrors yumex-ng's subtitle with the current package/action and its
+    // own progress. MainWindow::onOverallProgress() drives all three.
     void setMessage(const QString &message);
+    void setDetail(const QString &detail);
     void setProgress(int percent);
     // Switch the bar between indeterminate ("busy") mode, used during the
     // "prepare" phase when no percent is reported yet, and the determinate
@@ -37,6 +37,7 @@ public:
 
 private:
     QLabel *m_messageLabel;
+    QLabel *m_detailLabel;
     QProgressBar *m_progressBar;
 };
 

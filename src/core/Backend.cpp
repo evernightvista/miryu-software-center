@@ -2,12 +2,38 @@
 
 #include <QtConcurrent>
 #include <QDebug>
+#include <QMetaObject>
 #include <QMetaType>
 #include <QStringList>
+#include <QThread>
 
 #include <KLocalizedString>
 
 namespace Miryu {
+
+namespace {
+
+QString scriptTypeName(uint type)
+{
+    switch (type) {
+    case 1:  return QStringLiteral("%pre");
+    case 2:  return QStringLiteral("%post");
+    case 3:  return QStringLiteral("%preun");
+    case 4:  return QStringLiteral("%postun");
+    case 5:  return QStringLiteral("%pretrans");
+    case 6:  return QStringLiteral("%posttrans");
+    case 7:  return QStringLiteral("%triggerprein");
+    case 8:  return QStringLiteral("%triggerin");
+    case 9:  return QStringLiteral("%triggerun");
+    case 10: return QStringLiteral("%triggerpostun");
+    case 11: return QStringLiteral("sysusers");
+    case 12: return QStringLiteral("%preuntrans");
+    case 13: return QStringLiteral("%postuntrans");
+    default: return i18n("scriptlet %1", type);
+    }
+}
+
+} // namespace
 
 Backend::Backend(QObject *parent)
     : QObject(parent)
@@ -49,150 +75,261 @@ Backend::~Backend()
 void Backend::connectClientSignals()
 {
     connect(m_client, &Dnf5DaemonClient::downloadAddNew, this, [this](const QString &id, const QString &desc, qint64 total) {
-        // Record the package description (desc) keyed by download id so the
-        // subsequent downloadProgress(id, ...) signals can surface which
-        // package is currently being downloaded, not just "Downloading".
+        total = qMax<qint64>(0, total);
         m_downloadDescs.insert(id, desc);
-        // Track the new download for the overall-percent aggregation.
-        if (!m_activeDownloads.contains(id)) {
+        auto it = m_activeDownloads.find(id);
+        if (it == m_activeDownloads.end()) {
             m_activeDownloads.insert(id, {total, 0});
             m_downloadTotalBytes += total;
+        } else {
+            m_downloadTotalBytes += total - it->total;
+            it->total = total;
         }
-        // Entering the download phase (download_add_new only fires while
-        // downloading packages). Make sure the dialog reflects that even
-        // if no transaction_before_begin has been received yet.
         m_inTransactionPhase = false;
+        m_progressDetail = i18n("Downloading: %1 (0%)", desc);
         Q_EMIT downloadProgress(desc, total, 0);
         emitOverallProgress();
     });
     connect(m_client, &Dnf5DaemonClient::downloadProgress, this, [this](const QString &id, qint64 total, qint64 downloaded) {
-        // Resolve the download id back to the package description captured in
-        // downloadAddNew; if it is missing (e.g. a progress signal arrived
-        // before add_new), fall back to the id itself.
         const QString desc = m_downloadDescs.value(id, id);
-        // Keep the rolling byte totals in sync so the overall percent can be
-        // computed without walking the whole hash on every tick.
+        total = qMax<qint64>(0, total);
+        downloaded = qMax<qint64>(0, downloaded);
+        if (total > 0)
+            downloaded = qMin(downloaded, total);
+
         auto it = m_activeDownloads.find(id);
-        if (it != m_activeDownloads.end()) {
-            // The daemon may revise the total mid-download; subtract the old
-            // contribution first and re-add the new one so the totals never
-            // drift.
-            m_downloadDownloadedBytes -= it->downloaded;
-            m_downloadTotalBytes -= it->total;
+        if (it == m_activeDownloads.end()) {
+            it = m_activeDownloads.insert(id, {total, downloaded});
+            m_downloadTotalBytes += total;
+            m_downloadDownloadedBytes += downloaded;
+        } else {
+            m_downloadDownloadedBytes += downloaded - it->downloaded;
+            m_downloadTotalBytes += total - it->total;
             it->total = total;
             it->downloaded = downloaded;
-            m_downloadDownloadedBytes += downloaded;
-            m_downloadTotalBytes += total;
         }
-        // The dialog / status bar compose the full "Downloading <pkg> +
-        // percent" display from this signal themselves (MainWindow::
-        // onDownloadProgress), so there is a single source of truth for which
-        // package is currently being downloaded — see yumex-ng, which
-        // re-asserts the package name on every download_progress signal.
+
+        const int percent = total > 0 ? static_cast<int>(downloaded * 100 / total) : 0;
+        m_progressDetail = i18n("Downloading: %1 (%2%)", desc, percent);
         Q_EMIT downloadProgress(desc, total, downloaded);
         emitOverallProgress();
     });
-    connect(m_client, &Dnf5DaemonClient::downloadEnd, this, [this](const QString &id, uint status, const QString &) {
-        m_downloadDescs.remove(id);
-        // Drop the finished download from the aggregation table. Its bytes
-        // are subtracted from the running totals so the next progress tick
-        // reports the right overall percent for the remaining downloads.
+    connect(m_client, &Dnf5DaemonClient::downloadEnd, this, [this](const QString &id, uint status, const QString &message) {
+        const QString desc = m_downloadDescs.value(id, id);
         auto it = m_activeDownloads.find(id);
-        if (it != m_activeDownloads.end()) {
+        if (it == m_activeDownloads.end())
+            it = m_activeDownloads.insert(id, {0, 0});
+
+        // Keep completed items in the queue, as yumex-ng does. Removing them
+        // makes the aggregate byte total and percent move backwards and can
+        // briefly flip the dialog back to "Preparing" between two downloads.
+        if (status == 0 || status == 1) {
             m_downloadDownloadedBytes -= it->downloaded;
             m_downloadTotalBytes -= it->total;
-            m_activeDownloads.erase(it);
+            it->total = qMax<qint64>(1, it->total);
+            it->downloaded = it->total;
+            m_downloadDownloadedBytes += it->downloaded;
+            m_downloadTotalBytes += it->total;
+            m_progressDetail = status == 1
+                ? i18n("Already downloaded: %1 (100%)", desc)
+                : i18n("Downloaded: %1 (100%)", desc);
+        } else {
+            m_progressDetail = message.isEmpty()
+                ? i18n("Download failed: %1", desc)
+                : i18n("Download failed: %1 (%2)", desc, message);
         }
-        if (status == 0)
-            Q_EMIT transactionProgress(i18n("Download complete"), 100);
+        Q_EMIT transactionProgress(m_progressDetail, status == 2 ? -1 : 100);
+        emitOverallProgress();
+    });
+    connect(m_client, &Dnf5DaemonClient::downloadMirrorFailure, this,
+            [this](const QString &id, const QString &message, const QString &url,
+                   const QString &metadata) {
+        const QString desc = m_downloadDescs.value(id, id);
+        m_progressDetail = i18n("Mirror failed for %1: %2 (%3)", desc, message, url);
+        if (!metadata.isEmpty())
+            m_progressDetail = i18n("%1; metadata: %2", m_progressDetail, metadata);
+        Q_EMIT transactionProgress(m_progressDetail, -1);
         emitOverallProgress();
     });
 
     connect(m_client, &Dnf5DaemonClient::transactionActionStart, this, [this](const QString &nevra, uint action, quint64 total) {
-        Q_UNUSED(total)
-        // Reset the per-action counters; transactionActionProgress will fill
-        // them in. The action's total is also reported in start (same value
-        // as the subsequent progress signals) so capture it once here.
         m_transactionCurrentActionProcessed = 0;
         m_transactionCurrentActionTotal = total;
+        m_inTransactionPhase = true;
+        m_inTransactionPreparePhase = false;
         m_inVerifyPhase = false;
-        QString actionStr = actionToString(static_cast<TransactionActionType>(action));
-        Q_EMIT transactionProgress(i18n("%1 %2", actionStr, nevra), 0);
+        const QString actionStr = actionToString(static_cast<TransactionActionType>(action));
+        m_currentActionText = i18n("%1 %2", actionStr, nevra);
+        m_progressDetail = i18n("%1 (0%)", m_currentActionText);
+        Q_EMIT transactionProgress(m_currentActionText, 0);
         emitOverallProgress();
     });
     connect(m_client, &Dnf5DaemonClient::transactionActionProgress, this, [this](const QString &nevra, quint64 processed, quint64 total) {
         m_transactionCurrentActionProcessed = processed;
         m_transactionCurrentActionTotal = total;
-        int percent = total > 0 ? static_cast<int>(processed * 100 / total) : 0;
-        Q_EMIT transactionProgress(i18n("Processing %1", nevra), percent);
+        const int percent = total > 0 ? static_cast<int>(processed * 100 / total) : 0;
+        if (m_currentActionText.isEmpty())
+            m_currentActionText = i18n("Processing %1", nevra);
+        m_progressDetail = i18n("%1 (%2%)", m_currentActionText, percent);
+        Q_EMIT transactionProgress(m_currentActionText, percent);
         emitOverallProgress();
     });
     connect(m_client, &Dnf5DaemonClient::transactionActionStop, this, [this](const QString &nevra, quint64 total) {
-        Q_UNUSED(nevra)
-        Q_UNUSED(total)
-        // The action is done; bump the completed counter and reset the
-        // per-action progress so the next action starts from 0%.
-        if (m_transactionTotalActions > 0
-            && m_transactionActionsCompleted < m_transactionTotalActions)
-            ++m_transactionActionsCompleted;
+        if (m_currentActionText.isEmpty())
+            m_currentActionText = i18n("Processing %1", nevra);
+        m_transactionCurrentActionProcessed = total;
+        if (m_transactionCurrentActionTotal == 0)
+            m_transactionCurrentActionTotal = total;
+        m_progressDetail = i18n("%1 (100%)", m_currentActionText);
+
+        // transaction_elem_progress supplies an authoritative absolute item
+        // count on newer daemons. Without it, action_stop is the fallback.
+        if (!m_hasTransactionElemProgress) {
+            if (m_transactionTotalActions > 0
+                && m_transactionActionsCompleted < m_transactionTotalActions)
+                ++m_transactionActionsCompleted;
+            m_transactionCurrentActionProcessed = 0;
+            m_transactionCurrentActionTotal = 0;
+        }
+        Q_EMIT transactionProgress(m_currentActionText, 100);
+        emitOverallProgress();
+    });
+    connect(m_client, &Dnf5DaemonClient::transactionElemProgress, this,
+            [this](const QString &, quint64 processed, quint64 total) {
+        m_hasTransactionElemProgress = true;
+        m_inTransactionPhase = true;
+        m_inTransactionPreparePhase = false;
+        m_inVerifyPhase = false;
+        if (total > 0)
+            m_transactionTotalActions = total;
+        m_transactionActionsCompleted = processed;
+        // The daemon emits this immediately BEFORE the next item. Drop the
+        // previous item's completed fraction here; otherwise the interval
+        // until transaction_action_start would count that item twice.
         m_transactionCurrentActionProcessed = 0;
         m_transactionCurrentActionTotal = 0;
         emitOverallProgress();
     });
     connect(m_client, &Dnf5DaemonClient::transactionVerifyStart, this, [this](quint64 total) {
-        // Verification is a sub-phase inside the transaction phase; track it
-        // separately so the overall percent keeps advancing through verify.
         m_inVerifyPhase = true;
+        m_inTransactionPreparePhase = false;
         m_transactionVerifyTotal = total;
         m_transactionVerifyProcessed = 0;
+        m_progressDetail = i18n("Verifying package files (0%)");
         Q_EMIT transactionProgress(i18n("Verifying Packages"), 0);
         emitOverallProgress();
     });
     connect(m_client, &Dnf5DaemonClient::transactionVerifyProgress, this, [this](quint64 processed, quint64 total) {
         m_transactionVerifyTotal = total;
         m_transactionVerifyProcessed = processed;
-        int percent = total > 0 ? static_cast<int>(processed * 100 / total) : 0;
-        Q_EMIT transactionProgress(i18n("Verifying"), percent);
+        const int percent = total > 0 ? static_cast<int>(processed * 100 / total) : 0;
+        m_progressDetail = i18n("Verifying package files (%1%)", percent);
+        Q_EMIT transactionProgress(i18n("Verifying package files"), percent);
         emitOverallProgress();
     });
     connect(m_client, &Dnf5DaemonClient::transactionVerifyStop, this, [this]() {
         m_inVerifyPhase = false;
         m_transactionVerifyProcessed = m_transactionVerifyTotal;
+        m_progressDetail = i18n("Package verification completed");
+        Q_EMIT transactionProgress(m_progressDetail, 100);
         emitOverallProgress();
     });
     connect(m_client, &Dnf5DaemonClient::transactionBeforeBegin, this, [this](quint64 total) {
-        // The transaction (install) phase begins. Reset the action counters
-        // and remember the total so overall percent = completed / total.
         m_inTransactionPhase = true;
         m_inVerifyPhase = false;
+        m_inTransactionPreparePhase = false;
+        m_hasTransactionElemProgress = false;
         m_transactionTotalActions = total;
         m_transactionActionsCompleted = 0;
         m_transactionCurrentActionProcessed = 0;
         m_transactionCurrentActionTotal = 0;
+        m_currentActionText.clear();
+        m_progressDetail = i18n("Preparing to apply %1 transaction items", total);
         Q_EMIT transactionProgress(i18n("Applying Transaction"), 0);
         emitOverallProgress();
     });
-    connect(m_client, &Dnf5DaemonClient::transactionAfterComplete, this, [this](bool) {
-        // Clear the aggregation state so the next transaction starts fresh.
-        resetProgressState();
+    connect(m_client, &Dnf5DaemonClient::transactionPrepareStart, this, [this](quint64 total) {
+        m_inTransactionPhase = true;
+        m_inTransactionPreparePhase = true;
+        m_inVerifyPhase = false;
+        m_transactionPrepareTotal = total;
+        m_transactionPrepareProcessed = 0;
+        m_progressDetail = i18n("Preparing transaction packages (0%)");
+        Q_EMIT transactionProgress(i18n("Preparing transaction packages"), 0);
+        emitOverallProgress();
     });
-    connect(m_client, &Dnf5DaemonClient::transactionScriptStart, this, [this](const QString &, uint) {
-        Q_EMIT transactionProgress(i18n("Running scripts"), 0);
+    connect(m_client, &Dnf5DaemonClient::transactionPrepareProgress, this,
+            [this](quint64 processed, quint64 total) {
+        m_transactionPrepareProcessed = processed;
+        m_transactionPrepareTotal = total;
+        const int percent = total > 0 ? static_cast<int>(processed * 100 / total) : 0;
+        m_progressDetail = i18n("Preparing transaction packages (%1%)", percent);
+        Q_EMIT transactionProgress(i18n("Preparing transaction packages"), percent);
+        emitOverallProgress();
+    });
+    connect(m_client, &Dnf5DaemonClient::transactionPrepareStop, this, [this](quint64 total) {
+        m_inTransactionPreparePhase = false;
+        m_transactionPrepareTotal = total;
+        m_transactionPrepareProcessed = total;
+        m_progressDetail = i18n("Transaction packages prepared");
+        Q_EMIT transactionProgress(m_progressDetail, 100);
+        emitOverallProgress();
+    });
+    connect(m_client, &Dnf5DaemonClient::transactionAfterComplete, this, [this](bool success) {
+        m_inVerifyPhase = false;
+        m_inTransactionPreparePhase = false;
+        if (success && m_transactionTotalActions > 0)
+            m_transactionActionsCompleted = m_transactionTotalActions;
+        m_progressDetail = success ? i18n("Transaction completed successfully")
+                                   : i18n("Transaction failed");
+        const int percent = success ? 100 : computeOverallTransactionPercent();
+        Q_EMIT transactionProgress(m_progressDetail, percent);
+        Q_EMIT overallProgress(percent, QStringLiteral("complete"),
+                               success ? i18n("Transaction completed") : i18n("Transaction failed"),
+                               m_progressDetail);
+    });
+    connect(m_client, &Dnf5DaemonClient::transactionScriptStart, this,
+            [this](const QString &nevra, uint type) {
+        m_progressDetail = i18n("Running script %1: %2", scriptTypeName(type), nevra);
+        Q_EMIT transactionProgress(m_progressDetail, 0);
+        emitOverallProgress();
+    });
+    connect(m_client, &Dnf5DaemonClient::transactionScriptStop, this,
+            [this](const QString &nevra, uint type, quint64) {
+        m_progressDetail = i18n("Script %1 completed: %2", scriptTypeName(type), nevra);
+        Q_EMIT transactionProgress(m_progressDetail, 100);
+        emitOverallProgress();
+    });
+    connect(m_client, &Dnf5DaemonClient::transactionScriptError, this,
+            [this](const QString &nevra, uint type, quint64 returnCode) {
+        m_progressDetail = i18n("Script %1 failed (exit code %2): %3",
+                                scriptTypeName(type), returnCode, nevra);
+        Q_EMIT transactionProgress(m_progressDetail, -1);
         emitOverallProgress();
     });
 
-    connect(m_client, &Dnf5DaemonClient::errorOccurred, this, &Backend::errorOccurred);
-    connect(m_client, &Dnf5DaemonClient::repoKeyImportRequest, this, [this](const QString &keyId, const QStringList &userIds,
-                                                                             const QString &fingerprint, const QString &url, qint64) {
-        qInfo() << "Repository key import request:" << keyId << userIds << fingerprint << url;
-    });
+    connect(m_client, &Dnf5DaemonClient::errorOccurred, this, [this](const QString &error) {
+        // A background update probe reports its result through updatesLoaded;
+        // do not pop transient D-Bus errors for it. Never use blockSignals()
+        // here: that would also hide download and transaction progress.
+        if (m_backgroundUpdateChecks.load() == 0)
+            Q_EMIT errorOccurred(error);
+        // DirectConnection evaluates the filter on the emitting worker before
+        // it decrements the counter. Backend::errorOccurred is then queued to
+        // MainWindow normally; no UI code runs on the worker thread.
+    }, Qt::DirectConnection);
+    connect(m_client, &Dnf5DaemonClient::repoKeyImportRequest,
+            this, &Backend::repoKeyImportRequest);
 }
 
 void Backend::resetProgressState()
 {
+    m_downloadDescs.clear();
     m_activeDownloads.clear();
     m_downloadTotalBytes = 0;
     m_downloadDownloadedBytes = 0;
+    m_progressDetail.clear();
+    m_currentActionText.clear();
     m_transactionTotalActions = 0;
     m_transactionActionsCompleted = 0;
     m_transactionCurrentActionProcessed = 0;
@@ -200,6 +337,10 @@ void Backend::resetProgressState()
     m_transactionVerifyTotal = 0;
     m_transactionVerifyProcessed = 0;
     m_inVerifyPhase = false;
+    m_transactionPrepareTotal = 0;
+    m_transactionPrepareProcessed = 0;
+    m_inTransactionPreparePhase = false;
+    m_hasTransactionElemProgress = false;
     m_inTransactionPhase = false;
     // Re-emit the overall progress so the ProgressDialog immediately flips
     // to the "Preparing..." indeterminate state. Without this push the
@@ -231,18 +372,13 @@ int Backend::computeOverallDownloadPercent() const
 
 int Backend::computeOverallTransactionPercent() const
 {
-    // Overall transaction percent = (completed actions + fraction of the
-    // current action) / total actions. The verify sub-phase is folded in as
-    // a final fraction so the percent keeps advancing through verification.
+    // transaction_elem_progress is the authoritative item counter when it is
+    // available; action_start/progress/stop also provide a fallback and the
+    // fractional progress of the item currently being processed.
     if (m_transactionTotalActions == 0)
         return 0;
-    // Fraction of the current action (0..1) as a permyriad so integer math
-    // keeps precision before the final division.
     quint64 currentFraction = 0;
-    if (m_inVerifyPhase) {
-        if (m_transactionVerifyTotal > 0)
-            currentFraction = m_transactionVerifyProcessed * 10000 / m_transactionVerifyTotal;
-    } else if (m_transactionCurrentActionTotal > 0) {
+    if (m_transactionCurrentActionTotal > 0) {
         currentFraction = m_transactionCurrentActionProcessed * 10000
                           / m_transactionCurrentActionTotal;
     }
@@ -256,24 +392,30 @@ int Backend::computeOverallTransactionPercent() const
 
 void Backend::emitOverallProgress()
 {
-    // Pick the phase that the dialog should be describing based on which
-    // signals have arrived so far. Once transaction_before_begin fires the
-    // download phase is over and the install phase begins; verification is
-    // a tail sub-phase of install.
-    if (m_inTransactionPhase) {
-        int percent = computeOverallTransactionPercent();
-        QString phase = m_inVerifyPhase ? QStringLiteral("verify") : QStringLiteral("install");
-        QString msg = m_inVerifyPhase ? i18n("Verifying packages...")
-                                      : i18n("Installing packages...");
-        Q_EMIT overallProgress(percent, phase, msg);
+    // Preparation and verification have their own determinate progress, just
+    // like yumex-ng. Package actions use the aggregate transaction-item
+    // percent; downloads retain the whole queue's aggregate byte progress.
+    if (m_inTransactionPreparePhase) {
+        const int percent = m_transactionPrepareTotal > 0
+            ? static_cast<int>(m_transactionPrepareProcessed * 100 / m_transactionPrepareTotal)
+            : 0;
+        Q_EMIT overallProgress(percent, QStringLiteral("transaction-prepare"),
+                               i18n("Preparing transaction..."), m_progressDetail);
+    } else if (m_inVerifyPhase) {
+        const int percent = m_transactionVerifyTotal > 0
+            ? static_cast<int>(m_transactionVerifyProcessed * 100 / m_transactionVerifyTotal)
+            : 0;
+        Q_EMIT overallProgress(percent, QStringLiteral("verify"),
+                               i18n("Verifying packages..."), m_progressDetail);
+    } else if (m_inTransactionPhase) {
+        Q_EMIT overallProgress(computeOverallTransactionPercent(), QStringLiteral("install"),
+                               i18n("Applying transaction..."), m_progressDetail);
     } else if (!m_activeDownloads.isEmpty() || m_downloadTotalBytes > 0) {
-        int percent = computeOverallDownloadPercent();
-        Q_EMIT overallProgress(percent, QStringLiteral("download"),
-                              i18n("Downloading packages..."));
+        Q_EMIT overallProgress(computeOverallDownloadPercent(), QStringLiteral("download"),
+                               i18n("Downloading packages..."), m_progressDetail);
     } else {
-        // Neither phase has started yet — the dialog is in the "Preparing"
-        // state (goal resolution / metadata read inside do_transaction).
-        Q_EMIT overallProgress(0, QStringLiteral("prepare"), i18n("Preparing..."));
+        Q_EMIT overallProgress(0, QStringLiteral("prepare"), i18n("Preparing..."),
+                               m_progressDetail);
     }
 }
 
@@ -430,11 +572,11 @@ QList<Package> Backend::fetchUpdates(bool refreshMetadata)
     // D-Bus error raised by the client during this background probe would
     // otherwise be forwarded (errorOccurred → Backend::errorOccurred →
     // MainWindow::onError → KMessageBox) and pop a scary "Not connected to
-    // D-Bus server" dialog right after a successful update. Block all
-    // signals on the client for the duration of the probe so transient
-    // errors stay silent; the caller surfaces the result via
-    // updatesLoaded() (an empty list on failure) instead.
-    const bool wasBlocked = m_client->blockSignals(true);
+    // D-Bus server" dialog right after a successful update. Suppress only
+    // error forwarding for the duration of the probe. Blocking all client
+    // signals here would hide every transaction signal if this worker had to
+    // wait for m_callMutex while doTransaction() was running.
+    ++m_backgroundUpdateChecks;
 
     // The authoritative update list comes from the *daemon* itself
     // (packageList with PackageFilter::Updates), exactly as yumex-ng does
@@ -444,8 +586,8 @@ QList<Package> Backend::fetchUpdates(bool refreshMetadata)
     // and reading the update list from the daemon guarantees the displayed
     // list and the resolved transaction always share the same sack.
     //
-    // refreshMetadata is true at application startup and when the user
-    // clicks the explicit Refresh action. To guarantee every repo
+    // refreshMetadata is true when startup found the daemon stopped and when
+    // the user clicks the explicit Refresh action. To guarantee every repo
     // re-downloads its metadata (not just the ones whose cache has expired
     // per metadata_expire) we call cleanCache("expire-cache"), which marks
     // every repo's on-disk cache as expired.
@@ -553,10 +695,7 @@ QList<Package> Backend::fetchUpdates(bool refreshMetadata)
         p.calcTodo();
     }
 
-    // Restore signal delivery — real transactions and user-initiated
-    // operations after this point must still be able to surface errors.
-    m_client->blockSignals(wasBlocked);
-
+    --m_backgroundUpdateChecks;
     return result;
 }
 
@@ -645,7 +784,17 @@ TransactionResult Backend::runTransaction(const TransactionOptions &opts)
     // very first emitOverallProgress() reports the "prepare" phase — which
     // is what the dialog should show while do_transaction is still in its
     // goal-resolution / metadata-loading prelude.
-    resetProgressState();
+    //
+    // runTransaction() itself runs on a QtConcurrent worker, whereas all
+    // progress signal handlers run on Backend's GUI thread. Reset there too,
+    // and wait for completion, so no worker-thread writes race the first
+    // download or transaction signal.
+    if (QThread::currentThread() == thread()) {
+        resetProgressState();
+    } else {
+        QMetaObject::invokeMethod(this, [this]() { resetProgressState(); },
+                                  Qt::BlockingQueuedConnection);
+    }
     return m_transactionManager->runTransaction(opts);
 }
 

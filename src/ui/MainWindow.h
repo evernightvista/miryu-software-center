@@ -125,7 +125,11 @@ private Q_SLOTS:
     // the overall percent across every active download; during the install
     // phase it is the overall percent across all transaction actions. The
     // phase string identifies which message the dialog should show.
-    void onOverallProgress(int percent, const QString &phase, const QString &message);
+    void onOverallProgress(int percent, const QString &phase, const QString &message,
+                           const QString &detail);
+    void onRepoKeyImportRequest(const QString &keyId, const QStringList &userIds,
+                                const QString &fingerprint, const QString &url,
+                                qint64 timestamp);
     void onError(const QString &error);
     void onUpdatesAvailable(int count);
 

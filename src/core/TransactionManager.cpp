@@ -361,13 +361,9 @@ TransactionResult TransactionManager::buildTransaction(const QList<Package> &pac
     // seconds without changing the result, because the cache already matches
     // what we are about to resolve.
     //
-    // The software source is refreshed only at:
-    //   1. Application startup (UpdateChecker → Backend::fetchUpdates(true),
-    //      which calls readAllRepos() so only expired metadata is
-    //      re-downloaded).
-    //   2. The explicit "Refresh Metadata" action (which uses
-    //      cleanCache("expire-cache") + readAllRepos() to force a full
-    //      re-download).
+    // A full software-source refresh is reserved for startup when the daemon
+    // was initially stopped, and the explicit Refresh / Refresh Metadata
+    // actions. Transactions always resolve from the existing daemon cache.
 
     const int genBefore = m_client->reconnectCount();
     const bool buildOk = buildTransactions(packages, opts);
@@ -471,20 +467,11 @@ TransactionResult TransactionManager::runTransaction(const TransactionOptions &o
 
     // runTransaction() runs on a worker thread (QtConcurrent::run), but the
     // D-Bus progress signals emitted during do_transaction are dispatched to
-    // the thread that owns Dnf5DaemonClient — the GUI/main thread. If we
-    // called doTransaction() here on the worker thread, QDBus::BlockWithGui
-    // would pump the worker's (non-existent) event loop and the progress
-    // signals (delivered to the main thread) could not reach the UI.
-    //
-    // doTransaction() uses m_bus.call(..., QDBus::BlockWithGui) (the Qt
-    // counterpart of yumex-ng's async do_transaction + GLib.MainLoop): it
-    // blocks for the reply while keeping the Qt event loop running, so every
-    // download / transaction signal the daemon emits is dispatched. This only
-    // works on the SAME thread the D-Bus connection was created on (the main
-    // thread), so marshal the call onto it via a blocking queued invocation:
-    // the worker waits, the main thread executes do_transaction, and its
-    // event loop drains the incoming D-Bus signal queue so download / install
-    // progress reaches the ProgressDialog.
+    // the thread that owns Dnf5DaemonClient — the GUI/main thread. Marshal
+    // the call there: doTransaction() waits on QDBusPendingCallWatcher with a
+    // nested QEventLoop (the Qt counterpart of yumex-ng's async call + GLib
+    // MainLoop), so every download / transaction / GPG signal reaches the UI
+    // while this worker waits for the final result.
     bool transactionOk = false;
     QMetaObject::invokeMethod(m_client, [this, &transOptions, &transactionOk]() {
         transactionOk = m_client->doTransaction(transOptions);

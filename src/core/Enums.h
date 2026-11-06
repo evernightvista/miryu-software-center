@@ -71,25 +71,37 @@ enum class DownloadType {
 };
 Q_ENUM_NS(DownloadType)
 
+// Values are defined by libdnf5's TransactionItemAction and are sent
+// verbatim by dnf5daemon over D-Bus. Install starts at 1, not 0.
 enum class TransactionActionType {
-    Install,
-    Upgrade,
-    Downgrade,
-    Reinstall,
-    Remove,
-    Replaced
+    Unknown = 0,
+    Install = 1,
+    Upgrade = 2,
+    Downgrade = 3,
+    Reinstall = 4,
+    Remove = 5,
+    Replaced = 6,
+    ReasonChange = 7,
+    Enable = 8,
+    Disable = 9,
+    Reset = 10
 };
 Q_ENUM_NS(TransactionActionType)
 
 inline QString actionToString(TransactionActionType action)
 {
     switch (action) {
+    case TransactionActionType::Unknown:    return i18n("Processing");
     case TransactionActionType::Install:    return i18n("Installing");
     case TransactionActionType::Upgrade:    return i18n("Upgrading");
     case TransactionActionType::Downgrade:  return i18n("Downgrading");
     case TransactionActionType::Reinstall:  return i18n("Reinstalling");
     case TransactionActionType::Remove:     return i18n("Removing");
     case TransactionActionType::Replaced:   return i18n("Replacing");
+    case TransactionActionType::ReasonChange: return i18n("Changing reason for");
+    case TransactionActionType::Enable:     return i18n("Enabling");
+    case TransactionActionType::Disable:    return i18n("Disabling");
+    case TransactionActionType::Reset:      return i18n("Resetting");
     }
     return i18n("Processing");
 }

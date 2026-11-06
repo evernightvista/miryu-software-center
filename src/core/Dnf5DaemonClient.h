@@ -41,6 +41,11 @@ public:
     QString sessionPath() const { return m_sessionPath; }
     QString lastError() const { return m_lastError; }
 
+    // Captured before the constructor can activate the daemon over D-Bus.
+    // UpdateChecker uses this to decide whether startup needs a full metadata
+    // refresh; an already-running daemon keeps its existing repository cache.
+    bool daemonWasRunningAtStartup() const { return m_daemonWasRunningAtStartup; }
+
     // Number of times the client has re-connected (incremented whenever
     // reconnect() replaces the connection and re-opens the session). Callers
     // that set up state on the session (transaction goal specs) can detect a
@@ -49,7 +54,7 @@ public:
     int reconnectCount() const { return m_reconnectCount; }
 
     // Session management
-    bool openSession(const QVariantMap &options = {});
+    bool openSession(const QVariantMap &options = {}, bool suppressErrorSignal = false);
     bool closeSession();
     void resetSession();
     // Forget the current (possibly dead) session and open a fresh one.
@@ -157,7 +162,8 @@ Q_SIGNALS:
     void downloadAddNew(const QString &downloadId, const QString &description, qint64 totalToDownload);
     void downloadProgress(const QString &downloadId, qint64 total, qint64 downloaded);
     void downloadEnd(const QString &downloadId, uint transferStatus, const QString &message);
-    void downloadMirrorFailure(const QString &downloadId, const QString &message, const QString &url);
+    void downloadMirrorFailure(const QString &downloadId, const QString &message,
+                               const QString &url, const QString &metadata);
     void repoKeyImportRequest(const QString &keyId, const QStringList &userIds,
                               const QString &keyFingerprint, const QString &keyUrl, qint64 timestamp);
 
@@ -167,6 +173,9 @@ Q_SIGNALS:
     void transactionActionStop(const QString &nevra, quint64 total);
     void transactionBeforeBegin(quint64 total);
     void transactionAfterComplete(bool success);
+    void transactionPrepareStart(quint64 total);
+    void transactionPrepareProgress(quint64 processed, quint64 total);
+    void transactionPrepareStop(quint64 total);
     void transactionScriptStart(const QString &nevra, uint scriptletType);
     void transactionScriptStop(const QString &nevra, uint scriptletType, quint64 returnCode);
     void transactionScriptError(const QString &nevra, uint scriptletType, quint64 returnCode);
@@ -190,9 +199,12 @@ private:
     static constexpr const char *IFACE_GROUP = "org.rpm.dnf.v0.comps.Group";
     static constexpr const char *IFACE_ADVISORY = "org.rpm.dnf.v0.Advisory";
 
+    static bool queryDaemonServerRunning();
+
     QDBusConnection m_bus;
     QString m_sessionPath;
     bool m_connected = false;
+    bool m_daemonWasRunningAtStartup = false;
     QString m_lastError;
     int m_reconnectCount = 0;
 
@@ -224,7 +236,8 @@ private:
     bool callSync(const QString &path, const QString &interface,
                   const QString &method, const QList<QVariant> &args,
                   QVariant &result, QString &error,
-                  int timeoutMs = kDefaultCallTimeoutMs);
+                  int timeoutMs = kDefaultCallTimeoutMs,
+                  bool suppressErrorSignal = false);
 
     // Classic D-Bus Rpm.list() call — the primary package-list transport
     // (synchronous; same path the upstream miryu-software-center uses).
@@ -272,7 +285,8 @@ private Q_SLOTS:
     void onDownloadAddNew(const QDBusObjectPath &session, const QString &id, const QString &desc, qint64 total);
     void onDownloadProgress(const QDBusObjectPath &session, const QString &id, qint64 total, qint64 downloaded);
     void onDownloadEnd(const QDBusObjectPath &session, const QString &id, uint status, const QString &msg);
-    void onDownloadMirrorFailure(const QDBusObjectPath &session, const QString &id, const QString &msg, const QString &url);
+    void onDownloadMirrorFailure(const QDBusObjectPath &session, const QString &id, const QString &msg,
+                                 const QString &url, const QString &metadata);
     void onRepoKeyImportRequest(const QDBusObjectPath &session, const QString &keyId, const QStringList &userIds,
                                 const QString &fingerprint, const QString &url, qint64 timestamp);
     void onTransactionActionStart(const QDBusObjectPath &session, const QString &nevra, uint action, quint64 total);
@@ -280,12 +294,15 @@ private Q_SLOTS:
     void onTransactionActionStop(const QDBusObjectPath &session, const QString &nevra, quint64 total);
     void onTransactionBeforeBegin(const QDBusObjectPath &session, quint64 total);
     void onTransactionAfterComplete(const QDBusObjectPath &session, bool success);
+    void onTransactionPrepareStart(const QDBusObjectPath &session, quint64 total);
+    void onTransactionPrepareProgress(const QDBusObjectPath &session, quint64 processed, quint64 total);
+    void onTransactionPrepareStop(const QDBusObjectPath &session, quint64 total);
     void onTransactionScriptStart(const QDBusObjectPath &session, const QString &nevra, uint type);
     void onTransactionScriptStop(const QDBusObjectPath &session, const QString &nevra, uint type, quint64 rc);
     void onTransactionScriptError(const QDBusObjectPath &session, const QString &nevra, uint type, quint64 rc);
     void onTransactionVerifyStart(const QDBusObjectPath &session, quint64 total);
     void onTransactionVerifyProgress(const QDBusObjectPath &session, quint64 processed, quint64 total);
-    void onTransactionVerifyStop(const QDBusObjectPath &session);
+    void onTransactionVerifyStop(const QDBusObjectPath &session, quint64 total);
     void onTransactionElemProgress(const QDBusObjectPath &session, const QString &nevra, quint64 processed, quint64 total);
 };
 

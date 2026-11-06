@@ -29,12 +29,9 @@ UpdateChecker::UpdateChecker(Backend *backend, QObject *parent)
 
     loadSettings();
 
-    // Trigger a check whenever the timer fires. Periodic checks MUST NOT
-    // refresh the software source: per the desired behaviour the repository
-    // metadata is refreshed only at application startup (see start()), so
-    // every periodic tick reuses the metadata cache instead of
-    // re-downloading it. Applying an upgrade queue also reuses the cache
-    // (the displayed update list already came from it).
+    // Periodic checks always reuse the metadata cache. A full refresh is
+    // reserved for startup when the daemon was initially stopped (see start())
+    // and the user's explicit Refresh action.
     connect(m_timer, &QTimer::timeout, this, [this]() {
         checkNow(false);
     });
@@ -79,15 +76,14 @@ void UpdateChecker::start()
 
     qCDebug(MIRYU_UPDATE_CHECKER) << "Timer started, firing every" << m_intervalMinutes << "min";
 
-    // Perform an immediate first check so the user doesn't have to wait
-    // for the full interval to pass before seeing results. This startup
-    // check is the only automatic moment the software source is refreshed
-    // (repository metadata) — Backend::fetchUpdates() calls readAllRepos()
-    // which only re-downloads metadata for repos whose cache has expired.
-    // Applying an update queue does NOT refresh metadata: it resolves from
-    // the same daemon cache that produced the update list.
-    QMetaObject::invokeMethod(this, [this]() {
-        checkNow(true);
+    // Always check for updates immediately, but force a full metadata refresh
+    // only when dnf5daemon-server was not running before this process started.
+    // If it was already active, its repository cache is reused instead.
+    const bool refreshMetadata = !m_backend->client()->daemonWasRunningAtStartup();
+    qCDebug(MIRYU_UPDATE_CHECKER) << "Startup check:"
+                                  << (refreshMetadata ? "refreshing metadata" : "using cached metadata");
+    QMetaObject::invokeMethod(this, [this, refreshMetadata]() {
+        checkNow(refreshMetadata);
     }, Qt::QueuedConnection);
 }
 

@@ -3,8 +3,8 @@
 
 
 Name:           miryu-software-center
-Version:        45.0.0
-Release:        10%{?dist}
+Version:        45.0.1
+Release:        1%{?dist}
 Summary:        A modern RPM and Linglong software center powered by dnf5daemon
 
 License:        GPL-3.0-or-later
@@ -80,6 +80,11 @@ install -Dm 644 data/evernight-vista.conf %{buildroot}/%{_datadir}/dnf5/suggest-
 %{_datadir}/polkit-1/rules.d/50-miryu-dnf5daemon.rules
 
 %changelog
+* Fri Nov 06 2026 KairikiFedora <13278297951@sina.cn> - 45.0.1-1
+- Fix DNF5 Transaction not show progress
+- Miryu Software Center can detect dnf5daemon-server to smart
+- check DNF5 Repos
+
 * Wed Nov 04 2026 KairikiFedora <13278297951@sina.cn> - 45.0.0-10
 - Add Check Notify Support
 

@@ -76,6 +76,9 @@
 #include <QSettings>
 #include <QSet>
 #include <QRegularExpression>
+#include <QDateTime>
+#include <QDebug>
+#include <QLocale>
 
 namespace Miryu {
 
@@ -121,12 +124,12 @@ MainWindow::MainWindow(Backend *backend, QWidget *parent)
     connect(m_backend, &Backend::updatesLoaded, this, &MainWindow::onUpdatesLoaded);
     connect(m_backend, &Backend::transactionProgress, this, &MainWindow::onTransactionProgress);
     connect(m_backend, &Backend::downloadProgress, this, &MainWindow::onDownloadProgress);
-    // The modal ProgressDialog is driven entirely by the aggregated
-    // overallProgress signal — onDownloadProgress / onTransactionProgress
-    // only update the bottom status bar now, never the dialog itself, so the
-    // dialog shows ONE overall percent per phase (download / install) as
-    // requested instead of per-package ticks.
+    // The modal ProgressDialog is driven by overallProgress: one phase bar
+    // plus a yumex-ng-style detail line. The two per-operation signals only
+    // update the bottom status bar.
     connect(m_backend, &Backend::overallProgress, this, &MainWindow::onOverallProgress);
+    connect(m_backend, &Backend::repoKeyImportRequest,
+            this, &MainWindow::onRepoKeyImportRequest);
     connect(m_backend, &Backend::errorOccurred, this, &MainWindow::onError);
 
     // Disable the auto-generated KDE help menu (handbook, "What's This",
@@ -467,12 +470,10 @@ void MainWindow::setupUI()
 
         m_repoView = new RepoView(m_repoModel, m_backend);
         layout->addWidget(m_repoView, 1);
-        // Enabling/disabling a repository must NOT re-download repository
-        // metadata: per the desired behaviour the software source is only
-        // refreshed at startup and when the user applies an upgrade queue.
-        // Reloading the lists is enough — the daemon already applied the
-        // change and reads the affected repo's metadata on demand.
-        connect(m_repoView, &RepoView::repositoriesChanged, this, &MainWindow::onReloadData);
+        // Enabling/disabling a repository must NOT force a full metadata
+        // refresh. Use the cached post-transaction reload path here; the
+        // explicit toolbar Refresh action remains the full-refresh path.
+        connect(m_repoView, &RepoView::repositoriesChanged, this, &MainWindow::onRefresh);
 
         m_pageStack->addWidget(m_repoPage);
     }
@@ -609,13 +610,10 @@ void MainWindow::setupActions()
 
     QAction *refreshAction = new QAction(QIcon::fromTheme(QStringLiteral("view-refresh")), i18n("Refresh"), this);
     refreshAction->setShortcut(QKeySequence::Refresh);
-    // The manual "Refresh" action force-refreshes the software source, just
-    // like the automatic refresh at application startup: it reloads the
-    // update list with refreshMetadata=true, which calls
-    // cleanCache("expire-cache") + resetSession() + readAllRepos() so the
-    // daemon expires and re-downloads every repo's metadata — equivalent to
-    // `dnf5 check-upgrade --refresh` and reliable for detecting
-    // third-party-repo updates (e.g. microsoft-edge-stable).
+    // The manual "Refresh" action always force-refreshes the software source:
+    // cleanCache("expire-cache") + resetSession() + readAllRepos() expires and
+    // re-downloads every repository's metadata, equivalent to
+    // `dnf5 check-upgrade --refresh`.
     connect(refreshAction, &QAction::triggered, this, &MainWindow::onReloadData);
     ac->addAction(QStringLiteral("refresh"), refreshAction);
 
@@ -1164,17 +1162,11 @@ void MainWindow::onRefresh()
     if (!m_backend->isInitialized())
         return;
 
-    // Post-transaction reload: drop the daemon's in-memory sack so the next
-    // query re-reads the rpmdb and repo metadata from disk (reflecting the
-    // packages just installed/upgraded/removed).
-    //
-    // This is NOT a software-source refresh: no repository metadata is
-    // downloaded here. The only automatic refresh moment is application
-    // startup (Backend::fetchUpdates with refreshMetadata=true, which calls
-    // readAllRepos so only expired metadata is re-downloaded). Applying an
-    // update queue resolves directly from the daemon cache that produced
-    // the update list, so re-running readAllRepos() here would be a
-    // redundant, slow re-download.
+    // Cached reload used after transactions and repository enable/disable:
+    // drop the daemon's in-memory sack so the next query re-reads the rpmdb
+    // and repository configuration from disk. This is NOT a forced metadata
+    // refresh; full refreshes are limited to a startup where the daemon was
+    // initially stopped and the explicit toolbar Refresh action.
     m_backend->client()->resetSession();
 
     // Clear cached package details so refreshed data is fetched.
@@ -1194,22 +1186,18 @@ void MainWindow::onReloadData()
     if (!m_backend->isInitialized())
         return;
 
-    // Force-refresh: reload the displayed lists from the daemon while
-    // force-refreshing the software source (repository metadata), exactly
-    // as application startup does. Passing refreshMetadata=true to
-    // onLoadUpdates makes fetchUpdates call
-    // cleanCache("expire-cache") + resetSession() + readAllRepos()
-    // (on a worker thread, so the UI stays responsive), which expires and
-    // re-downloads every repo's metadata — equivalent to
-    // `dnf5 check-upgrade --refresh`, guaranteeing that newly published
-    // updates (e.g. microsoft-edge-stable) are detected.
+    // Explicit Refresh action: reload the displayed lists and force a full
+    // repository metadata refresh. onLoadUpdates(true) runs
+    // cleanCache("expire-cache") + resetSession() + readAllRepos() on a worker
+    // thread, equivalent to `dnf5 check-upgrade --refresh`.
     m_backend->cache()->clearDetails();
 
     PackageFilter filter = static_cast<PackageFilter>(m_filterCombo->currentData().toInt());
     m_backend->loadPackages(filter, true);
 
-    if (m_currentPage == 1)
-        onLoadUpdates(true);
+    // The toolbar Refresh button is an explicit full-refresh request no matter
+    // which page is visible; do not limit metadata expiry to the Updates page.
+    onLoadUpdates(true);
     if (m_currentPage == 3)
         m_backend->loadRepositories();
 }
@@ -1824,13 +1812,9 @@ void MainWindow::onLoadUpdates(bool refreshMetadata)
     m_statusLabel->setText(i18n("Checking for updates..."));
     m_progressBar->setRange(0, 0);
     m_progressBar->setVisible(true);
-    // Page switches and post-transaction reloads pass false so the cached
-    // metadata is reused. The manual Refresh action and application startup
-    // pass true, which calls readAllRepos() so expired metadata is
-    // re-downloaded and resetSession() drops the stale in-memory sack.
-    // Applying an update queue does NOT refresh metadata — it resolves
-    // directly from the daemon cache that produced the update list, so the
-    // transaction always matches what was displayed.
+    // Page switches and cached reloads pass false. The manual Refresh action
+    // always passes true; the startup check does so only when the daemon was
+    // not already running. Applying an update queue never forces a refresh.
     m_backend->loadUpdates(refreshMetadata);
 }
 
@@ -2434,7 +2418,8 @@ void MainWindow::onDownloadProgress(const QString &downloadId, qint64 total, qin
     }
 }
 
-void MainWindow::onOverallProgress(int percent, const QString &phase, const QString &message)
+void MainWindow::onOverallProgress(int percent, const QString &phase, const QString &message,
+                                   const QString &detail)
 {
     // Single source of truth for the modal ProgressDialog: the backend
     // already picked the right phase message ("Downloading packages...",
@@ -2444,6 +2429,7 @@ void MainWindow::onOverallProgress(int percent, const QString &phase, const QStr
         return;
 
     m_progressDialog->setMessage(message);
+    m_progressDialog->setDetail(detail);
     // During the "prepare" phase the daemon has not started downloading or
     // installing yet, so keep BOTH bars (the status-bar one AND the dialog
     // one) in indeterminate busy mode until real progress arrives. As soon
@@ -2461,6 +2447,44 @@ void MainWindow::onOverallProgress(int percent, const QString &phase, const QStr
     }
     m_progressDialog->setIndeterminate(indeterminate);
     m_progressDialog->setProgress(percent);
+}
+
+void MainWindow::onRepoKeyImportRequest(const QString &keyId, const QStringList &userIds,
+                                        const QString &fingerprint, const QString &url,
+                                        qint64 timestamp)
+{
+    // dnf5daemon waits for confirm_key() before it can continue the pending
+    // transaction. Even while closing, explicitly reject instead of leaving
+    // the server waiting forever.
+    if (m_closing.load(std::memory_order_acquire)) {
+        m_backend->client()->confirmKey(keyId, false);
+        return;
+    }
+
+    const QString users = userIds.isEmpty() ? i18n("Unknown") : userIds.join(QLatin1Char('\n'));
+    const QString date = QLocale::system().toString(
+        QDateTime::fromSecsSinceEpoch(timestamp).toLocalTime(), QLocale::ShortFormat);
+    QString text = i18n("The repository requests importing an RPM GPG key. "
+                        "Verify the key information before trusting it.");
+    text += QLatin1String("\n\n") + i18n("Key ID: %1", keyId);
+    text += QLatin1String("\n") + i18n("User ID: %1", users);
+    text += QLatin1String("\n") + i18n("Fingerprint: %1", fingerprint);
+    text += QLatin1String("\n") + i18n("Key URL: %1", url);
+    text += QLatin1String("\n") + i18n("Created: %1", date);
+
+    if (m_progressDialog)
+        m_progressDialog->hide();
+    const int answer = KMessageBox::questionTwoActions(
+        this, text, i18n("Import RPM GPG Key"),
+        KGuiItem(i18n("Import")), KGuiItem(i18n("Do Not Import")));
+    if (m_progressDialog)
+        m_progressDialog->show();
+
+    const bool confirmed = answer == KMessageBox::PrimaryAction;
+    if (!m_backend->client()->confirmKey(keyId, confirmed)) {
+        qWarning() << "Failed to answer RPM GPG key import request for"
+                   << keyId << "confirmed:" << confirmed;
+    }
 }
 
 void MainWindow::onError(const QString &error)

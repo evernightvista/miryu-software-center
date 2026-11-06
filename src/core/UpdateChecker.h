@@ -44,10 +44,10 @@ public:
      * Performs an immediate update check regardless of the timer state.
      * Safe to call while a check is already in progress (no-op then).
      *
-     * refreshMetadata controls whether this check refreshes the software
-     * source (repository metadata): the application startup check passes
-     * true, every periodic timer check passes false, so periodic checks
-     * reuse the cached metadata instead of re-downloading it.
+     * refreshMetadata controls whether this check force-refreshes repository
+     * metadata. The startup check passes true only when dnf5daemon-server was
+     * not running before client initialization; every periodic check passes
+     * false and reuses the existing cache.
      */
     void checkNow(bool refreshMetadata = false);
 

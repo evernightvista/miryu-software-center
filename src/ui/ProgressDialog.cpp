@@ -3,9 +3,44 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QProgressBar>
+#include <QFontMetrics>
+#include <QSizePolicy>
 #include <KLocalizedString>
 
 namespace Miryu {
+
+namespace {
+
+// QLabel's normal word wrapping can leave an unbroken NEVRA or a run of
+// Japanese text wider than the fixed-width dialog. Insert real line breaks at
+// the measured display width so every character remains visible.
+QString wrapTextAnywhere(const QString &text, const QFontMetrics &metrics, int availableWidth)
+{
+    if (text.isEmpty() || availableWidth <= 0)
+        return text;
+
+    QString wrapped;
+    QString line;
+    for (const QChar ch : text) {
+        if (ch == QLatin1Char('\n')) {
+            wrapped += line;
+            wrapped += ch;
+            line.clear();
+            continue;
+        }
+
+        if (!line.isEmpty() && metrics.horizontalAdvance(line + ch) > availableWidth) {
+            wrapped += line;
+            wrapped += QLatin1Char('\n');
+            line.clear();
+        }
+        line += ch;
+    }
+    wrapped += line;
+    return wrapped;
+}
+
+} // namespace
 
 ProgressDialog::ProgressDialog(QWidget *parent)
     // Pass the window flags to the QDialog constructor so they are set at
@@ -34,6 +69,17 @@ ProgressDialog::ProgressDialog(QWidget *parent)
     m_messageLabel->setFont(msgFont);
     layout->addWidget(m_messageLabel);
 
+    m_detailLabel = new QLabel;
+    // Wrapping is performed explicitly in setDetail(). Ignored horizontal
+    // sizing prevents a long package name from forcing the label beyond the
+    // dialog's content rectangle.
+    m_detailLabel->setWordWrap(false);
+    m_detailLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    m_detailLabel->setMinimumWidth(0);
+    m_detailLabel->setTextFormat(Qt::PlainText);
+    m_detailLabel->hide();
+    layout->addWidget(m_detailLabel);
+
     m_progressBar = new QProgressBar;
     m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
@@ -47,6 +93,16 @@ ProgressDialog::ProgressDialog(QWidget *parent)
 void ProgressDialog::setMessage(const QString &message)
 {
     m_messageLabel->setText(message);
+}
+
+void ProgressDialog::setDetail(const QString &detail)
+{
+    const QMargins margins = layout()->contentsMargins();
+    const int availableWidth = qMax(1, width() - margins.left() - margins.right());
+    m_detailLabel->setText(wrapTextAnywhere(detail, m_detailLabel->fontMetrics(), availableWidth));
+    m_detailLabel->setVisible(!detail.isEmpty());
+    // The width stays fixed; grow vertically to fit every wrapped line.
+    adjustSize();
 }
 
 void ProgressDialog::setProgress(int percent)
@@ -76,6 +132,8 @@ void ProgressDialog::setIndeterminate(bool on)
 void ProgressDialog::reset()
 {
     m_messageLabel->setText(i18n("Preparing..."));
+    m_detailLabel->clear();
+    m_detailLabel->hide();
     m_progressBar->setRange(0, 100);
     m_progressBar->setTextVisible(true);
     m_progressBar->setValue(0);

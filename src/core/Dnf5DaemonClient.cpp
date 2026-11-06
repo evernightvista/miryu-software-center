@@ -10,6 +10,8 @@
 #include <QDBusObjectPath>
 #include <QDBusUnixFileDescriptor>
 #include <QDBusAbstractInterface>
+#include <QDBusPendingCallWatcher>
+#include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
@@ -189,10 +191,9 @@ QDBusMessage Dnf5DaemonClient::callMethod(const QString &path, const QString &in
     //
     // The default mode is QDBus::Block, which is correct for calls made from
     // worker threads (resolve, list, …) that don't need to dispatch GUI
-    // signals. do_transaction does NOT go through callMethod: it calls
-    // m_bus.call() directly with QDBus::BlockWithGui (see doTransaction()) so
-    // the daemon's progress signals reach the ProgressDialog instead of
-    // leaving it stuck at "Preparing... 0%".
+    // signals. do_transaction does NOT go through callMethod: it uses an
+    // asynchronous call watched by a nested event loop (see doTransaction())
+    // so every daemon progress signal is dispatched to the ProgressDialog.
     return m_bus.call(msg, mode, timeoutMs);
 }
 
@@ -266,13 +267,10 @@ bool Dnf5DaemonClient::doReconnect()
     // The previous session object no longer exists after a daemon restart;
     // open a new one (this also re-wires the per-session signal connections).
     // Recovery must stay silent: a session re-open failure here is expected
-    // while the daemon is still starting. Blocking signals keeps it from
-    // popping a scary "Not connected to D-Bus server" dialog in the middle of
-    // the self-heal; the callers (callSync() / openSession()) report the
-    // final error only after their own retries are exhausted.
-    const bool wasBlocked = blockSignals(true);
-    openSession();
-    blockSignals(wasBlocked);
+    // while the daemon is still starting. Suppress only the error signal;
+    // blocking every signal could hide an active transaction's progress.
+    // The callers report the final error after their own retries.
+    openSession({}, true);
     return m_connected;
 }
 
@@ -310,7 +308,8 @@ static bool isAuthError(const QString &error)
 
 bool Dnf5DaemonClient::callSync(const QString &path, const QString &interface,
                                  const QString &method, const QList<QVariant> &args,
-                                 QVariant &result, QString &error, int timeoutMs)
+                                 QVariant &result, QString &error, int timeoutMs,
+                                 bool suppressErrorSignal)
 {
     QDBusMessage msg = callMethod(path, interface, method, args, timeoutMs);
 
@@ -351,7 +350,7 @@ bool Dnf5DaemonClient::callSync(const QString &path, const QString &interface,
         // user-facing message). Do NOT emit errorOccurred here, otherwise
         // MainWindow::onError would pop a second dialog on top of the
         // caller's.
-        if (!isAuthError(error))
+        if (!suppressErrorSignal && !isAuthError(error))
             Q_EMIT errorOccurred(error);
         return false;
     }
@@ -361,7 +360,8 @@ bool Dnf5DaemonClient::callSync(const QString &path, const QString &interface,
         error = i18n("Did not receive a reply from dnf5daemon-server within the timeout period. "
                      "The service may be busy or unresponsive.");
         qWarning() << "DBus call timed out:" << interface << method;
-        Q_EMIT errorOccurred(error);
+        if (!suppressErrorSignal)
+            Q_EMIT errorOccurred(error);
         return false;
     }
 
@@ -372,10 +372,35 @@ bool Dnf5DaemonClient::callSync(const QString &path, const QString &interface,
 
 // === Constructor / Destructor ===
 
+bool Dnf5DaemonClient::queryDaemonServerRunning()
+{
+    // is-active is read-only and, unlike a D-Bus method call to org.rpm.dnf.v0,
+    // cannot activate the service. Only an active unit counts as running;
+    // inactive, failed, activating and unavailable units all need a refresh.
+    QProcess proc;
+    proc.start(QStringLiteral("systemctl"),
+               {QStringLiteral("--system"), QStringLiteral("is-active"),
+                QStringLiteral("--quiet"), QStringLiteral("dnf5daemon-server.service")});
+    if (!proc.waitForFinished(3000)) {
+        proc.kill();
+        proc.waitForFinished(1000);
+        qWarning() << "Could not query dnf5daemon-server.service; assuming it is not running";
+        return false;
+    }
+    return proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0;
+}
+
 Dnf5DaemonClient::Dnf5DaemonClient(QObject *parent)
     : QObject(parent)
     , m_bus(QDBusConnection::systemBus())
 {
+    // This MUST be captured before startService() below: D-Bus activation makes
+    // a stopped unit active, which would otherwise hide its original state.
+    m_daemonWasRunningAtStartup = queryDaemonServerRunning();
+    qInfo() << "dnf5daemon-server was"
+            << (m_daemonWasRunningAtStartup ? "active" : "not active")
+            << "before client initialization";
+
     qRegisterMetaType<Package>("Miryu::Package");
     qRegisterMetaType<Repository>("Miryu::Repository");
 
@@ -428,7 +453,7 @@ Dnf5DaemonClient::~Dnf5DaemonClient()
 
 // === Session Management ===
 
-bool Dnf5DaemonClient::openSession(const QVariantMap &options)
+bool Dnf5DaemonClient::openSession(const QVariantMap &options, bool suppressErrorSignal)
 {
     // The cached m_connected flag can go stale (e.g. the bus dropped after
     // construction or after a system upgrade). Re-acquire the bus first so a
@@ -439,7 +464,8 @@ bool Dnf5DaemonClient::openSession(const QVariantMap &options)
         m_lastError = i18n("Cannot connect to the D-Bus system bus.\n\n"
                            "Please make sure the D-Bus system bus is running "
                            "(dbus-broker / dbus-daemon).");
-        Q_EMIT errorOccurred(m_lastError);
+        if (!suppressErrorSignal)
+            Q_EMIT errorOccurred(m_lastError);
         return false;
     }
 
@@ -496,7 +522,8 @@ bool Dnf5DaemonClient::openSession(const QVariantMap &options)
                 qWarning() << "open_session returned unexpected type:" << arg.typeName();
                 m_lastError = QStringLiteral("open_session returned unexpected type: %1")
                                      .arg(QString::fromLatin1(arg.typeName()));
-                Q_EMIT errorOccurred(m_lastError);
+                if (!suppressErrorSignal)
+                    Q_EMIT errorOccurred(m_lastError);
                 return false;
             }
 
@@ -538,7 +565,8 @@ bool Dnf5DaemonClient::openSession(const QVariantMap &options)
         // actionable one.
         m_lastError = friendlyDisconnectError(m_lastError);
     }
-    Q_EMIT errorOccurred(m_lastError);
+    if (!suppressErrorSignal)
+        Q_EMIT errorOccurred(m_lastError);
     return false;
 }
 
@@ -598,14 +626,11 @@ bool Dnf5DaemonClient::reopenSession()
 
     // openSession() re-acquires the bus (ensureConnected() -> reconnect()
     // when the system bus itself dropped, which is rarer) and opens a fresh
-    // session on it. Block signals so a failure here (the daemon may still
-    // be restarting) cannot pop a scary errorOccurred dialog — the caller's
-    // subsequent callSync()-based queries will still recover per-call as a
-    // fallback.
-    const bool wasBlocked = blockSignals(true);
-    const bool ok = openSession();
-    blockSignals(wasBlocked);
-    return ok;
+    // session on it. Suppress only the error signal so a failure here (the
+    // daemon may still be restarting) cannot pop a scary error dialog. All
+    // progress signals remain connected. Subsequent callSync()-based queries
+    // still recover per-call as a fallback.
+    return openSession({}, true);
 }
 
 bool Dnf5DaemonClient::restartDaemonServer()
@@ -664,43 +689,59 @@ bool Dnf5DaemonClient::restartDaemonServer()
 
 void Dnf5DaemonClient::connectSignals()
 {
+    const auto connectSignal = [this](const char *interface, const char *name, const char *slot) {
+        if (!m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath,
+                           QString::fromLatin1(interface), QString::fromLatin1(name),
+                           this, slot)) {
+            qWarning() << "Failed to subscribe to DNF5 D-Bus signal"
+                       << QString::fromLatin1(interface) << QString::fromLatin1(name)
+                       << "on" << m_sessionPath << ":" << m_bus.lastError().message();
+        }
+    };
+
     // Base interface signals — downloads and key import
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_BASE),
-                QStringLiteral("download_add_new"), this, SLOT(onDownloadAddNew(QDBusObjectPath,QString,QString,qint64)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_BASE),
-                QStringLiteral("download_progress"), this, SLOT(onDownloadProgress(QDBusObjectPath,QString,qint64,qint64)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_BASE),
-                QStringLiteral("download_end"), this, SLOT(onDownloadEnd(QDBusObjectPath,QString,uint,QString)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_BASE),
-                QStringLiteral("download_mirror_failure"), this, SLOT(onDownloadMirrorFailure(QDBusObjectPath,QString,QString,QString)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_BASE),
-                QStringLiteral("repo_key_import_request"), this, SLOT(onRepoKeyImportRequest(QDBusObjectPath,QString,QStringList,QString,QString,qint64)));
+    connectSignal(IFACE_BASE, "download_add_new",
+                  SLOT(onDownloadAddNew(QDBusObjectPath,QString,QString,qint64)));
+    connectSignal(IFACE_BASE, "download_progress",
+                  SLOT(onDownloadProgress(QDBusObjectPath,QString,qint64,qint64)));
+    connectSignal(IFACE_BASE, "download_end",
+                  SLOT(onDownloadEnd(QDBusObjectPath,QString,uint,QString)));
+    connectSignal(IFACE_BASE, "download_mirror_failure",
+                  SLOT(onDownloadMirrorFailure(QDBusObjectPath,QString,QString,QString,QString)));
+    connectSignal(IFACE_BASE, "repo_key_import_request",
+                  SLOT(onRepoKeyImportRequest(QDBusObjectPath,QString,QStringList,QString,QString,qint64)));
 
     // Rpm interface signals — transaction progress
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_action_start"), this, SLOT(onTransactionActionStart(QDBusObjectPath,QString,uint,quint64)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_action_progress"), this, SLOT(onTransactionActionProgress(QDBusObjectPath,QString,quint64,quint64)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_action_stop"), this, SLOT(onTransactionActionStop(QDBusObjectPath,QString,quint64)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_before_begin"), this, SLOT(onTransactionBeforeBegin(QDBusObjectPath,quint64)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_after_complete"), this, SLOT(onTransactionAfterComplete(QDBusObjectPath,bool)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_script_start"), this, SLOT(onTransactionScriptStart(QDBusObjectPath,QString,uint)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_script_stop"), this, SLOT(onTransactionScriptStop(QDBusObjectPath,QString,uint,quint64)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_script_error"), this, SLOT(onTransactionScriptError(QDBusObjectPath,QString,uint,quint64)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_verify_start"), this, SLOT(onTransactionVerifyStart(QDBusObjectPath,quint64)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_verify_progress"), this, SLOT(onTransactionVerifyProgress(QDBusObjectPath,quint64,quint64)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_verify_stop"), this, SLOT(onTransactionVerifyStop(QDBusObjectPath)));
-    m_bus.connect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_elem_progress"), this, SLOT(onTransactionElemProgress(QDBusObjectPath,QString,quint64,quint64)));
+    connectSignal(IFACE_RPM, "transaction_action_start",
+                  SLOT(onTransactionActionStart(QDBusObjectPath,QString,uint,quint64)));
+    connectSignal(IFACE_RPM, "transaction_action_progress",
+                  SLOT(onTransactionActionProgress(QDBusObjectPath,QString,quint64,quint64)));
+    connectSignal(IFACE_RPM, "transaction_action_stop",
+                  SLOT(onTransactionActionStop(QDBusObjectPath,QString,quint64)));
+    connectSignal(IFACE_RPM, "transaction_before_begin",
+                  SLOT(onTransactionBeforeBegin(QDBusObjectPath,quint64)));
+    connectSignal(IFACE_RPM, "transaction_after_complete",
+                  SLOT(onTransactionAfterComplete(QDBusObjectPath,bool)));
+    connectSignal(IFACE_RPM, "transaction_transaction_start",
+                  SLOT(onTransactionPrepareStart(QDBusObjectPath,quint64)));
+    connectSignal(IFACE_RPM, "transaction_transaction_progress",
+                  SLOT(onTransactionPrepareProgress(QDBusObjectPath,quint64,quint64)));
+    connectSignal(IFACE_RPM, "transaction_transaction_stop",
+                  SLOT(onTransactionPrepareStop(QDBusObjectPath,quint64)));
+    connectSignal(IFACE_RPM, "transaction_script_start",
+                  SLOT(onTransactionScriptStart(QDBusObjectPath,QString,uint)));
+    connectSignal(IFACE_RPM, "transaction_script_stop",
+                  SLOT(onTransactionScriptStop(QDBusObjectPath,QString,uint,quint64)));
+    connectSignal(IFACE_RPM, "transaction_script_error",
+                  SLOT(onTransactionScriptError(QDBusObjectPath,QString,uint,quint64)));
+    connectSignal(IFACE_RPM, "transaction_verify_start",
+                  SLOT(onTransactionVerifyStart(QDBusObjectPath,quint64)));
+    connectSignal(IFACE_RPM, "transaction_verify_progress",
+                  SLOT(onTransactionVerifyProgress(QDBusObjectPath,quint64,quint64)));
+    connectSignal(IFACE_RPM, "transaction_verify_stop",
+                  SLOT(onTransactionVerifyStop(QDBusObjectPath,quint64)));
+    connectSignal(IFACE_RPM, "transaction_elem_progress",
+                  SLOT(onTransactionElemProgress(QDBusObjectPath,QString,quint64,quint64)));
 }
 
 void Dnf5DaemonClient::disconnectSignals()
@@ -720,7 +761,7 @@ void Dnf5DaemonClient::disconnectSignals()
     m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_BASE),
                 QStringLiteral("download_end"), this, SLOT(onDownloadEnd(QDBusObjectPath,QString,uint,QString)));
     m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_BASE),
-                QStringLiteral("download_mirror_failure"), this, SLOT(onDownloadMirrorFailure(QDBusObjectPath,QString,QString,QString)));
+                QStringLiteral("download_mirror_failure"), this, SLOT(onDownloadMirrorFailure(QDBusObjectPath,QString,QString,QString,QString)));
     m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_BASE),
                 QStringLiteral("repo_key_import_request"), this, SLOT(onRepoKeyImportRequest(QDBusObjectPath,QString,QStringList,QString,QString,qint64)));
 
@@ -736,6 +777,12 @@ void Dnf5DaemonClient::disconnectSignals()
     m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
                 QStringLiteral("transaction_after_complete"), this, SLOT(onTransactionAfterComplete(QDBusObjectPath,bool)));
     m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
+                QStringLiteral("transaction_transaction_start"), this, SLOT(onTransactionPrepareStart(QDBusObjectPath,quint64)));
+    m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
+                QStringLiteral("transaction_transaction_progress"), this, SLOT(onTransactionPrepareProgress(QDBusObjectPath,quint64,quint64)));
+    m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
+                QStringLiteral("transaction_transaction_stop"), this, SLOT(onTransactionPrepareStop(QDBusObjectPath,quint64)));
+    m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
                 QStringLiteral("transaction_script_start"), this, SLOT(onTransactionScriptStart(QDBusObjectPath,QString,uint)));
     m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
                 QStringLiteral("transaction_script_stop"), this, SLOT(onTransactionScriptStop(QDBusObjectPath,QString,uint,quint64)));
@@ -746,7 +793,7 @@ void Dnf5DaemonClient::disconnectSignals()
     m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
                 QStringLiteral("transaction_verify_progress"), this, SLOT(onTransactionVerifyProgress(QDBusObjectPath,quint64,quint64)));
     m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
-                QStringLiteral("transaction_verify_stop"), this, SLOT(onTransactionVerifyStop(QDBusObjectPath)));
+                QStringLiteral("transaction_verify_stop"), this, SLOT(onTransactionVerifyStop(QDBusObjectPath,quint64)));
     m_bus.disconnect(QString::fromLatin1(BUS_NAME), m_sessionPath, QString::fromLatin1(IFACE_RPM),
                 QStringLiteral("transaction_elem_progress"), this, SLOT(onTransactionElemProgress(QDBusObjectPath,QString,quint64,quint64)));
 }
@@ -768,9 +815,11 @@ void Dnf5DaemonClient::onDownloadEnd(const QDBusObjectPath &, const QString &id,
     Q_EMIT downloadEnd(id, status, msg);
 }
 
-void Dnf5DaemonClient::onDownloadMirrorFailure(const QDBusObjectPath &, const QString &id, const QString &msg, const QString &url)
+void Dnf5DaemonClient::onDownloadMirrorFailure(const QDBusObjectPath &, const QString &id,
+                                               const QString &msg, const QString &url,
+                                               const QString &metadata)
 {
-    Q_EMIT downloadMirrorFailure(id, msg, url);
+    Q_EMIT downloadMirrorFailure(id, msg, url, metadata);
 }
 
 void Dnf5DaemonClient::onRepoKeyImportRequest(const QDBusObjectPath &, const QString &keyId, const QStringList &userIds,
@@ -810,6 +859,21 @@ void Dnf5DaemonClient::onTransactionAfterComplete(const QDBusObjectPath &, bool 
     Q_EMIT transactionAfterComplete(success);
 }
 
+void Dnf5DaemonClient::onTransactionPrepareStart(const QDBusObjectPath &, quint64 total)
+{
+    Q_EMIT transactionPrepareStart(total);
+}
+
+void Dnf5DaemonClient::onTransactionPrepareProgress(const QDBusObjectPath &, quint64 processed, quint64 total)
+{
+    Q_EMIT transactionPrepareProgress(processed, total);
+}
+
+void Dnf5DaemonClient::onTransactionPrepareStop(const QDBusObjectPath &, quint64 total)
+{
+    Q_EMIT transactionPrepareStop(total);
+}
+
 void Dnf5DaemonClient::onTransactionScriptStart(const QDBusObjectPath &, const QString &nevra, uint type)
 {
     Q_EMIT transactionScriptStart(nevra, type);
@@ -835,8 +899,9 @@ void Dnf5DaemonClient::onTransactionVerifyProgress(const QDBusObjectPath &, quin
     Q_EMIT transactionVerifyProgress(processed, total);
 }
 
-void Dnf5DaemonClient::onTransactionVerifyStop(const QDBusObjectPath &)
+void Dnf5DaemonClient::onTransactionVerifyStop(const QDBusObjectPath &, quint64 total)
 {
+    Q_UNUSED(total)
     Q_EMIT transactionVerifyStop();
 }
 
@@ -859,12 +924,11 @@ QList<Repository> Dnf5DaemonClient::repoList(const QStringList &attrs, const QSt
 
     QVariant result;
     QString error;
-    // Block the raw D-Bus error emitted by callSync so we can replace it
-    // with a localized error message.
-    bool wasBlocked = blockSignals(true);
+    // Suppress only the raw D-Bus error so we can replace it with a localized
+    // error message; repository loading must never block transaction signals.
     bool ok = callSync(m_sessionPath, QString::fromLatin1(IFACE_REPO),
-                       QStringLiteral("list"), {QVariant(options)}, result, error);
-    blockSignals(wasBlocked);
+                       QStringLiteral("list"), {QVariant(options)}, result, error,
+                       kDefaultCallTimeoutMs, true);
     if (!ok) {
         m_lastError = i18n("Cannot load repositories.");
         Q_EMIT errorOccurred(m_lastError);
@@ -1378,18 +1442,17 @@ bool Dnf5DaemonClient::doTransaction(const QVariantMap &options)
     // 20-minute call.
     //
     // HOW PROGRESS SIGNALS REACH THE UI (mirroring yumex-ng):
-    // yumex-ng calls do_transaction with reply_handler/error_handler and runs
-    // a GLib.MainLoop while waiting; that loop dispatches the daemon's
-    // download_progress / transaction_action_* signals to the UI. The Qt
-    // equivalent is QDBus::BlockWithGui: it blocks for the reply but keeps
-    // pumping the Qt event loop, so every D-Bus signal the daemon emits
-    // during the transaction is delivered to our slots and forwarded to the
-    // ProgressDialog. (QDBus::Block, by contrast, does NOT dispatch signals,
-    // which is why the dialog used to be stuck at "Preparing...".)
+    // yumex-ng calls do_transaction with reply/error handlers and runs a
+    // GLib.MainLoop while waiting. Here an asynchronous D-Bus call is paired
+    // with QDBusPendingCallWatcher and a nested QEventLoop. Unlike a blocking
+    // call, this guarantees that download_*, transaction_* and GPG-request
+    // signals are dispatched for the entire transaction, including while the
+    // caller is waiting for the final method reply.
     //
     // doTransaction() is always invoked on the GUI/main thread (Transaction-
-    // Manager marshals it via Qt::BlockingQueuedConnection), so BlockWithGui
-    // is valid here.
+    // Manager marshals it via Qt::BlockingQueuedConnection), so the nested
+    // event loop uses the same thread and event dispatcher as the D-Bus
+    // connection and all UI receivers.
     //
     // The resolved transaction is bound to the session that resolve() ran on.
     // A reconnect during the call would open a fresh session with no resolved
@@ -1420,7 +1483,14 @@ bool Dnf5DaemonClient::doTransaction(const QVariantMap &options)
             QString::fromLatin1(IFACE_GOAL),
             QStringLiteral("do_transaction"));
         msg.setArguments({QVariant(opts)});
-        reply = m_bus.call(msg, QDBus::BlockWithGui, kLongCallTimeoutMs);
+
+        QDBusPendingCallWatcher watcher(m_bus.asyncCall(msg, kLongCallTimeoutMs));
+        QEventLoop waitLoop;
+        connect(&watcher, &QDBusPendingCallWatcher::finished,
+                &waitLoop, &QEventLoop::quit);
+        if (!watcher.isFinished())
+            waitLoop.exec();
+        reply = watcher.reply();
     }
 
     // If the method reply was lost but the daemon's TransactionAfterComplete
@@ -1586,13 +1656,33 @@ bool Dnf5DaemonClient::confirmKey(const QString &keyId, bool confirmed)
 {
     if (m_sessionPath.isEmpty())
         return false;
+
     // confirm_key is polkit-gated (hardcoded 2-minute auth window), so use
-    // the long timeout.
-    QDBusMessage msg = callMethod(m_sessionPath, QString::fromLatin1(IFACE_REPO),
-                                  QStringLiteral("confirm_key"),
-                                  {QVariant(keyId), QVariant(confirmed)},
-                                  kLongCallTimeoutMs);
-    return msg.type() == QDBusMessage::ReplyMessage;
+    // the long timeout. On the GUI thread keep dispatching events while the
+    // daemon processes the answer; this method is normally called from the
+    // repo_key_import_request handler inside doTransaction()'s event loop.
+    if (QThread::currentThread() == thread()) {
+        // doTransaction() deliberately holds m_callMutex while its nested
+        // event loop dispatches this request. A worker-thread D-Bus call may
+        // hold the same mutex while the daemon waits for this answer. Taking
+        // callMethod() here would therefore wait for a call that cannot finish
+        // until confirm_key is sent. Reply directly on the existing bus instead:
+        // QDBusConnection supports nested calls, and BlockWithGui continues to
+        // dispatch the transaction's remaining signals.
+        QDBusMessage request = QDBusMessage::createMethodCall(
+            QString::fromLatin1(BUS_NAME), m_sessionPath,
+            QString::fromLatin1(IFACE_REPO), QStringLiteral("confirm_key"));
+        request.setArguments({QVariant(keyId), QVariant(confirmed)});
+        const QDBusMessage reply = m_bus.call(request, QDBus::BlockWithGui,
+                                              kLongCallTimeoutMs);
+        return reply.type() == QDBusMessage::ReplyMessage;
+    }
+
+    const QDBusMessage reply = callMethod(
+        m_sessionPath, QString::fromLatin1(IFACE_REPO),
+        QStringLiteral("confirm_key"), {QVariant(keyId), QVariant(confirmed)},
+        kLongCallTimeoutMs, QDBus::Block);
+    return reply.type() == QDBusMessage::ReplyMessage;
 }
 
 // === Advisory ===
