@@ -5,6 +5,13 @@
 #include <QDebug>
 #include <QtConcurrent>
 #include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QUrl>
+#include <QTimer>
 #include <QRegularExpression>
 #include <QLatin1Char>
 #include <memory>
@@ -21,6 +28,7 @@ static const char *const kSearchColumns =
 FlatpakBackend::FlatpakBackend(QObject *parent)
     : QObject(parent)
     , m_available(false)
+    , m_networkManager(new QNetworkAccessManager(this))
 {
     qRegisterMetaType<FlatpakApp>("Miryu::FlatpakApp");
     qRegisterMetaType<QList<FlatpakApp>>("QList<Miryu::FlatpakApp>");
@@ -223,11 +231,13 @@ QSet<QString> FlatpakBackend::parseUpgradableOutput(const QByteArray &output)
 }
 
 /*!
- * Parse the output of \c flatpak remotes and return a list of remote names.
+ * Parse the output of \c flatpak remotes --columns=name,title.
+ * The map key is the remote name used by Flatpak commands; the value is
+ * the human-readable title shown in the UI.
  */
-QStringList FlatpakBackend::parseRemotesOutput(const QByteArray &output)
+QMap<QString, QString> FlatpakBackend::parseRemotesOutput(const QByteArray &output)
 {
-    QStringList remotes;
+    QMap<QString, QString> remotes;
 
     QString text = QString::fromUtf8(output);
     const QStringList lines = text.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
@@ -239,11 +249,16 @@ QStringList FlatpakBackend::parseRemotesOutput(const QByteArray &output)
         if (line.trimmed().isEmpty())
             continue;
 
-        // flatpak remotes output may be "name\ttitle" or just "name"
-        QStringList fields = line.split(QLatin1Char('\t'));
-        QString name = fields.value(0).trimmed();
-        if (!name.isEmpty())
-            remotes.append(name);
+        const QStringList fields = line.split(QLatin1Char('\t'));
+        const QString name = fields.value(0).trimmed();
+        const QString title = fields.value(1).trimmed();
+        if (name.isEmpty())
+            continue;
+        if (name.compare(QStringLiteral("Name"), Qt::CaseInsensitive) == 0 &&
+            title.compare(QStringLiteral("Title"), Qt::CaseInsensitive) == 0)
+            continue;
+
+        remotes.insert(name, title.isEmpty() ? name : title);
     }
 
     return remotes;
@@ -294,21 +309,72 @@ void FlatpakBackend::loadInstalledApps()
 
 void FlatpakBackend::loadRemotes()
 {
-    auto *watcher = new QFutureWatcher<QStringList>(this);
-    connect(watcher, &QFutureWatcher<QStringList>::finished, this, [this, watcher]() {
+    auto *watcher = new QFutureWatcher<QMap<QString, QString>>(this);
+    connect(watcher, &QFutureWatcher<QMap<QString, QString>>::finished, this, [this, watcher]() {
         Q_EMIT remotesLoaded(watcher->result());
         watcher->deleteLater();
     });
 
     watcher->setFuture(QtConcurrent::run([this]() {
         bool ok;
-        QString output = executeSync({QStringLiteral("remotes")}, ok);
+        QString output = executeSync(
+            {QStringLiteral("remotes"), QStringLiteral("--columns=name,title")}, ok);
         if (!ok) {
             Q_EMIT errorOccurred(output);
-            return QStringList();
+            return QMap<QString, QString>();
         }
         return parseRemotesOutput(output.toUtf8());
     }));
+}
+
+void FlatpakBackend::loadPopularApps()
+{
+    QNetworkRequest request(
+        QUrl(QStringLiteral("https://flathub.org/api/v2/collection/popular")));
+    request.setRawHeader("User-Agent", "miryu-software-center");
+
+    auto *reply = m_networkManager->get(request);
+    QTimer::singleShot(30000, reply, [reply]() {
+        if (reply->isRunning())
+            reply->abort();
+    });
+
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+        reply->deleteLater();
+
+        if (reply->error() != QNetworkReply::NoError) {
+            Q_EMIT popularAppsLoaded({});
+            Q_EMIT errorOccurred(QStringLiteral("Failed to load popular Flatpak apps: %1").arg(reply->errorString()));
+            return;
+        }
+
+        QJsonParseError parseError;
+        const QJsonDocument document = QJsonDocument::fromJson(reply->readAll(), &parseError);
+        const QJsonValue hits = document.object().value(QStringLiteral("hits"));
+        if (parseError.error != QJsonParseError::NoError || !hits.isArray()) {
+            Q_EMIT popularAppsLoaded({});
+            Q_EMIT errorOccurred(QStringLiteral("Flathub returned an invalid popular apps response."));
+            return;
+        }
+
+        QList<FlatpakApp> apps;
+        for (const QJsonValue &value : hits.toArray()) {
+            const QJsonObject hit = value.toObject();
+            QJsonObject appObject;
+            appObject[QStringLiteral("name")] = hit.value(QStringLiteral("name"));
+            appObject[QStringLiteral("application")] = hit.value(QStringLiteral("app_id"));
+            appObject[QStringLiteral("branch")] = QStringLiteral("stable");
+            appObject[QStringLiteral("remote")] = QStringLiteral("flathub");
+            appObject[QStringLiteral("description")] = hit.value(QStringLiteral("summary"));
+
+            FlatpakApp app = FlatpakApp::fromSearchJson(appObject);
+            if (!app.appId.isEmpty())
+                apps.append(app);
+            if (apps.size() >= 50)
+                break;
+        }
+        Q_EMIT popularAppsLoaded(apps);
+    });
 }
 
 void FlatpakBackend::searchApps(const QString &keyword)
@@ -340,70 +406,99 @@ void FlatpakBackend::searchApps(const QString &keyword)
 
 void FlatpakBackend::executeAsync(const QString &appId, const QString &operation, const QStringList &args)
 {
-    Q_EMIT operationStarted(appId, operation);
+    m_pendingOperations.enqueue({appId, operation, args});
+    if (!m_operationRunning)
+        startNextOperation();
+}
+
+void FlatpakBackend::startNextOperation()
+{
+    if (m_operationRunning || m_pendingOperations.isEmpty())
+        return;
+
+    m_operationRunning = true;
+    const OperationRequest request = m_pendingOperations.dequeue();
+    Q_EMIT operationStarted(request.appId, request.operation);
 
     auto *proc = new QProcess(this);
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     env.insert(QStringLiteral("LC_ALL"), QStringLiteral("C.UTF-8"));
     env.insert(QStringLiteral("LANG"), QStringLiteral("C.UTF-8"));
     proc->setProcessEnvironment(env);
+    proc->setProcessChannelMode(QProcess::SeparateChannels);
 
-    // Use a shared pointer so the lambda captures remain valid for the
-    // lifetime of the QProcess.  A raw local QString would dangle once
-    // executeAsync() returns, causing use-after-free in the async handlers.
-    auto lastMessage = std::make_shared<QString>();
+    struct OperationState {
+        QString lastMessage;
+        bool completed = false;
+    };
+    auto state = std::make_shared<OperationState>();
 
-    connect(proc, &QProcess::readyReadStandardOutput, this, [this, appId, proc, lastMessage]() {
-        QByteArray data = proc->readAllStandardOutput();
-        // flatpak outputs progress as plain text lines; emit each non-empty
-        // line as a progress message with an indeterminate percentage (-1).
+    // All terminal paths pass through this idempotent cleanup. Using proc as
+    // the connection context releases every lambda capture when it is deleted.
+    auto complete = [this, proc, state, request](bool success, const QString &message) {
+        if (state->completed)
+            return;
+        state->completed = true;
+
+        if (proc->state() != QProcess::NotRunning)
+            proc->kill();
+        proc->deleteLater();
+
+        Q_EMIT operationFinished(request.appId, request.operation, success, message);
+        m_operationRunning = false;
+        QTimer::singleShot(0, this, [this]() { startNextOperation(); });
+    };
+
+    connect(proc, &QProcess::readyReadStandardOutput, proc,
+            [this, proc, state, appId = request.appId]() {
+        const QByteArray data = proc->readAllStandardOutput();
+        static const QRegularExpression percentRegex(QStringLiteral("(\\d+)%"));
         for (const QByteArray &line : data.split('\n')) {
             QString text = QString::fromUtf8(line).trimmed();
             if (text.isEmpty())
                 continue;
+            if (text.size() > 4096)
+                text.truncate(4096);
 
-            // Try to extract a percentage from lines like "Downloading: 45%"
             int percent = -1;
-            QRegularExpression rx(QStringLiteral("(\\d+)%"));
-            QRegularExpressionMatch match = rx.match(text);
+            const QRegularExpressionMatch match = percentRegex.match(text);
             if (match.hasMatch())
                 percent = match.captured(1).toInt();
 
+            state->lastMessage = text;
             Q_EMIT operationProgress(appId, text, percent);
-            *lastMessage = text;
         }
     });
 
-    connect(proc, &QProcess::readyReadStandardError, this, [this, appId, proc, lastMessage]() {
-        QByteArray data = proc->readAllStandardError();
+    connect(proc, &QProcess::readyReadStandardError, proc, [proc, state]() {
+        const QByteArray data = proc->readAllStandardError();
         for (const QByteArray &line : data.split('\n')) {
             QString text = QString::fromUtf8(line).trimmed();
             if (text.isEmpty())
                 continue;
-            *lastMessage = text;
+            if (text.size() > 4096)
+                text.truncate(4096);
+            state->lastMessage = text;
         }
     });
 
-    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
-            [this, appId, operation, proc, lastMessage](int exitCode, QProcess::ExitStatus) {
-        bool success = (exitCode == 0);
-        QString msg = *lastMessage;
-        if (!success && msg.isEmpty())
-            msg = QStringLiteral("Operation failed with exit code %1").arg(exitCode);
-        Q_EMIT operationFinished(appId, operation, success, msg);
-        proc->deleteLater();
+    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), proc,
+            [state, complete](int exitCode, QProcess::ExitStatus exitStatus) {
+        const bool success = exitStatus == QProcess::NormalExit && exitCode == 0;
+        QString message = state->lastMessage;
+        if (!success && message.isEmpty())
+            message = QStringLiteral("Operation failed with exit code %1").arg(exitCode);
+        complete(success, message);
     });
 
-    connect(proc, &QProcess::errorOccurred, this, [this, appId, operation, proc](QProcess::ProcessError) {
-        Q_EMIT operationFinished(appId, operation, false, proc->errorString());
-        proc->deleteLater();
+    connect(proc, &QProcess::errorOccurred, proc,
+            [proc, complete](QProcess::ProcessError) {
+        complete(false, proc->errorString());
     });
 
-    proc->start(QStringLiteral("flatpak"), args);
-    if (!proc->waitForStarted(5000)) {
-        Q_EMIT operationFinished(appId, operation, false, QStringLiteral("Failed to start flatpak"));
-        proc->deleteLater();
-    }
+    proc->start(QStringLiteral("flatpak"), request.args);
+    if (!proc->waitForStarted(5000))
+        complete(false, QStringLiteral("Failed to start flatpak"));
 }
 
 void FlatpakBackend::installApp(const QString &remote, const QString &appId)

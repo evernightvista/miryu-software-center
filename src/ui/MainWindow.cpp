@@ -841,7 +841,7 @@ void MainWindow::runRpmInstallWithPolkit(const QStringList &files, bool offline)
         m_progressDialog->show();
 
         auto *runWatcher = new QFutureWatcher<TransactionResult>(this);
-        connect(runWatcher, &QFutureWatcher<TransactionResult>::finished, this, [this, runWatcher]() {
+        connect(runWatcher, &QFutureWatcher<TransactionResult>::finished, this, [this, runWatcher, offline]() {
             if (m_closing.load(std::memory_order_acquire)) {
                 runWatcher->deleteLater();
                 return;
@@ -854,7 +854,8 @@ void MainWindow::runRpmInstallWithPolkit(const QStringList &files, bool offline)
             runWatcher->deleteLater();
 
             if (runResult.completed) {
-                KMessageBox::information(this, i18n("RPM installation completed successfully."));
+                showTransactionSuccessMessage(i18n("RPM installation completed successfully."),
+                                              offline || runResult.requiresOffline);
                 onRefresh();
                 checkRestartNeeded(runResult);
             } else if (runResult.brokenDependency) {
@@ -981,6 +982,8 @@ void MainWindow::onUnqueuePackage(const QString &nevra)
 {
     m_queueModel->removePackage(nevra);
     m_packageModel->setQueued(nevra, false);
+    if (m_updatesView)
+        m_updatesView->model()->setQueued(nevra, false);
     updateStatusBar();
 }
 
@@ -1056,7 +1059,8 @@ void MainWindow::onApplyQueue()
             m_progressDialog->show();
 
             auto *runWatcher = new QFutureWatcher<TransactionResult>(this);
-            connect(runWatcher, &QFutureWatcher<TransactionResult>::finished, this, [this, runWatcher]() {
+            const bool offline = m_resultDialog->isOffline();
+            connect(runWatcher, &QFutureWatcher<TransactionResult>::finished, this, [this, runWatcher, offline]() {
                 if (m_closing.load(std::memory_order_acquire)) {
                     runWatcher->deleteLater();
                     return;
@@ -1067,7 +1071,8 @@ void MainWindow::onApplyQueue()
 
                 TransactionResult runResult = runWatcher->result();
                 if (runResult.completed) {
-                    KMessageBox::information(this, i18n("Transaction completed successfully."));
+                    showTransactionSuccessMessage(i18n("Transaction completed successfully."),
+                                                  offline || runResult.requiresOffline);
                     m_queueModel->clear();
                     m_packageModel->clearQueued();
                     updateStatusBar();
@@ -1097,7 +1102,6 @@ void MainWindow::onApplyQueue()
                 runWatcher->deleteLater();
             });
 
-            bool offline = m_resultDialog->isOffline();
             m_statusLabel->setText(i18n("Applying transaction..."));
 
             TransactionOptions opts;
@@ -1774,7 +1778,8 @@ void MainWindow::onSystemUpgrade()
                 m_progressDialog->show();
 
                 auto *runWatcher = new QFutureWatcher<TransactionResult>(this);
-                connect(runWatcher, &QFutureWatcher<TransactionResult>::finished, this, [this, runWatcher]() {
+                const bool offline = m_resultDialog->isOffline();
+                connect(runWatcher, &QFutureWatcher<TransactionResult>::finished, this, [this, runWatcher, offline]() {
                     if (m_closing.load(std::memory_order_acquire)) {
                         runWatcher->deleteLater();
                         return;
@@ -1784,7 +1789,8 @@ void MainWindow::onSystemUpgrade()
                     m_progressDialog = nullptr;
                     TransactionResult r = runWatcher->result();
                     if (r.completed) {
-                        KMessageBox::information(this, i18n("System upgrade transaction completed."));
+                        showTransactionSuccessMessage(i18n("System upgrade transaction completed."),
+                                                      offline || r.requiresOffline);
                         checkRestartNeeded(r);
                     } else if (r.brokenDependency) {
                         showTransactionError(r);
@@ -1805,7 +1811,7 @@ void MainWindow::onSystemUpgrade()
                 });
 
                 TransactionOptions opts;
-                opts.offline = m_resultDialog->isOffline();
+                opts.offline = offline;
                 opts.parameter = targetVersion;
                 opts.command = TransactionCommand::SystemUpgrade;
                 runWatcher->setFuture(QtConcurrent::run([this, opts]() {
@@ -2052,6 +2058,18 @@ bool MainWindow::isRunningKernel(const Package &pkg) const
     if (!pkg.name.startsWith(QStringLiteral("kernel")))
         return false;
     return (pkg.evr() + QStringLiteral(".") + pkg.arch) == release;
+}
+
+void MainWindow::showTransactionSuccessMessage(const QString &message, bool offline)
+{
+    if (offline) {
+        KMessageBox::information(this,
+            i18n("Update installation is pending. Restart your computer to complete the update. "
+                 "If you are not ready to restart, you can continue using your computer."),
+            i18n("Offline Update"));
+        return;
+    }
+    KMessageBox::information(this, message);
 }
 
 void MainWindow::showTransactionError(const TransactionResult &result)
@@ -2405,8 +2423,20 @@ void MainWindow::onUpdatesLoaded(const QList<Package> &updates)
 {
     m_progressBar->setVisible(false);
     auto *model = qobject_cast<PackageModel*>(m_updatesView->model());
-    if (model)
-        model->setPackages(updates);
+    if (model) {
+        QList<Package> displayUpdates = updates;
+        const QList<Package> queuedPackages = m_queueModel->packages();
+        for (auto &pkg : displayUpdates) {
+            for (const auto &queuedPkg : queuedPackages) {
+                if (pkg.nevra() == queuedPkg.nevra()) {
+                    pkg.queued = true;
+                    pkg.todo = queuedPkg.todo;
+                    break;
+                }
+            }
+        }
+        model->setPackages(displayUpdates);
+    }
 
     m_updatesStack->setCurrentIndex(updates.isEmpty() ? 1 : 0);
     if (updates.isEmpty())

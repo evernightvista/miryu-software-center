@@ -233,7 +233,10 @@ static QPixmap loadFlatpakIcon(const QString &appId, const QString &appName, int
 class FlatpakAppDelegate : public QStyledItemDelegate
 {
 public:
-    using QStyledItemDelegate::QStyledItemDelegate;
+    explicit FlatpakAppDelegate(const QMap<QString, QString> &remotes, QObject *parent = nullptr)
+        : QStyledItemDelegate(parent), m_remotes(remotes)
+    {
+    }
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const override
@@ -320,12 +323,14 @@ public:
             painter->drawText(statusRect, Qt::AlignRight | Qt::AlignTop, i18n("Install"));
         }
 
-        // Size
-        QRect sizeRect = opt.rect.adjusted(opt.rect.width() - 110, opt.rect.height() / 2, -8, -4);
+        // Remote repository title (the name is only a fallback until titles load)
+        QRect remoteRect = opt.rect.adjusted(opt.rect.width() - 110, opt.rect.height() / 2, -8, -4);
         painter->setFont(idFont);
         painter->setPen(secondaryText);
-        painter->drawText(sizeRect, Qt::AlignRight | Qt::AlignTop,
-                          index.data(FlatpakAppModel::SizeTextRole).toString());
+        const QString remoteName = index.data(FlatpakAppModel::RemoteRole).toString();
+        const QString remoteTitle = m_remotes.value(remoteName, remoteName);
+        painter->drawText(remoteRect, Qt::AlignRight | Qt::AlignTop,
+                          painter->fontMetrics().elidedText(remoteTitle, Qt::ElideRight, remoteRect.width()));
 
         painter->restore();
     }
@@ -336,6 +341,9 @@ public:
         Q_UNUSED(index)
         return QSize(400, 56);
     }
+
+private:
+    const QMap<QString, QString> &m_remotes;
 };
 
 // ---------------------------------------------------------------------------
@@ -357,6 +365,8 @@ FlatpakPage::FlatpakPage(FlatpakBackend *backend, QWidget *parent)
             this, &FlatpakPage::onRemotesLoaded);
     connect(m_backend, &FlatpakBackend::searchCompleted,
             this, &FlatpakPage::onSearchCompleted);
+    connect(m_backend, &FlatpakBackend::popularAppsLoaded,
+            this, &FlatpakPage::onPopularAppsLoaded);
     connect(m_backend, &FlatpakBackend::operationStarted,
             this, &FlatpakPage::onOperationStarted);
     connect(m_backend, &FlatpakBackend::operationProgress,
@@ -483,7 +493,7 @@ void FlatpakPage::setupInstalledPage(QWidget *page)
     // App list
     m_installedList = new QListView;
     m_installedList->setModel(m_installedModel);
-    m_installedList->setItemDelegate(new FlatpakAppDelegate(this));
+    m_installedList->setItemDelegate(new FlatpakAppDelegate(m_remotes, this));
     m_installedList->setUniformItemSizes(true);
     m_installedList->setSpacing(1);
     m_installedList->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -544,10 +554,13 @@ void FlatpakPage::setupStorePage(QWidget *page)
 
     m_storeList = new QListView;
     m_storeList->setModel(m_storeModel);
-    m_storeList->setItemDelegate(new FlatpakAppDelegate(this));
+    m_storeList->setItemDelegate(new FlatpakAppDelegate(m_remotes, this));
     m_storeList->setUniformItemSizes(true);
     m_storeList->setSpacing(1);
     m_storeList->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    m_storeList->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_storeList, &QListView::customContextMenuRequested,
+            this, &FlatpakPage::showStoreContextMenu);
     connect(m_storeList, &QListView::activated, this, &FlatpakPage::onStoreAppClicked);
     connect(m_storeList->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, [this]() {
@@ -705,6 +718,8 @@ void FlatpakPage::onSidebarChanged(int index)
 
     if (index == 0) {
         m_statusLabel->setText(i18n("Loading installed Flatpak apps..."));
+    } else if (m_searchEdit->text().trimmed().isEmpty()) {
+        loadPopularApps();
     } else {
         m_statusLabel->setText(i18n("Search the Flatpak store"));
     }
@@ -805,11 +820,22 @@ void FlatpakPage::onUpdateAll()
 // Store page slots
 // ---------------------------------------------------------------------------
 
+void FlatpakPage::loadPopularApps()
+{
+    showStoreListView();
+    m_statusLabel->setText(i18n("Loading popular Flatpak apps..."));
+    m_progressBar->setRange(0, 0);
+    m_progressBar->setVisible(true);
+    m_backend->loadPopularApps();
+}
+
 void FlatpakPage::onSearch()
 {
     QString keyword = m_searchEdit->text().trimmed();
-    if (keyword.isEmpty())
+    if (keyword.isEmpty()) {
+        loadPopularApps();
         return;
+    }
 
     showStoreListView();
     m_statusLabel->setText(i18n("Searching for '%1'...", keyword));
@@ -836,6 +862,39 @@ void FlatpakPage::onRemoteChanged()
             filtered.append(app);
     }
     m_storeModel->setApps(filtered);
+}
+
+void FlatpakPage::showStoreContextMenu(const QPoint &pos)
+{
+    const QModelIndex index = m_storeList->indexAt(pos);
+    if (!index.isValid())
+        return;
+
+    const FlatpakApp app = m_storeModel->appAt(index.row());
+    if (app.appId.isEmpty())
+        return;
+
+    m_storeList->setCurrentIndex(index);
+    QMenu menu(this);
+    if (app.installed) {
+        auto *uninstallAction = menu.addAction(
+            QIcon::fromTheme(QStringLiteral("edit-delete")), i18n("Uninstall"));
+        connect(uninstallAction, &QAction::triggered, this, [this, app]() {
+            const auto ret = KMessageBox::warningTwoActions(this,
+                i18n("Uninstall '%1' (%2)?", app.name, app.appId),
+                i18n("Uninstall"), KGuiItem(i18n("Yes")), KGuiItem(i18n("No")));
+            if (ret == KMessageBox::PrimaryAction)
+                m_backend->uninstallApp(app.appId);
+        });
+    } else {
+        auto *installAction = menu.addAction(
+            QIcon::fromTheme(QStringLiteral("download")), i18n("Install"));
+        connect(installAction, &QAction::triggered, this, [this, app]() {
+            m_backend->installApp(app.remote, app.appId);
+        });
+    }
+
+    menu.exec(m_storeList->viewport()->mapToGlobal(pos));
 }
 
 void FlatpakPage::onStoreAppClicked(const QModelIndex &index)
@@ -870,7 +929,7 @@ void FlatpakPage::showStoreDetailView(const FlatpakApp &app)
     m_detailAppId->setText(i18n("Application ID: %1", app.appId));
     m_detailVersion->setText(i18n("Version: %1", app.version));
     m_detailBranch->setText(i18n("Branch: %1", app.branch));
-    m_detailRemote->setText(i18n("Remote: %1", app.remote));
+    m_detailRemote->setText(i18n("Remote: %1", m_remotes.value(app.remote, app.remote)));
     m_detailInstallType->setText(i18n("Installation: %1", app.installType));
     m_detailSize->setText(app.size > 0
                               ? i18n("Size: %1", FlatpakApp::formatSize(app.size))
@@ -975,6 +1034,8 @@ void FlatpakPage::reload()
     m_progressBar->setVisible(true);
     m_backend->loadInstalledApps();
     m_backend->loadRemotes();
+    if (m_sidebar->currentRow() == 1 && m_searchEdit->text().trimmed().isEmpty())
+        loadPopularApps();
 }
 
 void FlatpakPage::onInstalledAppsLoaded(const QList<FlatpakApp> &apps)
@@ -982,6 +1043,8 @@ void FlatpakPage::onInstalledAppsLoaded(const QList<FlatpakApp> &apps)
     m_progressBar->setVisible(false);
     m_allInstalledApps = apps;
     m_installedModel->setApps(apps);
+    for (const auto &app : apps)
+        m_storeModel->updateAppStatus(app.appId, true, app.upgradable);
 
     int upgCount = 0;
     for (const auto &app : apps) {
@@ -1003,17 +1066,23 @@ void FlatpakPage::onInstalledAppsLoaded(const QList<FlatpakApp> &apps)
         m_statusLabel->setText(i18np("%1 app installed", "%1 apps installed", apps.size()));
 }
 
-void FlatpakPage::onRemotesLoaded(const QStringList &remotes)
+void FlatpakPage::onRemotesLoaded(const QMap<QString, QString> &remotes)
 {
     m_remotes = remotes;
+    m_installedList->viewport()->update();
+    m_storeList->viewport()->update();
+    if (!m_currentDetailApp.appId.isEmpty()) {
+        m_detailRemote->setText(i18n("Remote: %1",
+            m_remotes.value(m_currentDetailApp.remote, m_currentDetailApp.remote)));
+    }
 
     // Preserve selection
     QString currentRemote = m_remoteCombo->currentData().toString();
 
     m_remoteCombo->clear();
     m_remoteCombo->addItem(i18n("All Remotes"), QString());
-    for (const auto &remote : remotes)
-        m_remoteCombo->addItem(remote, remote);
+    for (auto it = remotes.cbegin(); it != remotes.cend(); ++it)
+        m_remoteCombo->addItem(it.value(), it.key());
 
     // Restore selection
     if (!currentRemote.isEmpty()) {
@@ -1025,6 +1094,8 @@ void FlatpakPage::onRemotesLoaded(const QStringList &remotes)
 
 void FlatpakPage::onSearchCompleted(const QList<FlatpakApp> &apps)
 {
+    if (m_searchEdit->text().trimmed().isEmpty())
+        return;
     m_progressBar->setVisible(false);
 
     // Filter by remote if one is selected
@@ -1039,7 +1110,39 @@ void FlatpakPage::onSearchCompleted(const QList<FlatpakApp> &apps)
     }
 
     m_storeModel->setApps(filtered);
+    for (const auto &installedApp : m_allInstalledApps) {
+        m_storeModel->updateAppStatus(installedApp.appId, true, installedApp.upgradable);
+    }
     m_statusLabel->setText(i18np("%1 result", "%1 results", filtered.size()));
+}
+
+void FlatpakPage::onPopularAppsLoaded(const QList<FlatpakApp> &apps)
+{
+    if (m_sidebar->currentRow() != 1 || !m_searchEdit->text().trimmed().isEmpty())
+        return;
+
+    m_progressBar->setVisible(false);
+    const QString remote = m_remoteCombo->currentData().toString();
+    QList<FlatpakApp> filtered;
+    for (auto app : apps) {
+        if (!remote.isEmpty() && app.remote != remote)
+            continue;
+
+        for (const auto &installedApp : m_allInstalledApps) {
+            if (app.appId == installedApp.appId) {
+                app.installed = true;
+                app.upgradable = installedApp.upgradable;
+                app.version = installedApp.version;
+                app.installType = installedApp.installType;
+                app.size = installedApp.size;
+                break;
+            }
+        }
+        filtered.append(app);
+    }
+
+    m_storeModel->setApps(filtered);
+    m_statusLabel->setText(i18n("Popular Flatpak apps: %1", filtered.size()));
 }
 
 void FlatpakPage::onOperationStarted(const QString &appId, const QString &operation)

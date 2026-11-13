@@ -7,6 +7,8 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QPushButton>
+#include <QToolButton>
+#include <QStyle>
 #include <QHeaderView>
 #include <QDialogButtonBox>
 #include <QFont>
@@ -294,8 +296,23 @@ void TransactionResultDialog::setupUI(const TransactionResult &result)
     layout->addWidget(m_totalLabel);
 
     // Offline checkbox
+    auto *offlineLayout = new QHBoxLayout;
+    offlineLayout->setContentsMargins(0, 0, 0, 0);
     m_offlineCheck = new QCheckBox(i18n("Apply offline (on next reboot)"));
-    layout->addWidget(m_offlineCheck);
+    offlineLayout->addWidget(m_offlineCheck);
+    if (result.requiresOffline) {
+        m_offlineCheck->setChecked(true);
+        m_offlineCheck->setEnabled(false);
+
+        auto *offlineHelpButton = new QToolButton;
+        offlineHelpButton->setAutoRaise(true);
+        offlineHelpButton->setIcon(style()->standardIcon(QStyle::SP_MessageBoxQuestion));
+        offlineHelpButton->setToolTip(i18n(
+            "This update includes DNF5 core components and must be applied offline to continue."));
+        offlineLayout->addWidget(offlineHelpButton);
+    }
+    offlineLayout->addStretch();
+    layout->addLayout(offlineLayout);
 
     // Buttons
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);

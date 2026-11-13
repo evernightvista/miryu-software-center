@@ -6,6 +6,28 @@
 
 namespace Miryu {
 
+namespace {
+
+bool transactionRequiresOffline(const QVariantList &transactionItems)
+{
+    for (const auto &item : transactionItems) {
+        const QVariantList parts = item.toList();
+        if (parts.size() < 5)
+            continue;
+        if (parts[0].toString().compare(QStringLiteral("Package"), Qt::CaseInsensitive) != 0)
+            continue;
+        if (parts[1].toString().compare(QStringLiteral("Reason Change"), Qt::CaseInsensitive) == 0)
+            continue;
+
+        const QVariantMap package = parts[4].toMap();
+        if (package.value(QStringLiteral("name")).toString() == QStringLiteral("dnf5daemon-server"))
+            return true;
+    }
+    return false;
+}
+
+}
+
 bool TransactionManager::hasBrokenDependencyProblems(const QStringList &problems)
 {
     // libdnf5 formats solver failures as "Problem: <description>". A genuine
@@ -222,6 +244,7 @@ bool TransactionManager::buildTransactions(const QList<Package> &packages, const
 TransactionResult TransactionManager::buildResult(const QVariantList &transactionItems, uint resultCode)
 {
     TransactionResult result;
+    result.requiresOffline = transactionRequiresOffline(transactionItems);
 
     if (resultCode == 0 || resultCode == 1) {
         result.completed = true;
@@ -461,8 +484,13 @@ TransactionResult TransactionManager::runTransaction(const TransactionOptions &o
         return result;
     }
 
+    // Updating dnf5daemon-server restarts the daemon from its RPM scriptlet.
+    // Run that transaction offline so the restart cannot kill the very process
+    // applying the update. Detect it again after the final resolve so callers
+    // cannot accidentally bypass the requirement through the UI option.
+    result.requiresOffline = transactionRequiresOffline(resolveResult.transactionItems);
     QVariantMap transOptions;
-    if (opts.offline)
+    if (opts.offline || result.requiresOffline)
         transOptions[QStringLiteral("offline")] = true;
 
     // runTransaction() runs on a worker thread (QtConcurrent::run), but the

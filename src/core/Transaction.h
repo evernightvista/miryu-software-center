@@ -27,6 +27,9 @@ struct TransactionResult
     QString error;
     QStringList problems;
     bool keyInstall = false;
+    // Updating dnf5daemon-server restarts the service running the transaction,
+    // so this transaction must be applied by the offline update mechanism.
+    bool requiresOffline = false;
     // True when the solver reported broken dependencies (either as a WARNING
     // with skipped "broken_dependency" packages, or as a hard ERROR whose
     // resolve logs describe unsatisfiable requires / conflicts). When set the

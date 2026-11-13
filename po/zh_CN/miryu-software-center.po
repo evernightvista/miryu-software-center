@@ -751,6 +751,14 @@ msgstr "返回列表"
 msgid "Loading installed Flatpak apps..."
 msgstr "加载已安装 Flatpak 应用..."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:815
+msgid "Loading popular Flatpak apps..."
+msgstr "正在加载热门 Flatpak 应用..."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1090
+msgid "Popular Flatpak apps: %1"
+msgstr "热门 Flatpak 应用：%1"
+
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:709
 msgid "Search the Flatpak store"
 msgstr "搜索 Flatpak 商店"
@@ -1393,6 +1401,10 @@ msgstr "安装模式"
 msgid "Offline Update"
 msgstr "离线更新"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2063
+msgid "Update installation is pending. Restart your computer to complete the update. If you are not ready to restart, you can continue using your computer."
+msgstr "更新安装已挂起，请重启计算机后完成更新。如果还没有准备好重启，可以继续使用计算机。"
+
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2360
 msgid "Install Now"
 msgstr "立即安装"
@@ -1809,6 +1821,10 @@ msgstr "总安装大小"
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:297
 msgid "Apply offline (on next reboot)"
 msgstr "离线应用(下次重启时)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:310
+msgid "This update includes DNF5 core components and must be applied offline to continue."
+msgstr "本次更新涉及DNF5核心组件更新，需要离线更新才能继续"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:52
 msgid "Daily"

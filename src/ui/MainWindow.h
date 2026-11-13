@@ -197,6 +197,7 @@ private:
     //      package.
     //   3. generic — any other resolution failure, with the problem details.
     void showTransactionError(const Miryu::TransactionResult &result);
+    void showTransactionSuccessMessage(const QString &message, bool offline);
     // Load package names listed as "suggest reboot" from the dnf5
     // configuration drop-in directories
     // (/usr/share/dnf5/suggest-reboot.d/*.conf and

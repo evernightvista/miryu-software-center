@@ -61,8 +61,9 @@ private Q_SLOTS:
     void onUpdateSelected();
 
     void onInstalledAppsLoaded(const QList<FlatpakApp> &apps);
-    void onRemotesLoaded(const QStringList &remotes);
+    void onRemotesLoaded(const QMap<QString, QString> &remotes);
     void onSearchCompleted(const QList<FlatpakApp> &apps);
+    void onPopularAppsLoaded(const QList<FlatpakApp> &apps);
     void onOperationStarted(const QString &appId, const QString &operation);
     void onOperationProgress(const QString &appId, const QString &message, int percent);
     void onOperationFinished(const QString &appId, const QString &operation, bool success, const QString &message);
@@ -73,7 +74,9 @@ private:
     void setupInstalledPage(QWidget *page);
     void setupStorePage(QWidget *page);
     void setupDetailView();
+    void loadPopularApps();
     void showContextMenu(const QPoint &pos);
+    void showStoreContextMenu(const QPoint &pos);
     void showStoreDetailView(const FlatpakApp &app);
     void showStoreListView();
     void updateDetailButtons();
@@ -129,7 +132,7 @@ private:
 
     // State
     QList<FlatpakApp> m_allInstalledApps;
-    QStringList m_remotes;
+    QMap<QString, QString> m_remotes;
     FlatpakApp m_currentDetailApp;
 };
 

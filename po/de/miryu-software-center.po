@@ -790,6 +790,14 @@ msgstr "Zurück zur Liste"
 msgid "Loading installed Flatpak apps..."
 msgstr "Installierte Flatpak-Apps werden geladen..."
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:815
+msgid "Loading popular Flatpak apps..."
+msgstr "Beliebte Flatpak-Apps werden geladen..."
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1090
+msgid "Popular Flatpak apps: %1"
+msgstr "Beliebte Flatpak-Apps: %1"
+
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:709
 msgid "Search the Flatpak store"
 msgstr "Flatpak-Store durchsuchen"
@@ -1453,6 +1461,10 @@ msgstr "Installationsmodus"
 msgid "Offline Update"
 msgstr "Offline-Aktualisierung"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2063
+msgid "Update installation is pending. Restart your computer to complete the update. If you are not ready to restart, you can continue using your computer."
+msgstr "Die Installation der Aktualisierung ist für den nächsten Neustart vorgemerkt. Starten Sie den Computer neu, um die Aktualisierung abzuschließen. Wenn Sie noch nicht bereit für einen Neustart sind, können Sie den Computer weiterhin verwenden."
+
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2360
 msgid "Install Now"
 msgstr "Jetzt installieren"
@@ -1884,6 +1896,10 @@ msgstr "Gesamtgröße der Installation"
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:297
 msgid "Apply offline (on next reboot)"
 msgstr "Offline anwenden (beim nächsten Neustart)"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/TransactionResultDialog.cpp:310
+msgid "This update includes DNF5 core components and must be applied offline to continue."
+msgstr "Dieses Update enthält zentrale DNF5-Komponenten und muss zur Fortsetzung offline angewendet werden."
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/UpdateNotifySettingsDialog.cpp:52
 msgid "Daily"

@@ -4,7 +4,11 @@
 #include <QProcess>
 #include <QFutureWatcher>
 #include <QSet>
+#include <QMap>
+#include <QQueue>
 #include "FlatpakApp.h"
+
+class QNetworkAccessManager;
 
 namespace Miryu {
 
@@ -32,6 +36,7 @@ public:
     // Async queries (emit signals on completion)
     void loadInstalledApps();
     void loadRemotes();
+    void loadPopularApps();
     void searchApps(const QString &keyword);
 
     // Package operations (async, emit signals on progress / completion)
@@ -43,7 +48,8 @@ public:
 
 Q_SIGNALS:
     void installedAppsLoaded(const QList<FlatpakApp> &apps);
-    void remotesLoaded(const QStringList &remotes);
+    void remotesLoaded(const QMap<QString, QString> &remotes);
+    void popularAppsLoaded(const QList<FlatpakApp> &apps);
     void searchCompleted(const QList<FlatpakApp> &apps);
 
     void operationStarted(const QString &appId, const QString &operation);
@@ -53,14 +59,24 @@ Q_SIGNALS:
 
 private:
     bool m_available;
+    QNetworkAccessManager *m_networkManager;
 
     QString executeSync(const QStringList &args, bool &ok);
     void executeAsync(const QString &appId, const QString &operation, const QStringList &args);
+    void startNextOperation();
+
+    struct OperationRequest {
+        QString appId;
+        QString operation;
+        QStringList args;
+    };
+    QQueue<OperationRequest> m_pendingOperations;
+    bool m_operationRunning = false;
 
     QList<FlatpakApp> parseListOutput(const QByteArray &output);
     QList<FlatpakApp> parseSearchOutput(const QByteArray &output);
     QSet<QString> parseUpgradableOutput(const QByteArray &output);
-    QStringList parseRemotesOutput(const QByteArray &output);
+    QMap<QString, QString> parseRemotesOutput(const QByteArray &output);
 
     void checkAvailability();
 };
