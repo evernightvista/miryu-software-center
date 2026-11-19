@@ -3,6 +3,9 @@
 #include <KXmlGuiWindow>
 #include <KSharedConfig>
 
+#include "../core/FlatpakApp.h"
+#include "../core/Package.h"
+
 #include <atomic>
 
 class QStackedWidget;
@@ -90,6 +93,7 @@ private Q_SLOTS:
     void onDeselectAllUpdates();
     void onRefresh();
     void onReloadData();
+    void onRefreshInstalledPackages();
     void onSystemUpgrade();
     void onLoadUpdates(bool refreshMetadata = false);
     void onDistroSync();
@@ -118,6 +122,9 @@ private Q_SLOTS:
     void onSearchCompleted(const QList<Miryu::Package> &packages);
     void onRepositoriesLoaded(const QList<Miryu::Repository> &repos);
     void onUpdatesLoaded(const QList<Miryu::Package> &updates);
+    // Result of the Flatpak update probe; merged with the RPM update list on
+    // the Updates page.
+    void onFlatpakUpdatesLoaded(const QList<Miryu::FlatpakApp> &apps);
     void onTransactionProgress(const QString &message, int percent);
     void onDownloadProgress(const QString &downloadId, qint64 total, qint64 downloaded);
     // Drives the modal ProgressDialog with the *overall* (aggregated)
@@ -206,6 +213,25 @@ private:
     // (separated by ';' or whitespace) whose update requires a reboot.
     QStringList loadSuggestRebootPackages() const;
     bool nevraMatchesAnyPackage(const QString &nevra, const QStringList &packages) const;
+    // Rebuild the Updates list from the RPM + Flatpak update sets (keeping
+    // the queue markers in sync) and toggle the empty-state page.
+    void updateUpdatesView();
+    // Set the permanent status-bar badge; `count` is the total number of
+    // available updates (RPM + Flatpak).
+    void setUpdateCountLabel(int count);
+    // Run the deferred "Start Updates" flow once both update probes have
+    // reported, so Flatpak rows are queued together with RPM rows.
+    void maybeRunPendingStartUpdates();
+    // Build and confirm a transaction containing RPM and/or Flatpak updates.
+    void applyRpmQueue(const QList<Miryu::Package> &packages,
+                       const QList<Miryu::Package> &flatpakPackages = {});
+    // Run the already-built dnf transaction after the summary was accepted.
+    // A preceding successful Flatpak batch changes the final offline message.
+    void runRpmTransaction(bool offline, bool flatpakUpdatesCompleted = false);
+    // Apply Flatpak updates with live CLI progress, then optionally run the
+    // prepared RPM transaction in the same progress dialog.
+    void applyFlatpakUpdates(const QList<Miryu::Package> &flatpakPackages,
+                             bool offline, bool runRpmAfter);
 
     Backend *m_backend;
 
@@ -255,12 +281,20 @@ private:
 
     // Restart-needed banner
     QFrame *m_restartBanner = nullptr;
-    // Description label of the restart banner; its height is tracked via
-    // eventFilter() so the banner hugs the wrapped text.
-    QLabel *m_restartBannerDescLabel = nullptr;
+    // Combined icon/text content of the restart banner; its height is
+    // tracked via eventFilter() so the banner hugs the wrapped text.
+    QWidget *m_restartBannerDescLabel = nullptr;
 
     // Update checker
     UpdateChecker *m_updateChecker;
+
+    // Updates page data: RPM updates (dnf5daemon) and Flatpak updates
+    // (flatpak CLI) are probed independently and merged for display.
+    QList<Miryu::Package> m_rpmUpdates;
+    QList<Miryu::Package> m_flatpakUpdates;
+    bool m_rpmUpdatesLoaded = false;
+    bool m_flatpakUpdatesLoaded = true;   // no Flatpak probe in flight
+    bool m_pendingStartUpdates = false;   // --update waiting for both probes
 
     // Progress
     QProgressBar *m_progressBar;

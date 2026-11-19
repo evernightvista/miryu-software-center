@@ -108,6 +108,7 @@ private:
     qint64 m_downloadDownloadedBytes = 0;
     QString m_progressDetail;
     QString m_currentActionText;
+    TransactionActionType m_currentActionType = TransactionActionType::Unknown;
 
     // Transaction (install) phase: the daemon reports the total number of
     // actions in transaction_before_begin and then a per-action progress

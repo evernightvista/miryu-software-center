@@ -87,9 +87,19 @@ public:
         verFont.setPointSize(verFont.pointSize() - 1);
         painter->setFont(verFont);
         painter->setPen(secondaryText);
-        QString verText = index.data(QueueModel::VersionRole).toString() +
-                          QStringLiteral("-") + index.data(QueueModel::ReleaseRole).toString() +
-                          QStringLiteral("  (") + index.data(QueueModel::ArchRole).toString() + QStringLiteral(")");
+        const QString version = index.data(QueueModel::VersionRole).toString();
+        const QString release = index.data(QueueModel::ReleaseRole).toString();
+        QString verText = version;
+        // Flatpak entries may have no release (or a branch equal to the
+        // version); avoid the dangling "-" / "6.11-6.11".
+        if (!release.isEmpty() && release != version) {
+            if (!verText.isEmpty())
+                verText += QLatin1Char('-');
+            verText += release;
+        }
+        const QString arch = index.data(QueueModel::ArchRole).toString();
+        if (!arch.isEmpty())
+            verText += QStringLiteral("  (") + arch + QLatin1Char(')');
         painter->drawText(verRect, Qt::AlignLeft | Qt::AlignTop, verText);
 
         // Action badge

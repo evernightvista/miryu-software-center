@@ -38,6 +38,10 @@ struct TransactionResult
     // in a broken state.
     bool brokenDependency = false;
 
+    // Flatpak updates are applied outside the dnf transaction, but belong in
+    // the same user-facing confirmation summary.
+    QList<Package> flatpakPackages;
+
     QList<TransactionItem> itemsByAction(const QString &action) const
     {
         QList<TransactionItem> result;

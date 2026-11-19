@@ -585,6 +585,11 @@ msgstr ""
 msgid "Refresh"
 msgstr "Rafraîchir"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:338
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:339
+msgid "Refresh Package List"
+msgstr "Rafraîchir la liste des paquets"
+
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:268
 msgid ""
 "This will synchronise all installed packages to the latest version available "
@@ -774,6 +779,18 @@ msgstr "Installer la sélection"
 msgid "Uninstall"
 msgstr "Désinstaller"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:747
+msgid "Do you want to keep the data for %1 or permanently delete it?"
+msgstr "Voulez-vous conserver les données de %1 ou les supprimer définitivement ?"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:748
+msgid "Delete Files"
+msgstr "Supprimer les fichiers"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:748
+msgid "Keep Files"
+msgstr "Conserver les fichiers"
+
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:627
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:753
 msgid "Run"
@@ -959,8 +976,8 @@ msgid "Update %1 selected Flatpak application?"
 msgstr "Mettre à jour %1 applications Flatpak sélectionnées ?"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1213
-msgid "Updating %1 application..."
-msgstr "Mise à jour de %1 applications..."
+msgid "Updating %1 Flatpak application..."
+msgstr "Mise à jour de %1 applications Flatpak..."
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:214
 msgid "Search packages..."
@@ -1464,6 +1481,13 @@ msgstr "Mode d'installation"
 msgid "Offline Update"
 msgstr "Mise à jour hors ligne"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1207
+msgid ""
+"Flatpak application updates are complete. RPM package updates will be "
+"applied the next time the operating system starts. If you are not ready to "
+"restart, you can continue using your computer."
+msgstr "Les mises à jour des applications Flatpak sont terminées. Les mises à jour des paquets RPM seront appliquées au prochain démarrage du système d'exploitation. Si vous n'êtes pas prêt à redémarrer, vous pouvez continuer à utiliser votre ordinateur."
+
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2063
 msgid "Update installation is pending. Restart your computer to complete the update. If you are not ready to restart, you can continue using your computer."
 msgstr "L’installation de la mise à jour est en attente. Redémarrez votre ordinateur pour terminer la mise à jour. Si vous n’êtes pas prêt à redémarrer, vous pouvez continuer à utiliser votre ordinateur."
@@ -1953,7 +1977,7 @@ msgstr "Quitter"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/UpdateCheckNotifier.cpp:260
 msgid "%1 RPM package(s) and/or %2 Flatpak package(s) available for update"
-msgstr "%1 paquet(s) RPM et/ou %2 paquet(s) Flatpak peuvent être mis à jour"
+msgstr "%1 paquet(s) RPM et %2 paquet(s) Flatpak peuvent être mis à jour"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/UpdateCheckNotifier.cpp:263
 msgid "%1 RPM package(s) available for update"

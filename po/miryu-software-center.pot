@@ -527,6 +527,11 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:338
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:339
+msgid "Refresh Package List"
+msgstr ""
+
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:268
 msgid ""
 "This will synchronise all installed packages to the latest version available "
@@ -694,6 +699,18 @@ msgstr ""
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1089
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1105
 msgid "Uninstall"
+msgstr ""
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:747
+msgid "Do you want to keep the data for %1 or permanently delete it?"
+msgstr ""
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:748
+msgid "Delete Files"
+msgstr ""
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:748
+msgid "Keep Files"
 msgstr ""
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:627
@@ -881,7 +898,7 @@ msgid "Update %1 selected Flatpak application?"
 msgstr ""
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1213
-msgid "Updating %1 application..."
+msgid "Updating %1 Flatpak application..."
 msgstr ""
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:214
@@ -1348,6 +1365,13 @@ msgstr ""
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2360
 msgid "Offline Update"
+msgstr ""
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1207
+msgid ""
+"Flatpak application updates are complete. RPM package updates will be "
+"applied the next time the operating system starts. If you are not ready to "
+"restart, you can continue using your computer."
 msgstr ""
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2063

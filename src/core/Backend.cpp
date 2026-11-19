@@ -158,7 +158,8 @@ void Backend::connectClientSignals()
         m_inTransactionPhase = true;
         m_inTransactionPreparePhase = false;
         m_inVerifyPhase = false;
-        const QString actionStr = actionToString(static_cast<TransactionActionType>(action));
+        m_currentActionType = static_cast<TransactionActionType>(action);
+        const QString actionStr = actionToString(m_currentActionType);
         m_currentActionText = i18n("%1 %2", actionStr, nevra);
         m_progressDetail = i18n("%1 (0%)", m_currentActionText);
         Q_EMIT transactionProgress(m_currentActionText, 0);
@@ -244,6 +245,7 @@ void Backend::connectClientSignals()
         m_transactionCurrentActionProcessed = 0;
         m_transactionCurrentActionTotal = 0;
         m_currentActionText.clear();
+        m_currentActionType = TransactionActionType::Unknown;
         m_progressDetail = i18n("Preparing to apply %1 transaction items", total);
         Q_EMIT transactionProgress(i18n("Applying Transaction"), 0);
         emitOverallProgress();
@@ -330,6 +332,7 @@ void Backend::resetProgressState()
     m_downloadDownloadedBytes = 0;
     m_progressDetail.clear();
     m_currentActionText.clear();
+    m_currentActionType = TransactionActionType::Unknown;
     m_transactionTotalActions = 0;
     m_transactionActionsCompleted = 0;
     m_transactionCurrentActionProcessed = 0;
@@ -408,8 +411,11 @@ void Backend::emitOverallProgress()
         Q_EMIT overallProgress(percent, QStringLiteral("verify"),
                                i18n("Verifying packages..."), m_progressDetail);
     } else if (m_inTransactionPhase) {
+        const QString message = m_currentActionType == TransactionActionType::Unknown
+            ? i18n("Applying transaction...")
+            : actionToString(m_currentActionType);
         Q_EMIT overallProgress(computeOverallTransactionPercent(), QStringLiteral("install"),
-                               i18n("Applying transaction..."), m_progressDetail);
+                               message, m_progressDetail);
     } else if (!m_activeDownloads.isEmpty() || m_downloadTotalBytes > 0) {
         Q_EMIT overallProgress(computeOverallDownloadPercent(), QStringLiteral("download"),
                                i18n("Downloading packages..."), m_progressDetail);

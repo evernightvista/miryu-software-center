@@ -2,6 +2,7 @@
 
 #include <QDateTime>
 #include <QObject>
+#include <QPointer>
 #include <QString>
 
 class QProcess;
@@ -91,6 +92,7 @@ private:
     void onProbeFinished();
     void evaluateResults();
     void notifyUpdates(int rpmCount, int flatpakCount);
+    void closeNotification();
     void finish();
 
     static QByteArray stripAnsiEscapes(const QByteArray &data);
@@ -101,7 +103,9 @@ private:
     QProcess *m_flatpakProcess = nullptr;
     ProbeResult m_rpmResult;
     ProbeResult m_flatpakResult;
-    KNotification *m_notification = nullptr;
+    // QPointer: KNotification may delete itself once it is closed (either by
+    // the user or through close() below), so a raw pointer could dangle.
+    QPointer<KNotification> m_notification;
     NotifierItem *m_trayItem = nullptr;
 };
 

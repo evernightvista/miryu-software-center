@@ -35,19 +35,30 @@ public:
 
     // Async queries (emit signals on completion)
     void loadInstalledApps();
+    // Load only the installed refs (applications and runtimes) that have an
+    // update available, parsed from the summary printed by `flatpak update`
+    // (works on older flatpak releases that lack `flatpak list --updates`).
+    // Used by the Updates page so Flatpak updates are listed next to RPM
+    // updates.
+    void loadUpdatableApps();
     void loadRemotes();
     void loadPopularApps();
     void searchApps(const QString &keyword);
 
     // Package operations (async, emit signals on progress / completion)
     void installApp(const QString &remote, const QString &appId);
-    void uninstallApp(const QString &appId);
+    void uninstallApp(const QString &appId, bool deleteData = false);
     void updateApp(const QString &appId);
-    void updateAll();
     void runApp(const QString &appId);
+
+    // Batch update through the normal async operation queue. Progress and
+    // completion are reported by operationProgress/operationFinished with
+    // operation "update-batch" and appId set to the comma-separated IDs.
+    void updateApps(const QStringList &appIds);
 
 Q_SIGNALS:
     void installedAppsLoaded(const QList<FlatpakApp> &apps);
+    void updatableAppsLoaded(const QList<FlatpakApp> &apps);
     void remotesLoaded(const QMap<QString, QString> &remotes);
     void popularAppsLoaded(const QList<FlatpakApp> &apps);
     void searchCompleted(const QList<FlatpakApp> &apps);
@@ -75,8 +86,19 @@ private:
 
     QList<FlatpakApp> parseListOutput(const QByteArray &output);
     QList<FlatpakApp> parseSearchOutput(const QByteArray &output);
-    QSet<QString> parseUpgradableOutput(const QByteArray &output);
     QMap<QString, QString> parseRemotesOutput(const QByteArray &output);
+
+    // One ref that `flatpak update` wants to update. The branch is parsed from
+    // the same summary row so the updatable ref can be matched against the
+    // installed / available listings (needed to report correct versions).
+    struct UpdatableRef {
+        QString appId;
+        QString branch;
+    };
+    // Refs with a pending update, taken from the numbered summary printed by
+    // plain `flatpak update`. Used instead of `flatpak list --updates`, which
+    // older flatpak releases reject with "Unknown option --updates".
+    QList<UpdatableRef> fetchUpdatableRefs();
 
     void checkAvailability();
 };

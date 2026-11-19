@@ -4,7 +4,9 @@
 #include <QProcessEnvironment>
 #include <QDebug>
 #include <QtConcurrent>
+#include <QHash>
 #include <QJsonObject>
+#include <QRegularExpression>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QNetworkAccessManager>
@@ -72,7 +74,7 @@ QString FlatpakBackend::executeSync(const QStringList &args, bool &ok)
     int timeout = 1800000;
     for (const auto &arg : args) {
         if (arg == QStringLiteral("list") || arg == QStringLiteral("search") ||
-            arg == QStringLiteral("remotes")) {
+            arg == QStringLiteral("remotes") || arg == QStringLiteral("remote-ls")) {
             timeout = 60000;
             break;
         }
@@ -205,29 +207,79 @@ QList<FlatpakApp> FlatpakBackend::parseSearchOutput(const QByteArray &output)
 }
 
 /*!
- * Parse the output of \c flatpak list --app --updates --columns=application
- * and return the set of application IDs that have updates available.
+ * Return the refs that have an update available.
+ *
+ * \c flatpak list --updates only exists in recent flatpak releases (older
+ * ones abort with "Unknown option --updates"), so the refs are parsed from
+ * the numbered summary printed by plain \c flatpak update — the exact same
+ * output the update-check notifier counts. Without a controlling terminal
+ * flatpak answers its own "Proceed?" prompt with "no", so probing never
+ * deploys anything.
+ *
+ * Each summary row looks like
+ * \verbatim
+ *  1. org.kde.Platform.Locale   6.11   u   flathub   1.6 kB / 1.6 kB
+ * \endverbatim
+ * i.e. the branch is the first token after the ref ID. It is kept because the
+ * same application ID can be installed on several branches.
  */
-QSet<QString> FlatpakBackend::parseUpgradableOutput(const QByteArray &output)
+QList<FlatpakBackend::UpdatableRef> FlatpakBackend::fetchUpdatableRefs()
 {
-    QSet<QString> ids;
+    QProcess proc;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert(QStringLiteral("LC_ALL"), QStringLiteral("C.UTF-8"));
+    env.insert(QStringLiteral("LANG"), QStringLiteral("C.UTF-8"));
+    proc.setProcessEnvironment(env);
+    // The summary is on stdout while the abort notice goes to stderr; merge
+    // them so nothing of the table is lost (the exit code is non-zero when
+    // flatpak aborts the transaction, so stdout must not be discarded).
+    proc.setProcessChannelMode(QProcess::MergedChannels);
+    proc.start(QStringLiteral("flatpak"), {QStringLiteral("update")});
+    if (!proc.waitForStarted(5000))
+        return {};
+    // If flatpak ever decides to wait for an answer instead of detecting the
+    // missing TTY, EOF makes the prompt abort.
+    proc.closeWriteChannel();
+    if (!proc.waitForFinished(600000)) {
+        proc.kill();
+        proc.waitForFinished(3000);
+    }
+    const QString output = QString::fromUtf8(proc.readAllStandardOutput());
 
-    QString text = QString::fromUtf8(output);
-    const QStringList lines = text.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    static const QRegularExpression rowPattern(QStringLiteral("^\\s*\\d+\\.\\s"));
+    // Flatpak ref IDs always have at least three components, so "a.b.c"
+    // never matches version numbers or download sizes like "250.4 MB".
+    static const QRegularExpression refPattern(
+        QStringLiteral("([A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+){2,})"));
 
-    for (const QString &rawLine : lines) {
-        QString line = rawLine.trimmed();
-        if (line.endsWith(QLatin1Char('\r')))
-            line.chop(1);
-        if (line.isEmpty())
+    QList<UpdatableRef> refs;
+    QSet<QString> seenRefs;
+    const QStringList lines = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    for (const QString &line : lines) {
+        if (!rowPattern.match(line).hasMatch())
             continue;
-        // Skip headers
-        if (line.contains(QStringLiteral("application"), Qt::CaseInsensitive))
+        const auto match = refPattern.match(line);
+        if (!match.hasMatch())
             continue;
-        ids.insert(line);
+
+        UpdatableRef ref;
+        ref.appId = match.captured(1);
+        // The first token after the ref ID is the branch (the summary prints
+        // "ID  Branch  Op  Remote  Download").
+        const QString rest = line.mid(match.capturedEnd()).simplified();
+        if (!rest.isEmpty())
+            ref.branch = rest.section(QLatin1Char(' '), 0, 0);
+        if (ref.appId.isEmpty())
+            continue;
+
+        const QString key = ref.appId + QLatin1Char('\n') + ref.branch;
+        if (seenRefs.contains(key))
+            continue;
+        seenRefs.insert(key);
+        refs.append(ref);
     }
 
-    return ids;
+    return refs;
 }
 
 /*!
@@ -290,19 +342,109 @@ void FlatpakBackend::loadInstalledApps()
 
         QList<FlatpakApp> apps = parseListOutput(output.toUtf8());
 
-        // Query upgradable apps and merge status
-        QString upgOutput = executeSync(
-            {QStringLiteral("list"), QStringLiteral("--app"), QStringLiteral("--updates"),
-             QStringLiteral("--columns=application")},
+        // Query upgradable apps and merge status. Older flatpak releases do
+        // not support `list --updates`, so the summary of `flatpak update` is
+        // parsed instead.
+        QSet<QString> upgradableIds;
+        for (const auto &ref : fetchUpdatableRefs())
+            upgradableIds.insert(ref.appId);
+        for (auto &app : apps) {
+            if (upgradableIds.contains(app.appId))
+                app.upgradable = true;
+        }
+
+        return apps;
+    }));
+}
+
+void FlatpakBackend::loadUpdatableApps()
+{
+    auto *watcher = new QFutureWatcher<QList<FlatpakApp>>(this);
+    connect(watcher, &QFutureWatcher<QList<FlatpakApp>>::finished, this, [this, watcher]() {
+        Q_EMIT updatableAppsLoaded(watcher->result());
+        watcher->deleteLater();
+    });
+
+    watcher->setFuture(QtConcurrent::run([this]() {
+        const QList<UpdatableRef> refs = fetchUpdatableRefs();
+        if (refs.isEmpty())
+            return QList<FlatpakApp>();
+
+        // Enrich the refs from the installed listing. --all is required
+        // because plain `flatpak list` hides runtime extensions such as
+        // org.kde.Platform.Locale, which `flatpak update` does update.
+        bool ok = false;
+        const QString listOutput = executeSync(
+            {QStringLiteral("list"), QStringLiteral("--all"),
+             QStringLiteral("--columns=") + QString::fromLatin1(kListColumns)},
             ok);
+
+        QHash<QString, FlatpakApp> installed;         // "appId\nbranch"
+        QHash<QString, FlatpakApp> installedById;     // fallback: first match
         if (ok) {
-            QSet<QString> upgradableIds = parseUpgradableOutput(upgOutput.toUtf8());
-            for (auto &app : apps) {
-                if (upgradableIds.contains(app.appId))
-                    app.upgradable = true;
+            for (const auto &app : parseListOutput(listOutput.toUtf8())) {
+                if (app.appId.isEmpty())
+                    continue;
+                installed.insert(app.appId + QLatin1Char('\n') + app.branch, app);
+                if (!installedById.contains(app.appId))
+                    installedById.insert(app.appId, app);
             }
         }
 
+        // The update summary does not print versions; the version that the
+        // remotes offer is taken from `flatpak remote-ls`, which every
+        // flatpak release supports (unlike `list --updates`).
+        QHash<QString, QString> availableVersions;    // "appId\nbranch" -> version
+        const QString remoteOutput = executeSync(
+            {QStringLiteral("remote-ls"), QStringLiteral("--all"),
+             QStringLiteral("--columns=application,version,branch")},
+            ok);
+        if (ok) {
+            const QStringList lines =
+                remoteOutput.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+            for (const QString &rawLine : lines) {
+                QString line = rawLine;
+                if (line.endsWith(QLatin1Char('\r')))
+                    line.chop(1);
+                const QStringList fields = line.split(QLatin1Char('\t'));
+                if (fields.size() < 3)
+                    continue;
+                const QString appId = fields.value(0).trimmed();
+                const QString version = fields.value(1).trimmed();
+                const QString branch = fields.value(2).trimmed();
+                if (!appId.isEmpty() && !version.isEmpty())
+                    availableVersions.insert(appId + QLatin1Char('\n') + branch,
+                                             version);
+            }
+        }
+
+        const QString remotesOutput = executeSync(
+            {QStringLiteral("remotes"), QStringLiteral("--columns=name,title")}, ok);
+        const QMap<QString, QString> remoteTitles = ok
+            ? parseRemotesOutput(remotesOutput.toUtf8()) : QMap<QString, QString>();
+
+        QList<FlatpakApp> apps;
+        for (const auto &ref : refs) {
+            const QString key = ref.appId + QLatin1Char('\n') + ref.branch;
+            FlatpakApp app = installed.value(key);
+            if (app.appId.isEmpty())
+                app = installedById.value(ref.appId);
+            app.appId = ref.appId;
+            if (!ref.branch.isEmpty())
+                app.branch = ref.branch;
+
+            // Keep the installed version so the Updates page can render
+            // "installed → available"; expose the version the remote offers
+            // as the version of the update.
+            app.installedVersion = app.version;
+            const QString available = availableVersions.value(key);
+            if (!available.isEmpty())
+                app.version = available;
+
+            app.remoteTitle = remoteTitles.value(app.remote);
+            app.upgradable = true;
+            apps.append(app);
+        }
         return apps;
     }));
 }
@@ -449,38 +591,53 @@ void FlatpakBackend::startNextOperation()
         QTimer::singleShot(0, this, [this]() { startNextOperation(); });
     };
 
-    connect(proc, &QProcess::readyReadStandardOutput, proc,
-            [this, proc, state, appId = request.appId]() {
-        const QByteArray data = proc->readAllStandardOutput();
+    auto handleOutput = [this, state, appId = request.appId](const QByteArray &data) {
+        static const QRegularExpression lineSeparator(QStringLiteral("[\\r\\n]+"));
+        static const QRegularExpression ansiEscape(QStringLiteral("\\x1B\\[[0-?]*[ -/]*[@-~]"));
         static const QRegularExpression percentRegex(QStringLiteral("(\\d+)%"));
-        for (const QByteArray &line : data.split('\n')) {
-            QString text = QString::fromUtf8(line).trimmed();
+        // When flatpak does not emit percentages (typically without a TTY),
+        // its numbered "Installing 2/4" steps still provide real progress.
+        static const QRegularExpression stepRegex(
+            QStringLiteral("(?:Installing|Updating|Downloading)\\s*:?\\s*(\\d+)\\s*/\\s*(\\d+)"));
+
+        const QString textData = QString::fromUtf8(data);
+        const QStringList lines = textData.split(lineSeparator, Qt::SkipEmptyParts);
+        for (QString text : lines) {
+            text.remove(ansiEscape);
+            text = text.trimmed();
             if (text.isEmpty())
                 continue;
             if (text.size() > 4096)
                 text.truncate(4096);
 
             int percent = -1;
-            const QRegularExpressionMatch match = percentRegex.match(text);
-            if (match.hasMatch())
+            QRegularExpressionMatch match;
+            auto percentMatches = percentRegex.globalMatch(text);
+            while (percentMatches.hasNext())
+                match = percentMatches.next();
+            if (match.hasMatch()) {
                 percent = match.captured(1).toInt();
+            } else {
+                match = stepRegex.match(text);
+                if (match.hasMatch()) {
+                    const int current = match.captured(1).toInt();
+                    const int total = match.captured(2).toInt();
+                    if (total > 0)
+                        percent = current * 100 / total;
+                }
+            }
+            if (percent >= 0)
+                percent = qMin(percent, 100);
 
             state->lastMessage = text;
             Q_EMIT operationProgress(appId, text, percent);
         }
-    });
+    };
 
-    connect(proc, &QProcess::readyReadStandardError, proc, [proc, state]() {
-        const QByteArray data = proc->readAllStandardError();
-        for (const QByteArray &line : data.split('\n')) {
-            QString text = QString::fromUtf8(line).trimmed();
-            if (text.isEmpty())
-                continue;
-            if (text.size() > 4096)
-                text.truncate(4096);
-            state->lastMessage = text;
-        }
-    });
+    connect(proc, &QProcess::readyReadStandardOutput, proc,
+            [proc, handleOutput]() { handleOutput(proc->readAllStandardOutput()); });
+    connect(proc, &QProcess::readyReadStandardError, proc,
+            [proc, handleOutput]() { handleOutput(proc->readAllStandardError()); });
 
     connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), proc,
             [state, complete](int exitCode, QProcess::ExitStatus exitStatus) {
@@ -510,10 +667,13 @@ void FlatpakBackend::installApp(const QString &remote, const QString &appId)
     executeAsync(appId, QStringLiteral("install"), args);
 }
 
-void FlatpakBackend::uninstallApp(const QString &appId)
+void FlatpakBackend::uninstallApp(const QString &appId, bool deleteData)
 {
-    executeAsync(appId, QStringLiteral("uninstall"),
-                 {QStringLiteral("uninstall"), QStringLiteral("--assumeyes"), appId});
+    QStringList args{QStringLiteral("uninstall"), QStringLiteral("--assumeyes")};
+    if (deleteData)
+        args.append(QStringLiteral("--delete-data"));
+    args.append(appId);
+    executeAsync(appId, QStringLiteral("uninstall"), args);
 }
 
 void FlatpakBackend::updateApp(const QString &appId)
@@ -522,10 +682,20 @@ void FlatpakBackend::updateApp(const QString &appId)
                  {QStringLiteral("update"), QStringLiteral("--assumeyes"), appId});
 }
 
-void FlatpakBackend::updateAll()
+void FlatpakBackend::updateApps(const QStringList &appIds)
 {
-    executeAsync(QString(), QStringLiteral("update-all"),
-                 {QStringLiteral("update"), QStringLiteral("--assumeyes")});
+    QStringList args{QStringLiteral("update"), QStringLiteral("--assumeyes")};
+    QStringList ids;
+    for (const QString &id : appIds) {
+        if (!id.isEmpty()) {
+            ids.append(id);
+            args.append(id);
+        }
+    }
+    if (ids.isEmpty())
+        return;
+
+    executeAsync(ids.join(QLatin1Char(',')), QStringLiteral("update-batch"), args);
 }
 
 void FlatpakBackend::runApp(const QString &appId)

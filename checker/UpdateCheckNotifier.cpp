@@ -291,8 +291,16 @@ void UpdateCheckNotifier::notifyUpdates(int rpmCount, int flatpakCount)
 
     const QString viewAction = i18n("View Updates");
     const auto showUpdates = [this]() {
+        // Grab the activation token before closing the notification (closing
+        // may destroy it). Dismiss the popup immediately: it is "resident",
+        // so otherwise it would linger in the notification area even though
+        // the user already engaged with it. Deferred by one event loop turn
+        // because this lambda runs from KNotificationAction::activated —
+        // destroying the notification (and that action) mid-emission is not
+        // safe.
         const QString token =
             m_notification ? m_notification->xdgActivationToken() : QString();
+        QTimer::singleShot(0, this, &UpdateCheckNotifier::closeNotification);
         NotifierItem::launchSoftwareCenter(token, NotifierItem::LaunchMode::ShowUpdates);
         // The user engaged — give the async launch job a moment to flush its
         // DBus message, then take the tray entry (and this process) down.
@@ -311,8 +319,19 @@ void UpdateCheckNotifier::notifyUpdates(int rpmCount, int flatpakCount)
     connect(m_trayItem, &NotifierItem::quitRequested, this, &UpdateCheckNotifier::finish);
 }
 
+void UpdateCheckNotifier::closeNotification()
+{
+    // KNotification keeps the popup alive because of the "resident" hint;
+    // close it explicitly so it never outlives the user's interaction.
+    if (m_notification) {
+        m_notification->close();
+        m_notification = nullptr;
+    }
+}
+
 void UpdateCheckNotifier::finish()
 {
+    closeNotification();
     Q_EMIT finished();
 }
 

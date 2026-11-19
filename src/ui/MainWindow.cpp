@@ -68,6 +68,9 @@
 #include <QDialog>
 #include <QTextBrowser>
 #include <QTextCursor>
+#include <QTextDocument>
+#include <QPainter>
+#include <QtMath>
 #include <QProcess>
 #include <QDialogButtonBox>
 #include <QFont>
@@ -75,12 +78,90 @@
 #include <QFileInfo>
 #include <QSettings>
 #include <QSet>
+#include <QSignalBlocker>
 #include <QRegularExpression>
 #include <QDateTime>
 #include <QDebug>
 #include <QLocale>
 
 namespace Miryu {
+
+namespace {
+
+// Draw the icon, title and description together. The description has its own
+// text area so wrapped lines stay aligned with its first line, not the title.
+class RestartBannerContent final : public QWidget
+{
+public:
+    RestartBannerContent(const QString &title, const QString &description,
+                         QWidget *parent = nullptr)
+        : QWidget(parent)
+        , m_icon(QIcon::fromTheme(QStringLiteral("system-reboot")))
+        , m_titleHtml(QStringLiteral("<span style=\"color:#7a4f00;\"><b>%1</b></span>")
+                          .arg(title.toHtmlEscaped()))
+        , m_descriptionHtml(QStringLiteral("<span style=\"color:#6b4d00;\">%1</span>")
+                                .arg(description.toHtmlEscaped()))
+    {
+    }
+
+    int heightForWidth(int width) const override
+    {
+        if (width <= 0)
+            return -1;
+        QTextDocument titleDoc;
+        QTextDocument descriptionDoc;
+        configureDocuments(&titleDoc, &descriptionDoc, width);
+        return qMax(fontMetrics().lineSpacing(),
+                    qCeil(qMax(titleDoc.size().height(), descriptionDoc.size().height())));
+    }
+
+protected:
+    void paintEvent(QPaintEvent *) override
+    {
+        QPainter painter(this);
+        QTextDocument titleDoc;
+        QTextDocument descriptionDoc;
+        const int descriptionX = configureDocuments(&titleDoc, &descriptionDoc, width());
+
+        constexpr int iconSize = 18;
+        const int iconY = qMax(0, (fontMetrics().lineSpacing() - iconSize) / 2);
+        m_icon.paint(&painter, QRect(0, iconY, iconSize, iconSize));
+
+        painter.save();
+        painter.translate(kTextX, 0);
+        titleDoc.drawContents(&painter);
+        painter.restore();
+
+        painter.save();
+        painter.translate(descriptionX, 0);
+        descriptionDoc.drawContents(&painter);
+        painter.restore();
+    }
+
+private:
+    int configureDocuments(QTextDocument *titleDoc, QTextDocument *descriptionDoc,
+                           int contentWidth) const
+    {
+        titleDoc->setDocumentMargin(0);
+        titleDoc->setDefaultFont(font());
+        titleDoc->setHtml(m_titleHtml);
+
+        const int descriptionX = kTextX + qCeil(titleDoc->idealWidth()) + kTitleSpacing;
+        descriptionDoc->setDocumentMargin(0);
+        descriptionDoc->setDefaultFont(font());
+        descriptionDoc->setHtml(m_descriptionHtml);
+        descriptionDoc->setTextWidth(qMax(1, contentWidth - descriptionX));
+        return descriptionX;
+    }
+
+    static constexpr int kTextX = 28; // 20px icon area + 8px spacing
+    static constexpr int kTitleSpacing = 8;
+    QIcon m_icon;
+    QString m_titleHtml;
+    QString m_descriptionHtml;
+};
+
+} // namespace
 
 MainWindow::MainWindow(Backend *backend, QWidget *parent)
     : KXmlGuiWindow(parent)
@@ -131,6 +212,10 @@ MainWindow::MainWindow(Backend *backend, QWidget *parent)
     connect(m_backend, &Backend::repoKeyImportRequest,
             this, &MainWindow::onRepoKeyImportRequest);
     connect(m_backend, &Backend::errorOccurred, this, &MainWindow::onError);
+
+    // Flatpak updates are probed separately and merged onto the Updates page.
+    connect(m_flatpakBackend, &FlatpakBackend::updatableAppsLoaded,
+            this, &MainWindow::onFlatpakUpdatesLoaded);
 
     // Disable the auto-generated KDE help menu (handbook, "What's This",
     // report bug, donate, about KDE). The Help menu is declared in
@@ -249,9 +334,16 @@ void MainWindow::setupUI()
         m_applyButton->setEnabled(false);
         connect(m_applyButton, &QPushButton::clicked, this, &MainWindow::onApplyQueue);
 
+        auto *refreshListButton = new QPushButton(
+            QIcon::fromTheme(QStringLiteral("view-refresh")), i18n("Refresh Package List"));
+        refreshListButton->setToolTip(i18n("Refresh Package List"));
+        connect(refreshListButton, &QPushButton::clicked,
+                this, &MainWindow::onRefreshInstalledPackages);
+
         searchLayout->addWidget(m_searchEdit, 1);
         searchLayout->addWidget(m_filterCombo);
         searchLayout->addWidget(m_searchFieldCombo);
+        searchLayout->addWidget(refreshListButton);
         searchLayout->addWidget(m_applyButton);
 
         layout->addWidget(searchBar);
@@ -285,6 +377,14 @@ void MainWindow::setupUI()
                 this, [this](const QString &pkgName, const QString &nevra) {
             if (!m_backend || !m_backend->isInitialized() || !m_backend->client())
                 return;
+
+            // Flatpak rows are not RPM packages, so the dnf5daemon details
+            // lookup would never find them. Keep the info already collected
+            // from `flatpak list` and clear the extended tabs.
+            if (m_infoWidget && m_infoWidget->currentPackage().isFlatpak) {
+                m_infoWidget->setPackageDetails(QVariantMap());
+                return;
+            }
 
             // If details are already cached, show them immediately.
             if (m_backend->cache()->hasDetails(pkgName)) {
@@ -705,6 +805,12 @@ void MainWindow::switchToPage(int page)
     m_currentPage = page;
     m_pageStack->setCurrentIndex(page);
 
+    // A pending "--update" flow is only meaningful while the Updates page is
+    // visible. Dropping the flag when the user navigates away prevents a
+    // stale auto-apply from firing on a much later visit.
+    if (page != 1)
+        m_pendingStartUpdates = false;
+
     // Keep the sidebar highlight in sync with programmatic page switches
     // (tray icon click, "Start Updates", post-transaction jumps, ...).
     // Clicking a sidebar button checks it automatically, but a plain
@@ -995,13 +1101,24 @@ void MainWindow::onApplyQueue()
         return;
     }
 
+    // Flatpak updates are not part of a dnf transaction — they are applied
+    // through the flatpak CLI, separately from the RPM queue.
+    QList<Package> rpmPackages;
+    QList<Package> flatpakPackages;
+    for (const auto &pkg : packages) {
+        if (pkg.isFlatpak)
+            flatpakPackages.append(pkg);
+        else
+            rpmPackages.append(pkg);
+    }
+
     // Reject any attempt to remove the currently running kernel: doing so
     // would leave the system without a bootable kernel. We scan the user-
     // requested packages (not the auto-pulled dependencies) for a removal
     // whose target is the running kernel. The check is intentionally
     // conservative — if osrelease cannot be read we let the transaction
     // through and let dnf5 enforce its own protection (protected_packages).
-    for (const auto &pkg : packages) {
+    for (const auto &pkg : rpmPackages) {
         if (pkg.todo == PackageTodo::Remove && isRunningKernel(pkg)) {
             KMessageBox::error(this,
                 i18n("Cannot uninstall the running kernel. "
@@ -1019,7 +1136,7 @@ void MainWindow::onApplyQueue()
     // against a deleted binary / resources, and the post-transaction refresh
     // would crash). The user should close the app and use a different tool
     // (dnf5 / dnfdragora) to uninstall it.
-    for (const auto &pkg : packages) {
+    for (const auto &pkg : rpmPackages) {
         if (pkg.todo == PackageTodo::Remove &&
             pkg.name == QStringLiteral("miryu-software-center")) {
             KMessageBox::error(this,
@@ -1029,13 +1146,207 @@ void MainWindow::onApplyQueue()
         }
     }
 
-    // Build transaction
+    // Build one confirmation summary for both backends. Flatpak updates are
+    // applied separately only after the user accepts that summary.
+    applyRpmQueue(rpmPackages, flatpakPackages);
+}
+
+void MainWindow::applyFlatpakUpdates(const QList<Package> &flatpakPackages,
+                                     bool offline, bool runRpmAfter)
+{
+    QStringList appIds;
+    for (const auto &pkg : flatpakPackages) {
+        if (!pkg.flatpakAppId.isEmpty() && !appIds.contains(pkg.flatpakAppId))
+            appIds.append(pkg.flatpakAppId);
+    }
+    if (appIds.isEmpty()) {
+        if (runRpmAfter)
+            runRpmTransaction(offline);
+        return;
+    }
+
+    m_statusLabel->setText(i18np("Updating %1 Flatpak application...",
+                                 "Updating %1 Flatpak applications...", appIds.size()));
+    m_progressBar->setRange(0, 0);
+    m_progressBar->setVisible(true);
+    if (!m_progressDialog)
+        m_progressDialog = new ProgressDialog(this);
+    m_progressDialog->reset();
+    m_progressDialog->setMessage(i18np("Updating %1 Flatpak application...",
+                                       "Updating %1 Flatpak applications...", appIds.size()));
+    m_progressDialog->setIndeterminate(true);
+    m_progressDialog->show();
+
+    // The batch runs as one flatpak process in FlatpakBackend's operation
+    // queue. Its stdout/stderr drive the same progress dialog used for RPM.
+    const QString operationId = appIds.join(QLatin1Char(','));
+    bool sawPercent = false;
+    const QMetaObject::Connection progressConnection = connect(
+        m_flatpakBackend, &FlatpakBackend::operationProgress, this,
+        [this, operationId, sawPercent](const QString &appId, const QString &message,
+                                        int percent) mutable {
+            if (appId != operationId || m_closing.load(std::memory_order_acquire))
+                return;
+            if (!message.isEmpty()) {
+                m_statusLabel->setText(message);
+                if (m_progressDialog)
+                    m_progressDialog->setDetail(message);
+            }
+            if (percent >= 0) {
+                sawPercent = true;
+                if (m_progressDialog) {
+                    m_progressDialog->setIndeterminate(false);
+                    m_progressDialog->setProgress(percent);
+                }
+                m_progressBar->setRange(0, 100);
+                m_progressBar->setValue(percent);
+                m_progressBar->setVisible(true);
+            } else if (!sawPercent && m_progressDialog) {
+                m_progressDialog->setIndeterminate(true);
+            }
+        });
+
+    auto finishedConnection = QSharedPointer<QMetaObject::Connection>::create();
+    *finishedConnection = connect(
+        m_flatpakBackend, &FlatpakBackend::operationFinished, this,
+        [this, flatpakPackages, offline, runRpmAfter, operationId, progressConnection,
+         finishedConnection](const QString &appId, const QString &operation,
+                             bool success, const QString &message) {
+            if (appId != operationId || operation != QStringLiteral("update-batch"))
+                return;
+            disconnect(progressConnection);
+            disconnect(*finishedConnection);
+
+            auto closeProgress = [this]() {
+                if (m_progressDialog) {
+                    m_progressDialog->close();
+                    m_progressDialog->deleteLater();
+                    m_progressDialog = nullptr;
+                }
+            };
+
+            if (m_closing.load(std::memory_order_acquire)) {
+                closeProgress();
+                return;
+            }
+
+            if (success) {
+                // Remove the applied Flatpak entries from the queue and from
+                // the local update set so the rows do not linger.
+                for (const auto &pkg : flatpakPackages) {
+                    m_queueModel->removePackage(pkg.nevra());
+                    m_updatesView->model()->setQueued(pkg.nevra(), false);
+                }
+                m_flatpakUpdates.clear();
+                updateUpdatesView();
+                updateStatusBar();
+            }
+
+            if (runRpmAfter) {
+                if (!success) {
+                    closeProgress();
+                    KMessageBox::error(this,
+                        message.isEmpty() ? i18n("Transaction Failed") : message,
+                        i18n("Transaction Failed"));
+                }
+                // Reuse/reset the progress dialog for the prepared dnf run.
+                runRpmTransaction(offline, success);
+                return;
+            }
+
+            closeProgress();
+            m_progressBar->setVisible(false);
+            if (success)
+                showTransactionSuccessMessage(i18n("Transaction completed successfully."), false);
+            else
+                KMessageBox::error(this,
+                    message.isEmpty() ? i18n("Transaction Failed") : message,
+                    i18n("Transaction Failed"));
+            m_statusLabel->setText(i18n("Ready"));
+            onRefresh();
+        });
+
+    m_flatpakBackend->updateApps(appIds);
+}
+
+void MainWindow::runRpmTransaction(bool offline, bool flatpakUpdatesCompleted)
+{
+    if (!m_progressDialog)
+        m_progressDialog = new ProgressDialog(this);
+    m_progressDialog->reset();
+    m_progressDialog->show();
+
+    auto *runWatcher = new QFutureWatcher<TransactionResult>(this);
+    connect(runWatcher, &QFutureWatcher<TransactionResult>::finished, this,
+            [this, runWatcher, offline, flatpakUpdatesCompleted]() {
+        if (m_closing.load(std::memory_order_acquire)) {
+            runWatcher->deleteLater();
+            return;
+        }
+        m_progressDialog->close();
+        m_progressDialog->deleteLater();
+        m_progressDialog = nullptr;
+
+        TransactionResult runResult = runWatcher->result();
+        if (runResult.completed) {
+            const bool offlineUpdate = offline || runResult.requiresOffline;
+            if (flatpakUpdatesCompleted && offlineUpdate) {
+                KMessageBox::information(this,
+                    i18n("Flatpak application updates are complete. RPM package updates will be applied "
+                         "the next time the operating system starts. If you are not ready to restart, "
+                         "you can continue using your computer."),
+                    i18n("Offline Update"));
+            } else {
+                showTransactionSuccessMessage(i18n("Transaction completed successfully."),
+                                              offlineUpdate);
+            }
+            m_queueModel->clear();
+            m_packageModel->clearQueued();
+            updateStatusBar();
+            onRefresh();
+            checkRestartNeeded(runResult);
+        } else {
+            // Broken dependencies detected during the final resolve inside
+            // runTransaction(): show the dedicated dependency error.
+            if (runResult.brokenDependency) {
+                showTransactionError(runResult);
+            } else {
+                const QString errLower = runResult.error.toLower();
+                if (errLower.contains(QStringLiteral("not authorized")) ||
+                    errLower.contains(QStringLiteral("cancel")) ||
+                    errLower.contains(QStringLiteral("auth"))) {
+                    KMessageBox::information(this,
+                        i18n("Operation cancelled by user."),
+                        i18n("Transaction"));
+                } else {
+                    KMessageBox::error(this, runResult.error, i18n("Transaction Failed"));
+                }
+            }
+        }
+        m_statusLabel->setText(i18n("Ready"));
+        runWatcher->deleteLater();
+    });
+
+    m_statusLabel->setText(i18n("Applying transaction..."));
+    TransactionOptions opts;
+    opts.offline = offline;
+    runWatcher->setFuture(QtConcurrent::run([this, opts]() {
+        return m_backend->runTransaction(opts);
+    }));
+}
+
+void MainWindow::applyRpmQueue(const QList<Package> &packages,
+                               const QList<Package> &flatpakPackages)
+{
+    // Build the RPM part first. A Flatpak-only queue skips dnf entirely but
+    // still gets the same summary and confirmation step.
     m_statusLabel->setText(i18n("Resolving transaction..."));
     m_progressBar->setRange(0, 0);
     m_progressBar->setVisible(true);
 
     auto *watcher = new QFutureWatcher<TransactionResult>(this);
-    connect(watcher, &QFutureWatcher<TransactionResult>::finished, this, [this, watcher]() {
+    connect(watcher, &QFutureWatcher<TransactionResult>::finished, this,
+            [this, watcher, packages, flatpakPackages]() {
         if (m_closing.load(std::memory_order_acquire)) {
             m_progressBar->setVisible(false);
             watcher->deleteLater();
@@ -1051,64 +1362,14 @@ void MainWindow::onApplyQueue()
             return;
         }
 
-        // Show transaction result dialog
+        // Show one combined RPM + Flatpak transaction summary.
         m_resultDialog = new TransactionResultDialog(result, this);
         if (m_resultDialog->exec() == QDialog::Accepted) {
-            // Run transaction
-            m_progressDialog = new ProgressDialog(this);
-            m_progressDialog->show();
-
-            auto *runWatcher = new QFutureWatcher<TransactionResult>(this);
             const bool offline = m_resultDialog->isOffline();
-            connect(runWatcher, &QFutureWatcher<TransactionResult>::finished, this, [this, runWatcher, offline]() {
-                if (m_closing.load(std::memory_order_acquire)) {
-                    runWatcher->deleteLater();
-                    return;
-                }
-                m_progressDialog->close();
-                m_progressDialog->deleteLater();
-                m_progressDialog = nullptr;
-
-                TransactionResult runResult = runWatcher->result();
-                if (runResult.completed) {
-                    showTransactionSuccessMessage(i18n("Transaction completed successfully."),
-                                                  offline || runResult.requiresOffline);
-                    m_queueModel->clear();
-                    m_packageModel->clearQueued();
-                    updateStatusBar();
-                    onRefresh();
-                    checkRestartNeeded(runResult);
-                } else {
-                    // Broken dependencies detected during the final resolve
-                    // inside runTransaction(): show the dedicated dependency
-                    // error (with the raw problem text as detail) instead of
-                    // a generic "Transaction Failed" dialog.
-                    if (runResult.brokenDependency) {
-                        showTransactionError(runResult);
-                    } else {
-                        const QString errLower = runResult.error.toLower();
-                        if (errLower.contains(QStringLiteral("not authorized")) ||
-                            errLower.contains(QStringLiteral("cancel")) ||
-                            errLower.contains(QStringLiteral("auth"))) {
-                            KMessageBox::information(this,
-                                i18n("Operation cancelled by user."),
-                                i18n("Transaction"));
-                        } else {
-                            KMessageBox::error(this, runResult.error, i18n("Transaction Failed"));
-                        }
-                    }
-                }
-                m_statusLabel->setText(i18n("Ready"));
-                runWatcher->deleteLater();
-            });
-
-            m_statusLabel->setText(i18n("Applying transaction..."));
-
-            TransactionOptions opts;
-            opts.offline = offline;
-            runWatcher->setFuture(QtConcurrent::run([this, opts]() {
-                return m_backend->runTransaction(opts);
-            }));
+            if (!flatpakPackages.isEmpty())
+                applyFlatpakUpdates(flatpakPackages, offline, !packages.isEmpty());
+            else
+                runRpmTransaction(offline);
         }
 
         m_resultDialog->deleteLater();
@@ -1117,8 +1378,14 @@ void MainWindow::onApplyQueue()
     });
 
     m_statusLabel->setText(i18n("Building transaction..."));
-    watcher->setFuture(QtConcurrent::run([this, packages]() {
-        return m_backend->buildTransaction(packages);
+    watcher->setFuture(QtConcurrent::run([this, packages, flatpakPackages]() {
+        TransactionResult result;
+        if (packages.isEmpty())
+            result.completed = true;
+        else
+            result = m_backend->buildTransaction(packages);
+        result.flatpakPackages = flatpakPackages;
+        return result;
     }));
 }
 
@@ -1181,6 +1448,32 @@ void MainWindow::onDeselectAllUpdates()
         if (pkg.queued || m_queueModel->contains(pkg.nevra()))
             onUnqueuePackage(pkg.nevra());
     }
+}
+
+void MainWindow::onRefreshInstalledPackages()
+{
+    if (!m_backend->isInitialized())
+        return;
+
+    // This button refreshes only the installed-package view. Do not run the
+    // full refresh path, which also expires repository metadata and reloads
+    // updates and repositories.
+    {
+        const QSignalBlocker blocker(m_searchEdit);
+        m_searchEdit->clear();
+    }
+    const int installedIndex = m_filterCombo->findData(static_cast<int>(PackageFilter::Installed));
+    if (installedIndex >= 0) {
+        const QSignalBlocker blocker(m_filterCombo);
+        m_filterCombo->setCurrentIndex(installedIndex);
+    }
+
+    m_backend->client()->resetSession();
+    m_backend->cache()->clearDetails();
+    m_statusLabel->setText(i18n("Loading..."));
+    m_progressBar->setRange(0, 0);
+    m_progressBar->setVisible(true);
+    m_backend->loadPackages(PackageFilter::Installed, true);
 }
 
 void MainWindow::onRefresh()
@@ -1843,6 +2136,10 @@ void MainWindow::onLoadUpdates(bool refreshMetadata)
     // Page switches and cached reloads pass false. The manual Refresh action
     // always passes true; the startup check does so only when the daemon was
     // not already running. Applying an update queue never forces a refresh.
+    m_rpmUpdatesLoaded = false;
+    m_flatpakUpdatesLoaded = !m_flatpakBackend->isAvailable();
+    if (m_flatpakBackend->isAvailable())
+        m_flatpakBackend->loadUpdatableApps();
     m_backend->loadUpdates(refreshMetadata);
 }
 
@@ -1870,18 +2167,29 @@ void MainWindow::startUpdateFlow()
     // confirmation dialog — exactly the same code path as the user pressing
     // "Select All" followed by "Apply". The user stays in control: the
     // summary dialog (and polkit, when needed) still has to be confirmed.
-    auto pending = QSharedPointer<QMetaObject::Connection>::create();
-    *pending = connect(m_backend, &Backend::updatesLoaded, this,
-                       [this, pending](const QList<Package> &updates) {
-                           disconnect(*pending);
-                           if (updates.isEmpty()) {
-                               m_statusLabel->setText(i18n("No updates available."));
-                               return;
-                           }
-                           onSelectAllUpdates();
-                           onApplyQueue();
-                       });
+    //
+    // Both probes (RPM and Flatpak) must have reported before queueing, so
+    // Flatpak updates are included — otherwise Select All would race the
+    // slower Flatpak probe and silently miss those updates.
+    m_pendingStartUpdates = true;
     switchToPage(1);
+}
+
+void MainWindow::maybeRunPendingStartUpdates()
+{
+    if (!m_pendingStartUpdates)
+        return;
+    if (!m_rpmUpdatesLoaded || !m_flatpakUpdatesLoaded)
+        return;
+
+    m_pendingStartUpdates = false;
+    auto *model = qobject_cast<PackageModel *>(m_updatesView ? m_updatesView->model() : nullptr);
+    if (!model || model->packages().isEmpty()) {
+        m_statusLabel->setText(i18n("No updates available."));
+        return;
+    }
+    onSelectAllUpdates();
+    onApplyQueue();
 }
 
 void MainWindow::showUpdatesPage()
@@ -1994,36 +2302,18 @@ void MainWindow::createRestartBanner()
     layout->setContentsMargins(10, 4, 10, 4);
     layout->setSpacing(8);
 
-    auto *iconLabel = new QLabel;
-    iconLabel->setPixmap(QIcon::fromTheme(QStringLiteral("system-reboot")).pixmap(QSize(18, 18)));
-    iconLabel->setFixedSize(20, 20);
-    layout->addWidget(iconLabel);
-
-    auto *titleLabel = new QLabel(QStringLiteral("<b>%1</b>").arg(i18n("Need to Restart")));
-    titleLabel->setStyleSheet(QStringLiteral("color: #7a4f00;"));
-    layout->addWidget(titleLabel);
-    auto *descLabel = new QLabel(i18n("You have installed software packages that require a computer restart. "
-                                      "Please restart the operating system as soon as possible to ensure "
-                                      "the updates take full effect."));
-    descLabel->setStyleSheet(QStringLiteral("color: #6b4d00;"));
-    // Word-wrapping: the description starts a new line when the window is
-    // too narrow. Ignored horizontal policy lets the label fill the banner
-    // width without forcing the window to widen to fit the full text; the
-    // label height is locked to the wrapped text height (eventFilter()).
-    descLabel->setWordWrap(true);
-    descLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
-    descLabel->setMinimumWidth(0);
-    descLabel->setFixedHeight(36);
-    m_restartBannerDescLabel = descLabel;
-    descLabel->installEventFilter(this);
-    layout->addWidget(descLabel, 1);
-
-    // Vertically center every element within the banner row so the icon,
-    // title and (possibly multi-line) description share the exact same
-    // center line.
-    layout->setAlignment(iconLabel, Qt::AlignVCenter);
-    layout->setAlignment(titleLabel, Qt::AlignVCenter);
-    layout->setAlignment(descLabel, Qt::AlignVCenter);
+    auto *content = new RestartBannerContent(
+        i18n("Need to Restart"),
+        i18n("You have installed software packages that require a computer restart. "
+             "Please restart the operating system as soon as possible to ensure "
+             "the updates take full effect."),
+        m_restartBanner);
+    content->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+    content->setMinimumWidth(0);
+    content->setFixedHeight(36);
+    m_restartBannerDescLabel = content;
+    content->installEventFilter(this);
+    layout->addWidget(content, 1, Qt::AlignVCenter);
 }
 
 QString MainWindow::currentBootId() const
@@ -2421,28 +2711,87 @@ void MainWindow::onRepositoriesLoaded(const QList<Repository> &repos)
 
 void MainWindow::onUpdatesLoaded(const QList<Package> &updates)
 {
-    m_progressBar->setVisible(false);
-    auto *model = qobject_cast<PackageModel*>(m_updatesView->model());
-    if (model) {
-        QList<Package> displayUpdates = updates;
-        const QList<Package> queuedPackages = m_queueModel->packages();
-        for (auto &pkg : displayUpdates) {
-            for (const auto &queuedPkg : queuedPackages) {
-                if (pkg.nevra() == queuedPkg.nevra()) {
-                    pkg.queued = true;
-                    pkg.todo = queuedPkg.todo;
-                    break;
-                }
-            }
-        }
-        model->setPackages(displayUpdates);
+    // Keep the busy indicator until both probes reported, otherwise the bar
+    // would disappear while Flatpak updates are still being collected.
+    if (m_flatpakUpdatesLoaded)
+        m_progressBar->setVisible(false);
+    m_rpmUpdates = updates;
+    m_rpmUpdatesLoaded = true;
+    updateUpdatesView();
+    maybeRunPendingStartUpdates();
+}
+
+void MainWindow::onFlatpakUpdatesLoaded(const QList<FlatpakApp> &apps)
+{
+    if (m_rpmUpdatesLoaded)
+        m_progressBar->setVisible(false);
+    m_flatpakUpdatesLoaded = true;
+    m_flatpakUpdates.clear();
+
+    for (const auto &app : apps) {
+        if (app.appId.isEmpty())
+            continue;
+
+        Package pkg;
+        // Runtime refs may have no display name; fall back to the ref ID.
+        pkg.name = app.name.isEmpty() ? app.appId : app.name;
+        pkg.arch = app.arch;
+        // The Updates delegate renders "version-release"; the branch is the
+        // closest Flatpak equivalent and keeps the row readable.
+        pkg.release = app.branch;
+        pkg.repo = app.remoteTitle.isEmpty() ? app.remote : app.remoteTitle;
+        if (pkg.repo.isEmpty())
+            pkg.repo = QStringLiteral("flatpak");
+        pkg.summary = app.description;
+        pkg.description = app.description;
+        pkg.size = app.size;
+        pkg.state = PackageState::Update;
+        pkg.calcTodo();
+        pkg.isFlatpak = true;
+        pkg.flatpakAppId = app.appId;
+        // app.version is the version offered by the remote, while
+        // app.installedVersion is the one currently deployed; the delegate
+        // renders "installed → available" whenever they differ.
+        pkg.version = app.version;
+        if (!app.installedVersion.isEmpty() && app.installedVersion != app.version)
+            pkg.installedVersion = app.installedVersion;
+        m_flatpakUpdates.append(pkg);
     }
 
-    m_updatesStack->setCurrentIndex(updates.isEmpty() ? 1 : 0);
-    if (updates.isEmpty())
-        m_statusLabel->clear();
-    else
-        m_statusLabel->setText(i18np("%1 update available", "%1 updates available", updates.size()));
+    updateUpdatesView();
+    maybeRunPendingStartUpdates();
+}
+
+void MainWindow::updateUpdatesView()
+{
+    auto *model = qobject_cast<PackageModel*>(m_updatesView ? m_updatesView->model() : nullptr);
+    if (!model)
+        return;
+
+    QList<Package> displayUpdates = m_rpmUpdates + m_flatpakUpdates;
+    const QList<Package> queuedPackages = m_queueModel->packages();
+    for (auto &pkg : displayUpdates) {
+        for (const auto &queuedPkg : queuedPackages) {
+            if (pkg.nevra() == queuedPkg.nevra()) {
+                pkg.queued = true;
+                pkg.todo = queuedPkg.todo;
+                break;
+            }
+        }
+    }
+    model->setPackages(displayUpdates);
+
+    m_updatesStack->setCurrentIndex(displayUpdates.isEmpty() ? 1 : 0);
+    // The badge counts everything the page lists, not just RPM updates.
+    setUpdateCountLabel(m_rpmUpdates.size() + m_flatpakUpdates.size());
+    // Only own the status text while the Updates page is visible: periodic
+    // background checks must not rewrite the status bar of another page.
+    if (m_currentPage == 1) {
+        if (displayUpdates.isEmpty())
+            m_statusLabel->clear();
+        else
+            m_statusLabel->setText(i18np("%1 update available", "%1 updates available", displayUpdates.size()));
+    }
 }
 
 void MainWindow::onTransactionProgress(const QString &message, int percent)
@@ -2552,6 +2901,13 @@ void MainWindow::onError(const QString &error)
 }
 
 void MainWindow::onUpdatesAvailable(int count)
+{
+    // `count` covers the RPM check only; the Flatpak updates are merged into
+    // the same page, so add them to keep the badge consistent with the list.
+    setUpdateCountLabel(count + m_flatpakUpdates.size());
+}
+
+void MainWindow::setUpdateCountLabel(int count)
 {
     if (count > 0) {
         m_updateCountLabel->setText(i18n("%1 updates", count));

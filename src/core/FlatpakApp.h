@@ -17,6 +17,7 @@ class FlatpakApp
     Q_PROPERTY(QString branch MEMBER branch)
     Q_PROPERTY(QString arch MEMBER arch)
     Q_PROPERTY(QString remote MEMBER remote)
+    Q_PROPERTY(QString remoteTitle MEMBER remoteTitle)
     Q_PROPERTY(QString installType MEMBER installType)
     Q_PROPERTY(qint64 size MEMBER size)
     Q_PROPERTY(QString description MEMBER description)
@@ -28,10 +29,15 @@ public:
 
     QString appId;
     QString name;
+    // For updatable refs this is the version the remote offers; the version
+    // currently installed is kept in installedVersion so the UI can render
+    // "installed → available".
     QString version;
+    QString installedVersion;
     QString branch;
     QString arch;
     QString remote;
+    QString remoteTitle;
     QString installType; // "user" or "system"
     qint64 size = 0;
     QString description;

@@ -112,15 +112,27 @@ public:
         verFont.setPointSize(verFont.pointSize() - 1);
         painter->setFont(verFont);
         painter->setPen(secondaryText);
-        const QString newEvr = index.data(PackageModel::VersionRole).toString() +
-                               QStringLiteral("-") + index.data(PackageModel::ReleaseRole).toString();
+        const QString version = index.data(PackageModel::VersionRole).toString();
+        const QString release = index.data(PackageModel::ReleaseRole).toString();
+        QString newEvr = version;
+        // Omit the release when it is empty (Flatpak rows may only carry a
+        // version) or when it repeats the version (Flatpak runtime branches,
+        // which would otherwise render as "6.11-6.11").
+        if (!release.isEmpty() && release != version) {
+            if (!newEvr.isEmpty())
+                newEvr += QLatin1Char('-');
+            newEvr += release;
+        }
         const QString oldEvr = index.data(PackageModel::InstalledVersionRole).toString();
         QString verText;
-        if (!oldEvr.isEmpty())
+        if (!oldEvr.isEmpty() && oldEvr != newEvr)
             verText = oldEvr + QStringLiteral(" → ") + newEvr;
         else
             verText = newEvr;
-        verText += QStringLiteral("  (") + index.data(PackageModel::ArchRole).toString() + QStringLiteral(")");
+
+        const QString arch = index.data(PackageModel::ArchRole).toString();
+        if (!arch.isEmpty())
+            verText += QStringLiteral("  (") + arch + QLatin1Char(')');
         painter->drawText(verRect, Qt::AlignLeft | Qt::AlignTop, verText);
 
         // Draw summary. The right-edge reservation (for the queued todo

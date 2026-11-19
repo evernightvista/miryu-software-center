@@ -89,7 +89,7 @@ void TransactionResultDialog::setupUI(const TransactionResult &result)
         if (a != QStringLiteral("replaced"))
             visibleActions.append(a);
     }
-    bool isRemovalOnly = !visibleActions.isEmpty();
+    bool isRemovalOnly = !visibleActions.isEmpty() && result.flatpakPackages.isEmpty();
     for (const QString &a : visibleActions) {
         if (a != QStringLiteral("remove") && a != QStringLiteral("obsoleted")) {
             isRemovalOnly = false;
@@ -269,6 +269,35 @@ void TransactionResultDialog::setupUI(const TransactionResult &result)
         }
     }
 
+    // Flatpak updates share the confirmation dialog even though they are
+    // applied by flatpak rather than dnf5daemon. Flatpak size cells stay
+    // empty; a Flatpak-only summary hides both size columns entirely.
+    if (!result.flatpakPackages.isEmpty()) {
+        auto *groupItem = new QTreeWidgetItem(m_treeWidget);
+        const QString groupLabel = i18n("Flatpak") + QLatin1Char(' ') + i18n("Update");
+        groupItem->setText(ColPackage,
+                           QStringLiteral("%1 (%2)").arg(groupLabel).arg(result.flatpakPackages.size()));
+        QFont groupFont = groupItem->font(ColPackage);
+        groupFont.setBold(true);
+        groupItem->setFont(ColPackage, groupFont);
+        groupItem->setForeground(ColPackage, QColor(46, 160, 67));
+
+        for (const auto &pkg : result.flatpakPackages) {
+            auto *child = new QTreeWidgetItem(groupItem);
+            QString displayName = pkg.name;
+            if (!pkg.flatpakAppId.isEmpty() && pkg.flatpakAppId != pkg.name)
+                displayName += QStringLiteral(" (") + pkg.flatpakAppId + QLatin1Char(')');
+            child->setText(ColPackage, displayName);
+            child->setText(ColRepository, pkg.repo);
+        }
+
+        groupItem->setExpanded(true);
+        if (result.data.isEmpty()) {
+            m_treeWidget->setColumnHidden(ColDownloadSize, true);
+            m_treeWidget->setColumnHidden(ColInstallSize, true);
+        }
+    }
+
     layout->addWidget(m_treeWidget, 1);
 
     // Totals. For removal-only transactions there is nothing to download
@@ -281,10 +310,14 @@ void TransactionResultDialog::setupUI(const TransactionResult &result)
         totalText = QStringLiteral("<b>%1:</b> %2").arg(
             i18n("Total Freed Space"), formatSize(totalFreedSize));
     } else {
-        totalText = QStringLiteral("<b>%1:</b> %2").arg(
-            i18n("Total Download Size"), formatSize(totalDownloadSize));
+        if (totalDownloadSize > 0 || result.flatpakPackages.isEmpty()) {
+            totalText = QStringLiteral("<b>%1:</b> %2").arg(
+                i18n("Total Download Size"), formatSize(totalDownloadSize));
+        }
         if (totalInstallSize > 0) {
-            totalText += QStringLiteral(" &nbsp;&nbsp; <b>%1:</b> %2").arg(
+            if (!totalText.isEmpty())
+                totalText += QStringLiteral(" &nbsp;&nbsp; ");
+            totalText += QStringLiteral("<b>%1:</b> %2").arg(
                 i18n("Total Install Size"), formatSize(totalInstallSize));
         }
     }
@@ -299,6 +332,9 @@ void TransactionResultDialog::setupUI(const TransactionResult &result)
     auto *offlineLayout = new QHBoxLayout;
     offlineLayout->setContentsMargins(0, 0, 0, 0);
     m_offlineCheck = new QCheckBox(i18n("Apply offline (on next reboot)"));
+    // Offline updates are a dnf mechanism; a Flatpak-only transaction has no
+    // RPM payload to apply on reboot.
+    m_offlineCheck->setVisible(!result.data.isEmpty() || result.flatpakPackages.isEmpty());
     offlineLayout->addWidget(m_offlineCheck);
     if (result.requiresOffline) {
         m_offlineCheck->setChecked(true);

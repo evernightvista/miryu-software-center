@@ -553,6 +553,11 @@ msgstr "這將下載並重建所有已啟用倉庫的元資料快取。是否繼
 msgid "Refresh"
 msgstr "重新整理"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:338
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:339
+msgid "Refresh Package List"
+msgstr "重新整理套件清單"
+
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/AdvancedOpsDialog.cpp:268
 msgid ""
 "This will synchronise all installed packages to the latest version available "
@@ -733,6 +738,18 @@ msgstr "安裝選取"
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1105
 msgid "Uninstall"
 msgstr "解除安裝"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:747
+msgid "Do you want to keep the data for %1 or permanently delete it?"
+msgstr "要對 %1 保留資料還是徹底刪除資料？"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:748
+msgid "Delete Files"
+msgstr "刪除檔案"
+
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:748
+msgid "Keep Files"
+msgstr "保留檔案"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:627
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:753
@@ -919,8 +936,8 @@ msgid "Update %1 selected Flatpak application?"
 msgstr "更新選取的 %1 個 Flatpak 應用程式？"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/FlatpakPage.cpp:1213
-msgid "Updating %1 application..."
-msgstr "正在更新 %1 個應用程式..."
+msgid "Updating %1 Flatpak application..."
+msgstr "正在更新 %1 個 Flatpak 應用程式..."
 
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:214
 msgid "Search packages..."
@@ -1405,6 +1422,13 @@ msgstr "安裝模式"
 msgid "Offline Update"
 msgstr "離線更新"
 
+#: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:1207
+msgid ""
+"Flatpak application updates are complete. RPM package updates will be "
+"applied the next time the operating system starts. If you are not ready to "
+"restart, you can continue using your computer."
+msgstr "Flatpak 應用程式更新完成，RPM 套件更新將於下一次啟動作業系統時更新。如果你還未準備好重新啟動，可以繼續使用電腦。"
+
 #: /workspace/miryu-software-center/miryu-software-center-main/src/ui/MainWindow.cpp:2063
 msgid "Update installation is pending. Restart your computer to complete the update. If you are not ready to restart, you can continue using your computer."
 msgstr "更新安裝已擱置，請重新啟動電腦後完成更新。如果還沒有準備好重新啟動，可以繼續使用電腦。"
@@ -1878,7 +1902,7 @@ msgstr "結束"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/UpdateCheckNotifier.cpp:260
 msgid "%1 RPM package(s) and/or %2 Flatpak package(s) available for update"
-msgstr "%1個RPM軟體包和（或）%2個Flatpak軟體包更新可用"
+msgstr "%1個RPM軟體包和%2個Flatpak軟體包更新可用"
 
 #: /workspace/miryu-software-center/miryu-software-center-main/checker/UpdateCheckNotifier.cpp:263
 msgid "%1 RPM package(s) available for update"

@@ -22,7 +22,7 @@ namespace Miryu {
  *
  * The sidebar provides two tabs:
  *  - "Flatpak 应用" — installed applications list with context-menu
- *    actions (Update, Uninstall, Run) and an "Update All" button.
+ *    actions (Update, Uninstall, Run).
  *  - "Flatpak 商店" — search the flatpak store, with a remote filter,
  *    a custom list delegate, and a detail view that offers
  *    install / uninstall / update / run buttons.
@@ -53,12 +53,10 @@ private Q_SLOTS:
     void onUninstallApp();
     void onUpdateApp();
     void onRunApp();
-    void onUpdateAll();
     void onRefresh();
 
     void onInstallSelected();
     void onUninstallSelected();
-    void onUpdateSelected();
 
     void onInstalledAppsLoaded(const QList<FlatpakApp> &apps);
     void onRemotesLoaded(const QMap<QString, QString> &remotes);
@@ -76,6 +74,7 @@ private:
     void setupDetailView();
     void loadPopularApps();
     void showContextMenu(const QPoint &pos);
+    bool confirmDeleteDataOnUninstall(const QString &appNames);
     void showStoreContextMenu(const QPoint &pos);
     void showStoreDetailView(const FlatpakApp &app);
     void showStoreListView();
@@ -97,9 +96,7 @@ private:
     QWidget *m_installedPage;
     KLineEdit *m_filterEdit;
     QListView *m_installedList;
-    QPushButton *m_updateAllBtn;
     QPushButton *m_uninstallSelectedBtn;
-    QPushButton *m_updateSelectedBtn;
 
     // Store page
     QWidget *m_storePage;

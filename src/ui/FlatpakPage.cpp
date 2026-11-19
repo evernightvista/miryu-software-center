@@ -463,29 +463,17 @@ void FlatpakPage::setupInstalledPage(QWidget *page)
     connect(m_filterEdit, &KLineEdit::textChanged, this, &FlatpakPage::onFilterInstalled);
     connect(m_filterEdit, &KLineEdit::returnPressed, this, &FlatpakPage::onFilterInstalled);
 
-    m_updateAllBtn = new QPushButton(QIcon::fromTheme(QStringLiteral("system-software-update")),
-                                     i18n("Update All"));
-    m_updateAllBtn->setEnabled(false);
-    connect(m_updateAllBtn, &QPushButton::clicked, this, &FlatpakPage::onUpdateAll);
-
     m_uninstallSelectedBtn = new QPushButton(QIcon::fromTheme(QStringLiteral("edit-delete")),
                                              i18n("Uninstall Selected"));
     m_uninstallSelectedBtn->setEnabled(false);
     connect(m_uninstallSelectedBtn, &QPushButton::clicked, this, &FlatpakPage::onUninstallSelected);
-
-    m_updateSelectedBtn = new QPushButton(QIcon::fromTheme(QStringLiteral("system-software-update")),
-                                          i18n("Update Selected"));
-    m_updateSelectedBtn->setEnabled(false);
-    connect(m_updateSelectedBtn, &QPushButton::clicked, this, &FlatpakPage::onUpdateSelected);
 
     auto *refreshBtn = new QPushButton(QIcon::fromTheme(QStringLiteral("view-refresh")),
                                        i18n("Refresh"));
     connect(refreshBtn, &QPushButton::clicked, this, &FlatpakPage::onRefresh);
 
     tbLayout->addWidget(m_filterEdit, 1);
-    tbLayout->addWidget(m_updateSelectedBtn);
     tbLayout->addWidget(m_uninstallSelectedBtn);
-    tbLayout->addWidget(m_updateAllBtn);
     tbLayout->addWidget(refreshBtn);
 
     layout->addWidget(toolbar);
@@ -505,7 +493,6 @@ void FlatpakPage::setupInstalledPage(QWidget *page)
              this, [this]() {
                  int count = selectedInstalledApps().size();
                  m_uninstallSelectedBtn->setEnabled(count > 0);
-                 m_updateSelectedBtn->setEnabled(count > 0);
              });
 
     layout->addWidget(m_installedList, 1);
@@ -754,6 +741,14 @@ void FlatpakPage::onInstalledAppClicked(const QModelIndex &index)
     // Installed list clicks are handled via context menu
 }
 
+bool FlatpakPage::confirmDeleteDataOnUninstall(const QString &appNames)
+{
+    return KMessageBox::questionTwoActions(this,
+        i18n("Do you want to keep the data for %1 or permanently delete it?", appNames),
+        i18n("Uninstall"), KGuiItem(i18n("Delete Files")), KGuiItem(i18n("Keep Files")))
+        == KMessageBox::PrimaryAction;
+}
+
 void FlatpakPage::showContextMenu(const QPoint &pos)
 {
     QModelIndex index = m_installedList->indexAt(pos);
@@ -784,36 +779,11 @@ void FlatpakPage::showContextMenu(const QPoint &pos)
     auto *uninstallAction = menu.addAction(
         QIcon::fromTheme(QStringLiteral("edit-delete")), i18n("Uninstall"));
     connect(uninstallAction, &QAction::triggered, this, [this, app]() {
-        auto ret = KMessageBox::warningTwoActions(this,
-            i18n("Uninstall '%1' (%2)?", app.name, app.appId),
-            i18n("Uninstall"), KGuiItem(i18n("Yes")), KGuiItem(i18n("No")));
-        if (ret == KMessageBox::PrimaryAction)
-            m_backend->uninstallApp(app.appId);
+        const bool deleteData = confirmDeleteDataOnUninstall(app.name);
+        m_backend->uninstallApp(app.appId, deleteData);
     });
 
     menu.exec(m_installedList->viewport()->mapToGlobal(pos));
-}
-
-void FlatpakPage::onUpdateAll()
-{
-    int upgCount = 0;
-    for (const auto &app : m_allInstalledApps) {
-        if (app.upgradable)
-            ++upgCount;
-    }
-
-    if (upgCount == 0) {
-        KMessageBox::information(this, i18n("No updates available."));
-        return;
-    }
-
-    auto ret = KMessageBox::warningTwoActions(this,
-        i18np("Update %1 Flatpak application?", "Update %1 Flatpak applications?", upgCount),
-        i18n("Update All"), KGuiItem(i18n("Yes")), KGuiItem(i18n("No")));
-    if (ret != KMessageBox::PrimaryAction)
-        return;
-
-    m_backend->updateAll();
 }
 
 // ---------------------------------------------------------------------------
@@ -880,11 +850,8 @@ void FlatpakPage::showStoreContextMenu(const QPoint &pos)
         auto *uninstallAction = menu.addAction(
             QIcon::fromTheme(QStringLiteral("edit-delete")), i18n("Uninstall"));
         connect(uninstallAction, &QAction::triggered, this, [this, app]() {
-            const auto ret = KMessageBox::warningTwoActions(this,
-                i18n("Uninstall '%1' (%2)?", app.name, app.appId),
-                i18n("Uninstall"), KGuiItem(i18n("Yes")), KGuiItem(i18n("No")));
-            if (ret == KMessageBox::PrimaryAction)
-                m_backend->uninstallApp(app.appId);
+            const bool deleteData = confirmDeleteDataOnUninstall(app.name);
+            m_backend->uninstallApp(app.appId, deleteData);
         });
     } else {
         auto *installAction = menu.addAction(
@@ -984,18 +951,14 @@ void FlatpakPage::onUninstallApp()
     if (m_currentDetailApp.appId.isEmpty())
         return;
 
-    auto ret = KMessageBox::warningTwoActions(this,
-        i18n("Uninstall '%1' (%2)?", m_currentDetailApp.name, m_currentDetailApp.appId),
-        i18n("Uninstall"), KGuiItem(i18n("Yes")), KGuiItem(i18n("No")));
-    if (ret != KMessageBox::PrimaryAction)
-        return;
+    const bool deleteData = confirmDeleteDataOnUninstall(m_currentDetailApp.name);
 
     m_uninstallBtn->setEnabled(false);
     m_uninstallBtn->setText(i18n("Uninstalling..."));
     m_progressBar->setRange(0, 100);
     m_progressBar->setVisible(true);
 
-    m_backend->uninstallApp(m_currentDetailApp.appId);
+    m_backend->uninstallApp(m_currentDetailApp.appId, deleteData);
 }
 
 void FlatpakPage::onUpdateApp()
@@ -1051,12 +1014,6 @@ void FlatpakPage::onInstalledAppsLoaded(const QList<FlatpakApp> &apps)
         if (app.upgradable)
             ++upgCount;
     }
-
-    m_updateAllBtn->setEnabled(upgCount > 0);
-    if (upgCount > 0)
-        m_updateAllBtn->setText(i18n("Update All (%1)", upgCount));
-    else
-        m_updateAllBtn->setText(i18n("Update All"));
 
     if (upgCount > 0)
         m_statusLabel->setText(i18np("%1 app installed, %2 update available",
@@ -1148,6 +1105,9 @@ void FlatpakPage::onPopularAppsLoaded(const QList<FlatpakApp> &apps)
 void FlatpakPage::onOperationStarted(const QString &appId, const QString &operation)
 {
     Q_UNUSED(appId)
+    // Updates-page batches own their combined progress dialog.
+    if (operation == QStringLiteral("update-batch"))
+        return;
     m_statusLabel->setText(i18n("Operation: %1", operation));
     m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
@@ -1168,6 +1128,9 @@ void FlatpakPage::onOperationProgress(const QString &appId, const QString &messa
 void FlatpakPage::onOperationFinished(const QString &appId, const QString &operation,
                                       bool success, const QString &message)
 {
+    // MainWindow handles batch errors/completion in the Updates page flow.
+    if (operation == QStringLiteral("update-batch"))
+        return;
     m_progressBar->setRange(0, 100);
     m_progressBar->setVisible(false);
 
@@ -1275,11 +1238,14 @@ void FlatpakPage::onUninstallSelected()
     if (apps.isEmpty())
         return;
 
-    auto ret = KMessageBox::warningTwoActions(this,
-        i18np("Uninstall %1 selected Flatpak application?", "Uninstall %1 selected Flatpak applications?", apps.size()),
-        i18n("Uninstall Selected"), KGuiItem(i18n("Yes")), KGuiItem(i18n("No")));
-    if (ret != KMessageBox::PrimaryAction)
+    QStringList appNames;
+    for (const auto &app : apps) {
+        if (app.installed)
+            appNames.append(app.name);
+    }
+    if (appNames.isEmpty())
         return;
+    const bool deleteData = confirmDeleteDataOnUninstall(appNames.join(QStringLiteral(", ")));
 
     m_progressBar->setRange(0, 0);
     m_progressBar->setVisible(true);
@@ -1287,36 +1253,7 @@ void FlatpakPage::onUninstallSelected()
 
     for (const auto &app : apps) {
         if (app.installed)
-            m_backend->uninstallApp(app.appId);
-    }
-}
-
-void FlatpakPage::onUpdateSelected()
-{
-    QList<FlatpakApp> apps = selectedInstalledApps();
-    QList<FlatpakApp> toUpdate;
-    for (const auto &app : apps) {
-        if (app.upgradable)
-            toUpdate.append(app);
-    }
-
-    if (toUpdate.isEmpty()) {
-        KMessageBox::information(this, i18n("No upgradable applications selected."));
-        return;
-    }
-
-    auto ret = KMessageBox::warningTwoActions(this,
-        i18np("Update %1 selected Flatpak application?", "Update %1 selected Flatpak applications?", toUpdate.size()),
-        i18n("Update Selected"), KGuiItem(i18n("Yes")), KGuiItem(i18n("No")));
-    if (ret != KMessageBox::PrimaryAction)
-        return;
-
-    m_progressBar->setRange(0, 0);
-    m_progressBar->setVisible(true);
-    m_statusLabel->setText(i18np("Updating %1 application...", "Updating %1 applications...", toUpdate.size()));
-
-    for (const auto &app : toUpdate) {
-        m_backend->updateApp(app.appId);
+            m_backend->uninstallApp(app.appId, deleteData);
     }
 }
 

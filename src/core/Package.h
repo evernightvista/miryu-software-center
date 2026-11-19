@@ -67,6 +67,12 @@ public:
     bool queued = false;
     bool isDep = false;
 
+    // Flatpak applications are surfaced in the Updates list as well. They are
+    // NOT part of a dnf transaction: MainWindow routes them through
+    // FlatpakBackend when the queue is applied, using flatpakAppId.
+    bool isFlatpak = false;
+    QString flatpakAppId;
+
     QString evr() const
     {
         if (epoch.isEmpty() || epoch == QStringLiteral("0"))
@@ -80,6 +86,9 @@ public:
     {
         if (installedVersion.isEmpty() && installedRelease.isEmpty())
             return {};
+        // Flatpak updates have no release; avoid a dangling "-".
+        if (installedRelease.isEmpty())
+            return installedVersion;
         if (installedEpoch.isEmpty() || installedEpoch == QStringLiteral("0"))
             return installedVersion + QStringLiteral("-") + installedRelease;
         return installedEpoch + QStringLiteral(":") + installedVersion + QStringLiteral("-") + installedRelease;
