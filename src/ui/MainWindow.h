@@ -41,6 +41,7 @@ class ProgressDialog;
 class TransactionResultDialog;
 class FlatpakBackend;
 class FlatpakPage;
+class AppImagePage;
 class AdvancedOpsDialog;
 class UpdateChecker;
 struct TransactionResult;
@@ -275,6 +276,9 @@ private:
     QWidget *m_flatpakPage;
     FlatpakBackend *m_flatpakBackend;
     FlatpakPage *m_flatpakPageWidget;
+
+    // AppImage management page (integration handled by Miryu App Launcher)
+    AppImagePage *m_appImagePage = nullptr;
 
     // Advanced Ops dialog
     AdvancedOpsDialog *m_advancedOpsDialog;

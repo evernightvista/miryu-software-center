@@ -16,6 +16,7 @@
 #include "ProgressDialog.h"
 #include "TransactionResultDialog.h"
 #include "FlatpakPage.h"
+#include "AppImagePage.h"
 #include "AdvancedOpsDialog.h"
 #include "UpdateNotifySettingsDialog.h"
 
@@ -600,7 +601,13 @@ void MainWindow::setupUI()
         m_pageStack->addWidget(m_repoPage);
     }
 
-    // Page 4: Flatpak
+    // Page 4: AppImage management
+    {
+        m_appImagePage = new AppImagePage;
+        m_pageStack->addWidget(m_appImagePage);
+    }
+
+    // Page 5: Flatpak
     {
         m_flatpakPageWidget = new FlatpakPage(m_flatpakBackend);
         m_flatpakPage = m_flatpakPageWidget;
@@ -660,7 +667,8 @@ void MainWindow::setupSidebar()
         {QStringLiteral("system-software-update"), i18n("Updates"), 1},
         {QStringLiteral("view-task"), i18n("Queue"), 2},
         {QStringLiteral("folder-download"), i18n("Repositories"), 3},
-        {QStringLiteral("application-x-addon"), i18n("Flatpak"), 4},
+        {QStringLiteral("application-x-executable"), i18n("AppImage Management"), 4},
+        {QStringLiteral("application-x-addon"), i18n("Flatpak"), 5},
     };
 
     for (const auto &p : pages) {
@@ -840,6 +848,10 @@ void MainWindow::switchToPage(int page)
         m_backend->loadRepositories();
         break;
     case 4:
+        m_statusLabel->setText(i18n("AppImage Management"));
+        m_appImagePage->reload();
+        break;
+    case 5:
         m_statusLabel->setText(i18n("Flatpak"));
         if (m_flatpakBackend->isAvailable())
             m_flatpakPageWidget->reload();

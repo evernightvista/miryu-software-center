@@ -6,6 +6,11 @@
   <name>Miryu Software Center</name>
   <summary>A modern RPM package manager powered by dnf5daemon</summary>
   <summary xml:lang="zh_CN">使用 dnf5daemon 的现代 RPM 软件中心</summary>
+  <summary xml:lang="zh_TW">使用 dnf5daemon 的現代 RPM 軟體中心</summary>
+  <summary xml:lang="ja">dnf5daemon を利用したモダンな RPM パッケージマネージャー</summary>
+  <summary xml:lang="ko">dnf5daemon 기반의 현대적인 RPM 패키지 관리자</summary>
+  <summary xml:lang="de">Ein moderner RPM-Paketmanager auf Basis von dnf5daemon</summary>
+  <summary xml:lang="fr">Un gestionnaire de paquets RPM moderne basé sur dnf5daemon</summary>
   <description>
     <p>
       Miryu is a modern graphical package manager for RPM-based Linux distributions
@@ -19,6 +24,36 @@
       并提供如意玲珑商店的外部启动入口。
       使用 Qt6 和 KDE Frameworks 6 构建。
     </p>
+    <p xml:lang="zh_TW">
+      Miryu 是一個用於以 RPM 為基礎的 Linux 發行版（Fedora、RHEL、CentOS Stream、openEuler、deepin 等）的
+      現代圖形軟體包管理員。它使用 dnf5daemon-server DBus API 執行所有 RPM 軟體包操作，
+      並提供如意玲瓏商店的外部啟動入口。
+      使用 Qt6 與 KDE Frameworks 6 建置。
+    </p>
+    <p xml:lang="ja">
+      Miryu は、RPM ベースの Linux ディストリビューション（Fedora、RHEL、CentOS Stream、openEuler、deepin など）
+      向けのモダンなグラフィカルパッケージマネージャーです。すべての RPM パッケージ操作に
+      dnf5daemon-server の DBus API を使用し、Linglong ストアの外部ランチャーを提供します。
+      Qt6 と KDE Frameworks 6 で構築されています。
+    </p>
+    <p xml:lang="ko">
+      Miryu는 RPM 기반 Linux 배포판(Fedora, RHEL, CentOS Stream, openEuler, deepin 등)을 위한
+      현대적인 그래픽 패키지 관리자입니다. 모든 RPM 패키지 작업에 dnf5daemon-server DBus API를
+      사용하며 Linglong Store용 외부 실행기를 제공합니다.
+      Qt6와 KDE Frameworks 6로 구축되었습니다.
+    </p>
+    <p xml:lang="de">
+      Miryu ist ein moderner grafischer Paketmanager für RPM-basierte Linux-Distributionen
+      (Fedora, RHEL, CentOS Stream, openEuler, deepin usw.). Er nutzt die DBus-API von
+      dnf5daemon-server für alle RPM-Paketvorgänge und bietet einen externen Starter für den
+      Linglong Store. Miryu basiert auf Qt6 und KDE Frameworks 6.
+    </p>
+    <p xml:lang="fr">
+      Miryu est un gestionnaire de paquets graphique moderne pour les distributions Linux basées
+      sur RPM (Fedora, RHEL, CentOS Stream, openEuler, deepin, etc.). Il utilise l'API DBus de
+      dnf5daemon-server pour toutes les opérations sur les paquets RPM et fournit un lanceur
+      externe pour le Linglong Store. Il est construit avec Qt6 et KDE Frameworks 6.
+    </p>
     <p>Features include:</p>
     <ul>
       <li>Browse installed, available, and upgradable RPM packages</li>
@@ -31,6 +66,84 @@
       <li>Update checking with repository priority filtering</li>
       <li>External launcher for the Linglong Store (/usr/bin/linglong-store)</li>
       <li>Flatpak package management support</li>
+    </ul>
+    <p xml:lang="zh_CN">功能包括：</p>
+    <ul xml:lang="zh_CN">
+      <li>浏览已安装、可用和可升级的 RPM 软件包</li>
+      <li>按名称、摘要或描述搜索软件包</li>
+      <li>安装、更新、删除、降级和重新安装 RPM 软件包</li>
+      <li>带依赖解析的事务队列</li>
+      <li>软件仓库管理</li>
+      <li>支持系统升级</li>
+      <li>支持离线事务</li>
+      <li>带仓库优先级过滤的更新检查</li>
+      <li>如意玲珑商店的外部启动入口（/usr/bin/linglong-store）</li>
+      <li>支持 Flatpak 软件包管理</li>
+    </ul>
+    <p xml:lang="zh_TW">功能包括：</p>
+    <ul xml:lang="zh_TW">
+      <li>瀏覽已安裝、可用和可升級的 RPM 軟體包</li>
+      <li>依名稱、摘要或描述搜尋軟體包</li>
+      <li>安裝、更新、移除、降級和重新安裝 RPM 軟體包</li>
+      <li>具相依性解析的交易佇列</li>
+      <li>軟體倉庫管理</li>
+      <li>支援系統升級</li>
+      <li>支援離線交易</li>
+      <li>具倉庫優先順序篩選的更新檢查</li>
+      <li>如意玲瓏商店的外部啟動入口（/usr/bin/linglong-store）</li>
+      <li>支援 Flatpak 軟體包管理</li>
+    </ul>
+    <p xml:lang="ja">主な機能：</p>
+    <ul xml:lang="ja">
+      <li>インストール済み、利用可能、更新可能な RPM パッケージを閲覧</li>
+      <li>名前、概要、説明でパッケージを検索</li>
+      <li>RPM パッケージのインストール、更新、削除、ダウングレード、再インストール</li>
+      <li>依存関係解決を備えたトランザクションキュー</li>
+      <li>リポジトリ管理</li>
+      <li>システムアップグレードのサポート</li>
+      <li>オフライントランザクションのサポート</li>
+      <li>リポジトリ優先度フィルタリング付きの更新確認</li>
+      <li>Linglong ストアの外部ランチャー（/usr/bin/linglong-store）</li>
+      <li>Flatpak パッケージ管理のサポート</li>
+    </ul>
+    <p xml:lang="ko">주요 기능:</p>
+    <ul xml:lang="ko">
+      <li>설치됨, 사용 가능, 업그레이드 가능한 RPM 패키지 탐색</li>
+      <li>이름, 요약 또는 설명으로 패키지 검색</li>
+      <li>RPM 패키지 설치, 업데이트, 제거, 다운그레이드 및 재설치</li>
+      <li>의존성 해결 기능이 있는 트랜잭션 대기열</li>
+      <li>저장소 관리</li>
+      <li>시스템 업그레이드 지원</li>
+      <li>오프라인 트랜잭션 지원</li>
+      <li>저장소 우선순위 필터링을 통한 업데이트 확인</li>
+      <li>Linglong Store용 외부 실행기(/usr/bin/linglong-store)</li>
+      <li>Flatpak 패키지 관리 지원</li>
+    </ul>
+    <p xml:lang="de">Funktionen:</p>
+    <ul xml:lang="de">
+      <li>Installierte, verfügbare und aktualisierbare RPM-Pakete durchsuchen</li>
+      <li>Pakete nach Name, Zusammenfassung oder Beschreibung durchsuchen</li>
+      <li>RPM-Pakete installieren, aktualisieren, entfernen, herabstufen und neu installieren</li>
+      <li>Transaktionswarteschlange mit Abhängigkeitsauflösung</li>
+      <li>Verwaltung von Software-Paketquellen</li>
+      <li>Unterstützung für Systemaktualisierungen</li>
+      <li>Unterstützung für Offline-Transaktionen</li>
+      <li>Aktualisierungsprüfung mit Filterung nach Paketquellenpriorität</li>
+      <li>Externer Starter für den Linglong Store (/usr/bin/linglong-store)</li>
+      <li>Unterstützung für die Verwaltung von Flatpak-Paketen</li>
+    </ul>
+    <p xml:lang="fr">Fonctionnalités :</p>
+    <ul xml:lang="fr">
+      <li>Parcourir les paquets RPM installés, disponibles et pouvant être mis à jour</li>
+      <li>Rechercher des paquets par nom, résumé ou description</li>
+      <li>Installer, mettre à jour, supprimer, rétrograder et réinstaller des paquets RPM</li>
+      <li>File de transactions avec résolution des dépendances</li>
+      <li>Gestion des dépôts</li>
+      <li>Prise en charge de la mise à niveau du système</li>
+      <li>Prise en charge des transactions hors ligne</li>
+      <li>Vérification des mises à jour avec filtrage par priorité des dépôts</li>
+      <li>Lanceur externe pour le Linglong Store (/usr/bin/linglong-store)</li>
+      <li>Prise en charge de la gestion des paquets Flatpak</li>
     </ul>
   </description>
   <launchable type="desktop-id">org.miryugaming.PackageManager.desktop</launchable>

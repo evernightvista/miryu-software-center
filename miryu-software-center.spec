@@ -4,7 +4,7 @@
 
 Name:           miryu-software-center
 Version:        45.0.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A modern RPM and Linglong software center powered by dnf5daemon
 
 License:        GPL-3.0-or-later
@@ -41,6 +41,7 @@ Requires:       kf6-kxmlgui
 Requires:       kf6-kconfig
 Requires:       kf6-kwidgetsaddons
 Requires:       kf6-kiconthemes
+Requires:       miryu-app-launcher
 Obsoletes:      miryu-package-manager
 Provides:       miryu-package-manager
 
@@ -80,6 +81,9 @@ install -Dm 644 data/evernight-vista.conf %{buildroot}/%{_datadir}/dnf5/suggest-
 %{_datadir}/polkit-1/rules.d/50-miryu-dnf5daemon.rules
 
 %changelog
+* Mon Nov 23 2026 KairikiFedora <13278297951@sina.cn> - 45.0.1-5
+- Add Appimage Manage Page
+
 * Thu Nov 19 2026 KairikiFedora <13278297951@sina.cn> - 45.0.1-4
 - Fix not shown flatpak updates bug
 
